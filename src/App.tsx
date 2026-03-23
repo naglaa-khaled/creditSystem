@@ -9,7 +9,7 @@ import ChangePass from './Modules/AuthModule/components/ChangePass/ChangePass'
 import ForgetPass from './Modules/AuthModule/components/ForgetPass/ForgetPass'
 import Regulations from './Modules/AuthModule/components/Regulations/Regulations'
 import CheckEmail from './Modules/AuthModule/components/CheckEmail/CheckEmail'
-import StudentAffairsDashboard from './Modules/Dashboards/StudentAffairs/StudentAffairsDashboard'
+import StudentAffairsDashboard from './Modules/Dashboards/StudentAffairs/Pages/Dashboard'
 
 
 

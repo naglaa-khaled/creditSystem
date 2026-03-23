@@ -16,7 +16,6 @@ import { useState } from "react";
 import DensityMediumIcon from "@mui/icons-material/DensityMedium";
 import LockIcon from "@mui/icons-material/Lock";
 import LogoutIcon from "@mui/icons-material/Logout";
-import Brightness5Icon from "@mui/icons-material/Brightness5";
 import photo from "../../../../assets/images/logoazhar.png";
 import BasicModal from "../Modal/Modal"; // استدعاء المودال العام
 
@@ -29,7 +28,6 @@ const Navebar = ({ toggleSidebar }: NavebarProps) => {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  // مودالات
   const [openLogout, setOpenLogout] = useState(false);
   const [openChangePassword, setOpenChangePassword] = useState(false);
 
@@ -43,8 +41,15 @@ const Navebar = ({ toggleSidebar }: NavebarProps) => {
 
   return (
     <>
-      <AppBar position="fixed">
-        <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+      <AppBar position="fixed"elevation={0} >
+        <Toolbar
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            backgroundColor: "var(--bg)",
+            borderBottom: "1px solid var(--gray)"
+          }}
+        >
           <Box
             sx={{
               display: "flex",
@@ -55,7 +60,7 @@ const Navebar = ({ toggleSidebar }: NavebarProps) => {
             {isMobile && (
               <IconButton
                 onClick={toggleSidebar}
-                sx={{ color: "#fff", "&:focus": { outline: "none" } }}
+                sx={{ color: "var(--primary)", "&:focus": { outline: "none" } }}
                 disableRipple
               >
                 <DensityMediumIcon />
@@ -71,6 +76,7 @@ const Navebar = ({ toggleSidebar }: NavebarProps) => {
               fontWeight="bold"
               sx={{
                 fontSize: { xs: "15px", sm: "18px", md: "20px", lg: "24px" },
+                color: "var(--primary)",
               }}
             >
               Al-Azhar University
@@ -83,21 +89,23 @@ const Navebar = ({ toggleSidebar }: NavebarProps) => {
               gap: { xs: 1, md: 3 },
             }}
           >
-            <Brightness5Icon
-              sx={{ fontSize: { xs: 30, md: 35 }, cursor: "pointer" }}
-            />
             <IconButton
               onClick={handleMenuOpen}
               disableRipple
-              sx={{ "&:focus": { outline: "none" } }}
+              sx={{ "&:focus": { outline: "none" },  }}
             >
-              <Avatar />
+              <Avatar sx={{color: "var(--primary)"}} />
             </IconButton>
 
             <Menu
               anchorEl={anchorEl}
               open={Boolean(anchorEl)}
               onClose={handleMenuClose}
+              PaperProps={{
+                sx: {
+                  boxShadow: "none",
+                },
+              }}
             >
               <Box
                 sx={{
@@ -110,24 +118,27 @@ const Navebar = ({ toggleSidebar }: NavebarProps) => {
               >
                 <Avatar sx={{ width: 40, height: 40 }} />
                 <Box>
-                  <Typography variant="subtitle1" fontWeight="bold">
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight="bold"
+                    sx={{ color: "var(--primary)" }}
+                  >
                     Naglaa Khaled
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{ color: "var(--primary)" }}>
                     naglaayoness14@gmail.com
                   </Typography>
                 </Box>
               </Box>
 
-              <Box sx={{ borderTop: "1px solid #ddd", my: 1 }} />
-
+              <Box sx={{ borderTop: "1px solid var(--gray)", my: 1 }} />
               <MenuItem
                 onClick={() => {
                   handleMenuClose();
                   setOpenChangePassword(true);
                 }}
               >
-                <LockIcon sx={{ color: "red", mr: 1 }} />
+                <LockIcon sx={{ color: "var(--error)", mr: 1 }} />
                 Change Password
               </MenuItem>
               <MenuItem
@@ -136,7 +147,7 @@ const Navebar = ({ toggleSidebar }: NavebarProps) => {
                   setOpenLogout(true);
                 }}
               >
-                <LogoutIcon sx={{ color: "red", mr: 1 }} />
+                <LogoutIcon sx={{ color: "var(--error)", mr: 1 }} />
                 Logout
               </MenuItem>
             </Menu>
@@ -167,7 +178,7 @@ const Navebar = ({ toggleSidebar }: NavebarProps) => {
         actions={
           <>
             <Button onClick={() => setOpenChangePassword(false)}>Cancel</Button>
-            <Button variant="contained" color="primary">
+            <Button variant="contained" sx={{ color: "#ddd" }}>
               Save
             </Button>
           </>
@@ -182,7 +193,7 @@ const Navebar = ({ toggleSidebar }: NavebarProps) => {
         actions={
           <>
             <Button onClick={() => setOpenLogout(false)}>Cancel</Button>
-            <Button variant="contained" color="error">
+            <Button variant="contained" sx={{ color: "#ddd" }}>
               Logout
             </Button>
           </>
