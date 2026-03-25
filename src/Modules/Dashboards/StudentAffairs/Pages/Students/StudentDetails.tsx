@@ -28,7 +28,7 @@ const StudentDetails = () => {
     <DetailsLayout
       PageName="Students"
       title={student?.nameEn}
-      isAdmin={true}
+      isAdmin={false}
       tableTitle="Enrolled Courses"
       tableData={courses}
       tableColumns={[

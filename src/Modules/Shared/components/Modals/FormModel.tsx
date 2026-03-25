@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Box, TextField, MenuItem } from "@mui/material";
-import { useForm, Controller,type FieldValues } from "react-hook-form";
+import { useForm, Controller, type FieldValues } from "react-hook-form";
 import BasicModal from "./BasicModal";
 import CustomButton from "../Button/Button";
 import { useEffect } from "react";
@@ -20,13 +21,22 @@ interface DynamicFormModalProps {
   onSave: (data: FieldValues) => void;
   title: string;
   fields: FieldConfig[];
+  initialData?: any; 
 }
 
-const FormModal = ({ open, onClose, onSave, title, fields }: DynamicFormModalProps) => {
-const { control, handleSubmit, reset, formState: { errors } } = useForm<FieldValues>();
+const FormModal = ({ open, onClose, onSave, title, fields, initialData }: DynamicFormModalProps) => {
+  const { 
+    control, 
+    handleSubmit, 
+    reset, 
+    formState: { errors } 
+  } = useForm<FieldValues>();
+
   useEffect(() => {
-    if (open) reset({});
-  }, [open, reset]);
+    if (open) {
+      reset(initialData || {});
+    }
+  }, [open, reset, initialData]);
 
   const onSubmit = (data: FieldValues) => {
     onSave(data);
@@ -40,7 +50,13 @@ const { control, handleSubmit, reset, formState: { errors } } = useForm<FieldVal
       content={
         <Box 
           component="form" 
-          sx={{ display: "flex", flexWrap: "wrap", gap: 2, mt: 2, minWidth: { xs: "100%", sm: "70%" } }}
+          sx={{ 
+            display: "flex", 
+            flexWrap: "wrap", 
+            gap: 2, 
+            mt: 2, 
+            minWidth: { xs: "100%", sm: "70%" } 
+          }}
         >
           {fields.map((field) => (
             <Controller
@@ -49,7 +65,7 @@ const { control, handleSubmit, reset, formState: { errors } } = useForm<FieldVal
               control={control}
               defaultValue=""
               rules={{ 
-                required: field.required ? "This field is required" : false,
+                required: field.required ? `${field.label} is required` : false,
                 pattern: field.type === "email" ? {
                   value: /\S+@\S+\.\S+/,
                   message: "Invalid email format"
@@ -57,6 +73,7 @@ const { control, handleSubmit, reset, formState: { errors } } = useForm<FieldVal
               }}
               render={({ field: { onChange, value } }) => (
                 <TextField
+                  fullWidth
                   label={field.label}
                   select={field.select}
                   type={field.type || "text"}
@@ -64,11 +81,13 @@ const { control, handleSubmit, reset, formState: { errors } } = useForm<FieldVal
                   sx={{ flex: field.halfWidth ? "1 1 calc(50% - 10px)" : "1 1 100%" }}
                   error={!!errors[field.name]}
                   helperText={errors[field.name]?.message as string}
-                  value={value}
+                  value={value ?? ""} 
                   onChange={onChange}
                 >
                   {field.select && field.options?.map((opt) => (
-                    <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
+                    <MenuItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </MenuItem>
                   ))}
                 </TextField>
               )}
@@ -77,9 +96,17 @@ const { control, handleSubmit, reset, formState: { errors } } = useForm<FieldVal
         </Box>
       }
       actions={
-        <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end", width: "100%" }}>
-          <CustomButton label="Cancel" onClick={onClose} sx={{ backgroundColor: "#666" }} />
-          <CustomButton label="Save" variantType="primary" onClick={handleSubmit(onSubmit)} />
+        <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end", width: "100%", p: 1 }}>
+          <CustomButton 
+            label="Cancel" 
+            onClick={onClose} 
+            variantType="primary" 
+          />
+          <CustomButton 
+            label={initialData ? "Save Changes" : "Add Item"} 
+            variantType="primary" 
+            onClick={handleSubmit(onSubmit)} 
+          />
         </Box>
       }
     />

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { type FieldValues } from "react-hook-form";
 import { Grid as Grid, Typography } from "@mui/material";
 import DetailsLayout from "../../../../Shared/components/DetailsLayout/DetailsLayout";
 import {
@@ -7,15 +8,24 @@ import {
   getStudentCourses,
 } from "../../../../../API/SyudentAffairsData/Students";
 import { type ICourse, type IStudent ,type studentId , type IInfoFieldProps } from "../../../../Shared/Interfaces/index";
+import FormModal from "../../../../Shared/components/Modals/FormModel";
 
 const StudentDetails = () => {
-  
-
  
-
   const { id } = useParams();
   const [student, setStudent] = useState<IStudent>();
   const [courses, setCourses] = useState<ICourse[]>([]);
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
+
+  const editFields = [
+    { name: "nameEn", label: "Full Name", required: true },
+    { name: "email", label: "Email", type: "email", required: true },
+    { name: "studentID", label: "Student ID", required: true },
+    { name: "year", label: "Academic Year", required: true },
+    { name: "semester", label: "Semester", required: true },
+    { name: "gpa", label: "GPA", halfWidth: true },
+    { name: "completedHours", label: "Completed Hours", halfWidth: true },
+  ];
 
   useEffect(() => {
     const loadData = async () => {
@@ -26,8 +36,18 @@ const StudentDetails = () => {
     };
     loadData();
   }, [id]);
+  const handleSaveEdit = async (updatedData: FieldValues) => {
+    try {
+      console.log("Sending to API:", updatedData);
+      setStudent((prev) => ({ ...prev, ...updatedData } as IStudent));
+      setEditModalOpen(false);
+    } catch (error) {
+      console.error("Update failed:", error);
+    }
+  };
 
   return (
+    <>
     <DetailsLayout
       PageName="Students"
       title={student?.nameEn}
@@ -40,7 +60,7 @@ const StudentDetails = () => {
         { id: "credits", label: "Credits" },
         { id: "status", label: "Status" },
       ]}
-      onEdit={() => console.log("Open Edit Modal")}
+      onEdit={() => setEditModalOpen(true)}
     >
       <Grid container spacing={3}>
         <InfoField label="Student ID" value={student?.studentID} />
@@ -51,6 +71,15 @@ const StudentDetails = () => {
         <InfoField label="Completed Hours" value={student?.completedHours} />
       </Grid>
     </DetailsLayout>
+    <FormModal
+        open={isEditModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        onSave={handleSaveEdit}
+        title="Edit Student Details"
+        fields={editFields}
+        initialData={student} // ببعت بيانات الطالب الحالية عشان تظهر في الخانات
+      />
+    </>
   );
 };
 
