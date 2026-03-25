@@ -17,7 +17,7 @@ import DensityMediumIcon from "@mui/icons-material/DensityMedium";
 import LockIcon from "@mui/icons-material/Lock";
 import LogoutIcon from "@mui/icons-material/Logout";
 import photo from "../../../../assets/images/logoazhar.png";
-import BasicModal from "../Modal/Modal"; // استدعاء المودال العام
+import BasicModal from "../Modals/BasicModal"; // استدعاء المودال العام
 
 interface NavebarProps {
   toggleSidebar: () => void;

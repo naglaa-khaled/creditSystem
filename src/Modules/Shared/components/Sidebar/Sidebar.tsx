@@ -6,7 +6,7 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
-import { useLocation } from "react-router-dom";
+import { useLocation, NavLink } from "react-router-dom";
 
 interface SidebarItem {
   text: string;
@@ -37,14 +37,19 @@ const Sidebar = ({ items }: SidebarProps) => {
         {items?.length > 0 &&
           items.map((item, index) => {
             const isActive = location.pathname === item.path;
+
             return (
               <ListItem key={index} disablePadding>
                 <ListItemButton
-                  component="a"
-                  href={item.path}
+                  component={NavLink}
+                  to={item.path || "#"}
                   sx={{
-                    color: isActive ? "#fff" : "#5f5858e4",
-                    backgroundColor: isActive ? "var(--primary)" : "transparent",
+                    margin: "8px 12px",
+                    borderRadius: "10px",
+                    color: isActive ? "#fff" : "var(--darkGray)",
+                    backgroundColor: isActive
+                      ? "var(--primary)"
+                      : "transparent",
                     "&:hover": {
                       backgroundColor: "var(--primary)",
                       color: "#fff",
@@ -57,7 +62,7 @@ const Sidebar = ({ items }: SidebarProps) => {
                   {item.icon && (
                     <ListItemIcon
                       sx={{
-                        color: isActive ? "#fff" : "#5f5858e4",
+                        color: isActive ? "#fff" : "var(--darkGray)",
                       }}
                     >
                       {item.icon}

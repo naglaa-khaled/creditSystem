@@ -31,6 +31,7 @@ select:focus {
   --error: #E70909;
   --success: #077707;
   --gray: #E8E8EB;
+  --darkGray:#5f5858e4;
   --bg: #000000;
 
 
@@ -84,11 +85,15 @@ button:focus-visible {
     color: #213547;
     background-color: #ffffff;
     --primary: #394188;
+    --primary-hover: #3d479b;
     --secondary: #DBDEFF;
-    --error: #E70909;
+    --error: #f01212;
+    --error-hover: #fb1212;
     --success: #077707;
     --gray: #E8E8EB;
     --bg: #ffffff;
+    --darkGray:#5f5858e4;
+
   }
   a:hover {
     color: #747bff;

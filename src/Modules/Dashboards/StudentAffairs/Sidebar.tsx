@@ -9,7 +9,7 @@ function Sidebar() {
   return (
     <BasicSidebar
     items={[
-        { text: "Dashboard", icon: <DashboardIcon />, path: "/student-affairs/dashboard" },
+        { text: "Dashboard", icon: <DashboardIcon />, path: "/student-affairs" },
         { text: "Students", icon: <PeopleIcon />, path: "/student-affairs/students" },
         { text: "Courses", icon: <SchoolIcon />, path: "/student-affairs/courses" },
         { text: "Instructors", icon: <PersonIcon />, path: "/student-affairs/instructors" },
