@@ -11,11 +11,14 @@ import CheckEmail from "./Modules/AuthModule/components/CheckEmail/CheckEmail";
 import StudentAffairsDashboard from "./Modules/Dashboards/StudentAffairs/Dashboard";
 import DashboardHome from "./Modules/Dashboards/StudentAffairs/Pages/DashboardHome";
 import StudentsPage from "./Modules/Dashboards/StudentAffairs/Pages/Students/StudentsPage";
-import CoursesPage from "./Modules/Dashboards/StudentAffairs/Pages/Courses";
+import CoursesPage from "./Modules/Dashboards/StudentAffairs/Pages/Courses/Courses";
 import AdminDashboard from "./Modules/Dashboards/Admin/Dashboard";
 import StudentDetailsPage from "./Modules/Dashboards/StudentAffairs/Pages/Students/StudentDetails";
 import Students from "./Modules/Dashboards/Admin/Pages/Students/StudentPage";
 import StudentDetails from "./Modules/Dashboards/Admin/Pages/Students/StudentDetails";
+import CourseDetails from "./Modules/Dashboards/StudentAffairs/Pages/Courses/CourseDetails";
+import Courses from "./Modules/Dashboards/Admin/Pages/courses/Courses";
+import ACourseDetails from "./Modules/Dashboards/Admin/Pages/courses/CourseDetails";
 
 function App() {
   const routes = createBrowserRouter([
@@ -44,6 +47,7 @@ function App() {
         { path: "students", element: <StudentsPage /> },
         { path: "students/details/:id", element: <StudentDetailsPage /> },
         { path: "courses", element: <CoursesPage /> },
+        {path: "courses/details/:id", element: <CourseDetails /> },
       ],
     },
     {
@@ -53,6 +57,9 @@ function App() {
         { index: true, element: <DashboardHome /> },
         { path: "students", element: <Students /> },
         { path: "students/details/:id", element: <StudentDetails /> },
+        { path: "courses", element: <Courses /> },
+        { path: "courses/details/:id", element: <ACourseDetails /> },
+
       ],
     },
   ]);

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import axiosInstance from "../AxiosInstance"; 
-import { type IStudent, type ICourse, type IApiResponse, type studentId } from "../../Modules/Shared/Interfaces";
+import { type IStudent, type ICourse, type IApiResponse,type CourseId , type studentId , type IFullStudentProfile,type IFullCourseProfile} from "../../Modules/Shared/Interfaces";
 
 export const getStudents = async (year?: string, semester?: string): Promise<IStudent[]> => {
   return [
@@ -10,34 +10,29 @@ export const getStudents = async (year?: string, semester?: string): Promise<ISt
   ];
 };
 
-export const getStudentById = async (studentId: studentId): Promise<IStudent> => {
+export const getStudentProfile = async (studentId: studentId): Promise<IFullStudentProfile> => {
   try {
-    const res = await axiosInstance.get(`/student-affairs/get-student/${studentId}`);
-    return res.data;
+    const res = await axiosInstance.get(`/student-affairs/student-profile/${studentId}`);
+    return res.data; 
   } catch (error) {
-    return { 
-      studentID: "12", 
-      nameEn: "Fatma Mohammed", 
-      email: "fatima@stu.com", 
-      year: "3rd Year",
-      semester: "Semester 2",
-      gpa: "3.9",
-      completedHours: 78,
+    return {
+      student: { 
+        studentID: "12", 
+        nameEn: "Fatma Mohammed", 
+        email: "fatima@stu.com", 
+        year: "3rd Year",
+        semester: "Semester 2",
+        gpa: "3.9",
+        completedHours: 78,
+      },
+      courses: [
+        { courseID: "CSC301", courseName: "Algorithms", creditsHours: 4, status: "Enrolled" ,semester: "Semester 2", level: "300", courseType: "Core"},
+        { courseID: "CSC305", courseName: "Database System", creditsHours: 3, status: "Enrolled",semester: "Semester 2", level: "300", courseType: "Core" }
+      ]
     };
   }
 };
 
-export const getStudentCourses = async (studentId: studentId): Promise<ICourse[]> => {
-  try {
-    const res = await axiosInstance.get(`/student-affairs/course-enrollments/${studentId}`);
-    return res.data;
-  } catch (error) {
-    return [
-      { courseID: "CSC301", courseName: "Algorithms", credits: 4, status: "Enrolled" },
-      { courseID: "CSC305", courseName: "Database System", credits: 3, status: "Enrolled" }
-    ];
-  }
-};
 
 export const deleteStudent = async (studentId: studentId): Promise<IApiResponse> => {
   console.log("Deleting student:", studentId);
@@ -48,3 +43,4 @@ export const addStudent = async (studentData: Partial<IStudent>): Promise<IApiRe
   console.log("Adding student data:", studentData);
   return { success: true }; 
 };
+

@@ -3,15 +3,16 @@ import { useParams } from "react-router-dom";
 import { type FieldValues } from "react-hook-form";
 import { Grid as Grid, Typography } from "@mui/material";
 import DetailsLayout from "../../../../Shared/components/DetailsLayout/DetailsLayout";
+import { getStudentProfile } from "../../../../../API/SyudentAffairsData/Students";
 import {
-  getStudentById,
-  getStudentCourses,
-} from "../../../../../API/SyudentAffairsData/Students";
-import { type ICourse, type IStudent ,type studentId , type IInfoFieldProps } from "../../../../Shared/Interfaces/index";
+  type ICourse,
+  type IStudent,
+  type studentId,
+  type IInfoFieldProps,
+} from "../../../../Shared/Interfaces/index";
 import FormModal from "../../../../Shared/components/Modals/FormModel";
 
 const StudentDetails = () => {
- 
   const { id } = useParams();
   const [student, setStudent] = useState<IStudent>();
   const [courses, setCourses] = useState<ICourse[]>([]);
@@ -27,19 +28,19 @@ const StudentDetails = () => {
     { name: "completedHours", label: "Completed Hours", halfWidth: true },
   ];
 
-  useEffect(() => {
+useEffect(() => {
     const loadData = async () => {
-      const sData = await getStudentById(id as studentId);
-      const cData = await getStudentCourses(id as studentId);
-      setStudent(sData);
-      setCourses(cData);
+      const data = await getStudentProfile(id as studentId);
+      setStudent(data.student); 
+      setCourses(data.courses);
     };
+
     loadData();
   }, [id]);
   const handleSaveEdit = async (updatedData: FieldValues) => {
     try {
       console.log("Sending to API:", updatedData);
-      setStudent((prev) => ({ ...prev, ...updatedData } as IStudent));
+      setStudent((prev) => ({ ...prev, ...updatedData }) as IStudent);
       setEditModalOpen(false);
     } catch (error) {
       console.error("Update failed:", error);
@@ -48,46 +49,42 @@ const StudentDetails = () => {
 
   return (
     <>
-    <DetailsLayout
-      PageName="Students"
-      title={student?.nameEn}
-      isAdmin={true}
-      tableTitle="Enrolled Courses"
-      tableData={courses}
-      tableColumns={[
-        { id: "courseID", label: "Course ID" },
-        { id: "courseName", label: "Course Name" },
-        { id: "credits", label: "Credits" },
-        { id: "status", label: "Status" },
-      ]}
-      onEdit={() => setEditModalOpen(true)}
-    >
-      <Grid container spacing={3}>
-        <InfoField label="Student ID" value={student?.studentID} />
-        <InfoField label="Email" value={student?.email} />
-        <InfoField label="GPA" value={student?.gpa} isGpa />
-        <InfoField label="Academic Year" value={student?.year} />
-        <InfoField label="Semester" value={student?.semester} />
-        <InfoField label="Completed Hours" value={student?.completedHours} />
-      </Grid>
-    </DetailsLayout>
-    <FormModal
+      <DetailsLayout
+        PageName="Students"
+        title={student?.nameEn}
+        isAdmin={true}
+        tableTitle="Enrolled Courses"
+        tableData={courses}
+        tableColumns={[
+          { id: "courseID", label: "Course ID" },
+          { id: "courseName", label: "Course Name" },
+          { id: "creditsHours", label: "Credits" },
+          { id: "status", label: "Status" },
+        ]}
+        onEdit={() => setEditModalOpen(true)}
+      >
+        <Grid container spacing={3}>
+          <InfoField label="Student ID" value={student?.studentID} />
+          <InfoField label="Email" value={student?.email} />
+          <InfoField label="GPA" value={student?.gpa} isGpa />
+          <InfoField label="Academic Year" value={student?.year} />
+          <InfoField label="Semester" value={student?.semester} />
+          <InfoField label="Completed Hours" value={student?.completedHours} />
+        </Grid>
+      </DetailsLayout>
+      <FormModal
         open={isEditModalOpen}
         onClose={() => setEditModalOpen(false)}
         onSave={handleSaveEdit}
         title="Edit Student Details"
         fields={editFields}
-        initialData={student} // ببعت بيانات الطالب الحالية عشان تظهر في الخانات
+        initialData={student} 
       />
     </>
   );
 };
 
-const InfoField = ({
-  label,
-  value,
-  isGpa,
-}: IInfoFieldProps) => (
+const InfoField = ({ label, value, isGpa }: IInfoFieldProps) => (
   <Grid size={{ xs: 6, md: 4 }}>
     <Typography
       variant="caption"

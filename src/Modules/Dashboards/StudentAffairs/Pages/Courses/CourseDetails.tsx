@@ -2,54 +2,51 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Grid as Grid, Typography } from "@mui/material";
 import DetailsLayout from "../../../../Shared/components/DetailsLayout/DetailsLayout";
+import { getCourseProfile } from "../../../../../API/SyudentAffairsData/Courses";
 import {
-  getStudentProfile,
-} from "../../../../../API/SyudentAffairsData/Students";
-import {
-
   type studentId,
   type IInfoFieldProps,
-  type IFullStudentProfile,
+  type IFullCourseProfile,
 } from "../../../../Shared/Interfaces/index";
 
-const StudentDetails = () => {
+const CourseDetails = () => {
   const { id } = useParams();
-  const [profile, setProfile] = useState<IFullStudentProfile | null>(null);
-
-
+  const [profile, setProfile] = useState<IFullCourseProfile | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
-      const data = await getStudentProfile(id as studentId);
+      const data = await getCourseProfile(id as studentId);
       setProfile(data);
     };
     loadData();
   }, [id]);
 
-  if (!profile) return <Typography sx={{ p: 4 }}>Loading Student Details...</Typography>;
+  if (!profile)
+    return <Typography sx={{ p: 4 }}>Loading Student Details...</Typography>;
 
   return (
     <>
       <DetailsLayout
-        PageName="Students"
-        title={profile.student.nameEn}
+        PageName="Courses"
+        title={profile.course.courseName}
         isAdmin={false}
         tableTitle="Enrolled Courses"
-        tableData={profile.courses}
+        tableData={profile.enrolledStudents}
         tableColumns={[
-          { id: "courseID", label: "Course ID" },
-          { id: "courseName", label: "Course Name" },
-          { id: "credits", label: "Credits" },
+          { id: "studentID", label: "Student ID" },
+          { id: "studentName", label: "Student Name" },
           { id: "status", label: "Status" },
         ]}
       >
         <Grid container spacing={3}>
-          <InfoField label="Student ID" value={profile.student.studentID} />
-          <InfoField label="Email" value={profile.student.email} />
-          <InfoField label="GPA" value={profile.student.gpa} isGpa />
-          <InfoField label="Academic Year" value={profile.student.year} />
-          <InfoField label="Semester" value={profile.student.semester} />
-          <InfoField label="Completed Hours" value={profile.student.completedHours} />
+          <InfoField label="Course ID" value={profile.course.courseID} />
+          <InfoField
+            label="Credits Hours"
+            value={profile.course.creditsHours}
+          />
+          <InfoField label="Level" value={profile.course.level} isGpa />
+          <InfoField label="Course Type" value={profile.course.courseType} />
+          <InfoField label="Semester" value={profile.course.semester} />
         </Grid>
       </DetailsLayout>
     </>
@@ -77,4 +74,4 @@ const InfoField = ({ label, value, isGpa }: IInfoFieldProps) => (
   </Grid>
 );
 
-export default StudentDetails;
+export default CourseDetails;

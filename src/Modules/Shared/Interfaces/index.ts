@@ -2,7 +2,7 @@
 
 // --- Student Related Interfaces ---
 export type studentId = number | string;
-
+export type CourseId = string | number;
 
 export interface IStudent {
   studentID: number | string;
@@ -13,12 +13,29 @@ export interface IStudent {
   gpa?: string | number;
   completedHours?: string | number;
 }
+export interface IFullStudentProfile {
+  student: IStudent;
+  courses: ICourse[];
+}
+export interface IFullCourseProfile {
+  course: ICourse;
+  enrolledStudents: {
+    studentID: string | number;
+    studentName: string;
+    StudentYear: string;
+
+    status: string;
+  }[];
+}
 
 // --- Course Related Interfaces ---
 export interface ICourse {
   courseID: string;
   courseName: string;
-  credits: number;
+  creditsHours: number;
+  semester: string;
+  level: string;
+  courseType: string;
   status: string;
 }
 
@@ -41,22 +58,22 @@ export interface IApiResponse {
 
 export interface IInfoFieldProps {
   label: string;
-  value: string | number | undefined | null; 
+  value: string | number | undefined | null;
   isGpa?: boolean;
 }
 
 export interface Column<T> {
-  id: keyof T;   
-  label: string; 
+  id: keyof T;
+  label: string;
 }
 
 export interface IDetailsLayoutProps<T extends Record<string, any>> {
   title?: string;
   isAdmin: boolean;
   tableTitle: string;
-  tableData: T[];         
+  tableData: T[];
   PageName: string;
-  tableColumns: Column<T>[]; 
+  tableColumns: Column<T>[];
   onEdit?: () => void;
   children?: React.ReactNode;
 }
