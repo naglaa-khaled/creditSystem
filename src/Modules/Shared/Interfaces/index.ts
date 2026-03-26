@@ -77,3 +77,16 @@ export interface IDetailsLayoutProps<T extends Record<string, any>> {
   onEdit?: () => void;
   children?: React.ReactNode;
 }
+export interface IInstructorCourse {
+  courseID: string;
+  courseName: string;
+  studentsCount: number;
+}
+
+export interface IInstructor {
+  instructorID: number;
+  name: string;
+  email: string;
+  totalCourses: number;
+  coursesList: IInstructorCourse[]; 
+}

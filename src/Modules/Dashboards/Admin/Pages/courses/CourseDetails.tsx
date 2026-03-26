@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Grid as Grid, Typography } from "@mui/material";
 import DetailsLayout from "../../../../Shared/components/DetailsLayout/DetailsLayout";
-import { getCourseProfile } from "../../../../../API/SyudentAffairsData/Courses";
+import { getCourseProfile, updateCourse } from "../../../../../API/SyudentAffairsData/Courses";
 import {
   type studentId,
   type IInfoFieldProps,
@@ -32,17 +32,24 @@ const editCourseFields = [
     };
     loadData();
   }, [id]);
-  const handleSaveEdit = async (updatedData: FieldValues) => {
-    try {
-      console.log("Updating Course:", updatedData);
+const handleSaveEdit = async (updatedData: FieldValues) => {
+  try {
+    if (!id) return;
+
+    const response = await updateCourse(id, updatedData as ICourse);
+
+    if (response.success) {
       setProfile((prev) => 
         prev ? { ...prev, course: { ...prev.course, ...updatedData } as ICourse } : null
       );
+      
       setEditModalOpen(false);
-    } catch (error) {
-      console.error("Update failed:", error);
+      
     }
-  };
+  } catch (error) {
+    console.error("Update failed:", error);
+  }
+};
 
   if (!profile)
     return <Typography sx={{ p: 4 }}>Loading Student Details...</Typography>;

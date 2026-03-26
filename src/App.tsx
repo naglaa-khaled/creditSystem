@@ -19,6 +19,10 @@ import StudentDetails from "./Modules/Dashboards/Admin/Pages/Students/StudentDet
 import CourseDetails from "./Modules/Dashboards/StudentAffairs/Pages/Courses/CourseDetails";
 import Courses from "./Modules/Dashboards/Admin/Pages/courses/Courses";
 import ACourseDetails from "./Modules/Dashboards/Admin/Pages/courses/CourseDetails";
+import Instructors from "./Modules/Dashboards/Admin/Pages/Instructor/Instructor";
+import AInstructorDetails from "./Modules/Dashboards/Admin/Pages/Instructor/InstructorDetails";
+import Instructor from "./Modules/Dashboards/StudentAffairs/Pages/Instructor/Instructors";
+import InstructorDetails from "./Modules/Dashboards/StudentAffairs/Pages/Instructor/InstructorDetails";
 
 function App() {
   const routes = createBrowserRouter([
@@ -48,6 +52,8 @@ function App() {
         { path: "students/details/:id", element: <StudentDetailsPage /> },
         { path: "courses", element: <CoursesPage /> },
         {path: "courses/details/:id", element: <CourseDetails /> },
+        { path: "instructors", element: <Instructor /> },
+        {path: "instructors/details/:id", element: <InstructorDetails /> },
       ],
     },
     {
@@ -59,6 +65,9 @@ function App() {
         { path: "students/details/:id", element: <StudentDetails /> },
         { path: "courses", element: <Courses /> },
         { path: "courses/details/:id", element: <ACourseDetails /> },
+        { path: "instructors", element: <Instructors /> },
+        { path: "instructors/details/:id", element: <AInstructorDetails /> },
+
 
       ],
     },

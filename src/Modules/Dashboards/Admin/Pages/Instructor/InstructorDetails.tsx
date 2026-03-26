@@ -1,0 +1,93 @@
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { Grid, Typography } from "@mui/material";
+import DetailsLayout from "../../../../Shared/components/DetailsLayout/DetailsLayout";
+import { getInstructorProfile, updateInstructor } from "../../../../../API/SyudentAffairsData/Instructor";
+import {
+  type studentId,
+  type IInstructor,
+} from "../../../../Shared/Interfaces/index";
+import FormModal from "../../../../Shared/components/Modals/FormModel";
+import type { FieldValues } from "react-hook-form";
+
+const InstructorDetails = () => {
+  const { id } = useParams();
+  const [instructor, setInstructor] = useState<IInstructor | null>(null);
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
+
+  const editInstructorFields = [
+    { name: "name", label: "Full Name", required: true },
+    { name: "email", label: "Email Address", type: "email", required: true },
+    { name: "instructorID", label: "Instructor ID", required: true },
+  ];
+
+  useEffect(() => {
+    const loadData = async () => {
+      const data = await getInstructorProfile(id as studentId);
+      setInstructor(data);
+    };
+    loadData();
+  }, [id]);
+
+  const handleSaveEdit = async (updatedData: FieldValues) => {
+    try {
+      if (!id) return;
+      const response = await updateInstructor(id, updatedData as IInstructor);
+      if (response.success) {
+        setInstructor((prev) => (prev ? { ...prev, ...updatedData } : null));
+        setEditModalOpen(false);
+      }
+    } catch (error) {
+      console.error("Update failed:", error);
+    }
+  };
+
+  if (!instructor)
+    return <Typography sx={{ p: 4 }}>Loading Instructor Details...</Typography>;
+
+  return (
+    <>
+      <DetailsLayout
+        PageName="Instructors"
+        title={instructor.name}
+        isAdmin={true}
+        tableTitle="Assigned Courses"
+        tableData={instructor.coursesList || []}
+        tableColumns={[
+          { id: "courseID", label: "Course ID" },
+          { id: "courseName", label: "Course Name" },
+          { id: "studentsCount", label: "Students Count" },
+        ]}
+        onEdit={() => setEditModalOpen(true)}
+      >
+        <Grid container spacing={3}>
+          <InfoField label="Instructor ID" value={instructor.instructorID} />
+          <InfoField label="Email Address" value={instructor.email} />
+          <InfoField label="Total Courses" value={instructor.totalCourses} />
+        </Grid>
+      </DetailsLayout>
+
+      <FormModal
+        open={isEditModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        onSave={handleSaveEdit}
+        title="Edit Instructor Details"
+        fields={editInstructorFields}
+        initialData={instructor}
+      />
+    </>
+  );
+};
+
+const InfoField = ({ label, value }: { label: string; value: string | number }) => (
+  <Grid size={{ xs: 12, md: 4 }}>
+    <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 0.5 }}>
+      {label}
+    </Typography>
+    <Typography variant="body2" sx={{ fontWeight: 600, color: "#1a202c" }}>
+      {value || "---"}
+    </Typography>
+  </Grid>
+);
+
+export default InstructorDetails;

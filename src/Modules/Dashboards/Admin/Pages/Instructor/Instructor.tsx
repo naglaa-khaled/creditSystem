@@ -3,54 +3,41 @@ import SharedTable from "../../../../Shared/components/SharedTable/SharedTable";
 import { FilterBar } from "../../../../Shared/components/FilterBar/FilterBar";
 import FormModal from "../../../../Shared/components/Modals/FormModel";
 import {
-  getCourses,
-  addCourse,
-  deleteCourse,
-} from "../../../../../API/SyudentAffairsData/Courses";
+  getInstructors,
+  addInstructor,
+  deleteInstructor,
+} from "../../../../../API/SyudentAffairsData/Instructor";
 import CustomButton from "../../../../Shared/components/Button/Button";
 import { Box, useMediaQuery, useTheme } from "@mui/material";
 import ConfirmDeleteModal from "../../../../Shared/components/Modals/DeleteModal";
 import AddIcon from "@mui/icons-material/Add";
 import { type FieldValues } from "react-hook-form";
-import {  type Column,type ICourse } from "../../../../Shared/Interfaces";
+import {  type Column,type IInstructor } from "../../../../Shared/Interfaces";
 
-const CoursePage = () => {
+const InstructorPage = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
-  const [allCourses, setAllCourses] = useState<ICourse[]>([]);
+  const [allInstructors, setAllInstructors] = useState<IInstructor[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeApiFilters, setActiveApiFilters] = useState({
-    year: "",
-    semester: "",
-  });
+ 
 
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [selectedCourseId, setSelectedCourseId] = useState<
+  const [selectedInstructorId, setSelectedInstructorId] = useState<
     string | number | null
   >(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const CourseFields = [
-    { name: "courseName", label: "Course Name", required: true },
-    { name: "courseID", label: "Course Code/ID", required: true },
-    { name: "creditsHours", label: "Credits Hours", type: "number", required: true },
-    { 
-      name: "level", 
-      label: "Level", 
-      select: true, 
-      options: [
-        { value: "100", label: "Level 1" },
-        { value: "200", label: "Level 2" },
-        { value: "300", label: "Level 3" },
-      ] 
-    },
-  ];
+ const InstructorFields = [
+  { name: "nameAr", label: "Instructor Name (Arabic)", required: true },
+  { name: "instructorID", label: "Instructor ID", required: true },
+  { name: "email", label: "Email Address", type: "email", required: true },
+];
 
-  const loadDataFromApi = async (year?: string, semester?: string) => {
+  const loadDataFromApi = async () => {
     try {
-      const data = await getCourses(year, semester);
+      const data = await getInstructors();
       setTimeout(() => {
-        setAllCourses(data);
+        setAllInstructors(data);
       }, 0);
     } catch (error) {
       console.error("Failed to load students:", error);
@@ -62,20 +49,20 @@ const CoursePage = () => {
   }, []);
 
   const handleOpenDeleteModal = (id: string | number) => {
-    setSelectedCourseId(id);
+    setSelectedInstructorId(id);
     setDeleteModalOpen(true);
   };
 
-  //delete student handler
+  //delete Instructor handler
   const handleConfirmDelete = async () => {
-    if (selectedCourseId) {
+    if (selectedInstructorId) {
       try {
-        await deleteCourse(selectedCourseId);
-        setAllCourses((prev) =>
-          prev.filter((student) => student.courseID !== selectedCourseId),
+        await deleteInstructor(selectedInstructorId);
+        setAllInstructors((prev) =>
+          prev.filter((Instructor) => Instructor.instructorID !== selectedInstructorId),
         );
         setDeleteModalOpen(false);
-        setSelectedCourseId(null);
+        setSelectedInstructorId(null);
       } catch (error) {
         console.error("Delete failed", error);
       }
@@ -84,7 +71,7 @@ const CoursePage = () => {
   //add student handler
   const handleSaveStudent = async (data: FieldValues) => {
     try {
-      await addCourse(data);
+      await addInstructor(data);
       setIsAddModalOpen(false);
       loadDataFromApi();
     } catch (error) {
@@ -93,29 +80,24 @@ const CoursePage = () => {
   };
 
   const filteredData = useMemo(() => {
-    return allCourses.filter((course) =>
-      course.courseName.toLowerCase().includes(searchTerm.toLowerCase()),
+    return allInstructors.filter((Instructor) =>
+      Instructor.name.toLowerCase().includes(searchTerm.toLowerCase()),
     );
-  }, [allCourses, searchTerm]);
+  }, [allInstructors, searchTerm]);
 
-  const handleApiFilterChange = (type: "year" | "semester", value: string) => {
-    const updatedFilters = { ...activeApiFilters, [type]: value };
-    setActiveApiFilters(updatedFilters);
-    loadDataFromApi(updatedFilters.year, updatedFilters.semester);
-  };
 
-  const CourseColumns: Column<ICourse>[] = [
-    { id: "courseID", label: "Course ID" },
-    { id: "courseName", label: "Course Name" },
-    { id: "creditsHours", label: "Credits" },
-    { id: "level", label: "Level" },
-    { id: "semester", label: "Semester" },
-  ];
+
+const InstructorColumns: Column<IInstructor>[] = [
+  { id: "instructorID", label: "ID" },
+  { id: "name", label: "Name" },
+  { id: "email", label: "Email" },
+  { id: "totalCourses", label: "Total Courses" },
+];
 
   return (
     <div style={{ padding: isMobile ? "10px" : "20px" }}>
       <h2 style={{ marginBottom: "20px", color: "var(--primary)" }}>
-        Courses Management
+        Instructors Management
       </h2>
 
       <Box
@@ -130,11 +112,10 @@ const CoursePage = () => {
         <Box sx={{ flex: 1 }}>
           <FilterBar
             onSearch={(value: string) => setSearchTerm(value)}
-            onFilterChange={handleApiFilterChange}
           />
         </Box>
         <CustomButton
-          label="Add Course"
+          label="Add Instructor"
           icon={<AddIcon />}
           variantType="primary"
           onClick={() => setIsAddModalOpen(true)}
@@ -142,10 +123,10 @@ const CoursePage = () => {
       </Box>
 
       <SharedTable
-        columns={CourseColumns}
+        columns={InstructorColumns}
         data={filteredData}
-        idField="courseID"
-        detailsPath="/admin/courses/details"
+        idField="instructorID"
+        detailsPath="/admin/Instructors/details"
         isAdmin={true}
         onDelete={handleOpenDeleteModal}
       />
@@ -154,17 +135,17 @@ const CoursePage = () => {
         open={isDeleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
         onConfirm={handleConfirmDelete}
-        message="Are you sure you want to delete this Course record?"
+        message="Are you sure you want to delete this instructor record?"
       />
       <FormModal
         open={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onSave={handleSaveStudent}
-        title="Add New Course"
-        fields={CourseFields}
+        title="Add New Student"
+        fields={InstructorFields} 
       />
     </div>
   );
 };
 
-export default CoursePage;
+export default InstructorPage;

@@ -62,3 +62,12 @@ export const getCourses = async (year?: string, semester?: string): Promise<ICou
     ];
   }
 };
+export const updateCourse = async (courseId: string | number, updatedData: Partial<ICourse>): Promise<IApiResponse> => {
+  try {
+    // const res = await axiosInstance.put(`/student-affairs/courses/${courseId}`, updatedData);
+    console.log("Saving to Backend:", courseId, updatedData);
+    return { success: true }; 
+  } catch (error) {
+    return { success: false };
+  }
+};

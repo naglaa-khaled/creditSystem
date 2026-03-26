@@ -12,7 +12,7 @@ function Sidebar() {
         { text: "Dashboard", icon: <DashboardIcon />, path: "/admin" },
         { text: "Students", icon: <PeopleIcon />, path: "/admin/students" },
         { text: "Courses", icon: <SchoolIcon />, path: "/admin/courses" },
-        { text: "Instructors", icon: <PersonIcon />, path: "/admin/instructors" },
+        { text: "instructors", icon: <PersonIcon />, path: "/admin/instructors" },
         { text: "Grades", icon: <GradeIcon />, path: "/admin/grades" },
         { text: "Schedule", icon: <CalendarMonthIcon />, path: "/admin/schedule" },
       ]}
