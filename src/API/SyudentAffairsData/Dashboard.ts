@@ -1,17 +1,14 @@
 
 
 import {type IDashboardStats, type IRecentStudentResponse } from "../../Modules/Shared/Interfaces";
+import axiosInstance from "../AxiosInstance";
 // import axiosInstance from "../AxiosInstance";
 
 export const getDashboardStats = async ():Promise<IDashboardStats> => {
 
-  return {
-    students: 50,
-    professors: 11,
-    courses: 30,
-  };
-  // const res = await axiosInstance.get("/dashboard-stats");
-  // return res.data;
+
+  const res = await axiosInstance.get("student-affairs/dashboard-stats");
+  return res.data;
 };
 export const getResentStudent = async ():Promise<IRecentStudentResponse> => {
 

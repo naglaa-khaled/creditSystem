@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Box,
   Drawer,
@@ -8,6 +7,7 @@ import {
   Toolbar,
   IconButton,
 } from "@mui/material";
+import React, { useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import Navebar from "../Navebar/Navebar";
 
@@ -15,8 +15,8 @@ interface DashboardLayoutProps {
   sidebar: React.ReactNode;
   children: React.ReactNode;
 }
-const DashboardLayout = ({ sidebar, children }:DashboardLayoutProps) => {
-  
+
+const DashboardLayout = ({ sidebar, children }: DashboardLayoutProps) => {
   const [openSidebar, setOpenSidebar] = useState(false);
 
   const theme = useTheme();
@@ -27,43 +27,63 @@ const DashboardLayout = ({ sidebar, children }:DashboardLayoutProps) => {
   };
 
   return (
-    <Box>
-
+    <Box sx={{ height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
       {/* Navbar */}
       <Navebar toggleSidebar={toggleSidebar} />
       <Toolbar />
       {isMobile ? (
-        <>
+        
+        <Box sx={{ flexGrow: 1, overflowY: "auto" }}>
           <Drawer
             anchor="left"
             open={openSidebar}
             onClose={() => setOpenSidebar(false)}
+            PaperProps={{
+              sx: {
+                backgroundColor: "#eff2fe", 
+                width: 250,
+                overflow: "hidden",
+                border: "none",
+              },
+            }}
           >
-            <Box sx={{ width: 250, p: 2 }}>
+            <Box sx={{ width: 250, height: "100%", p: 0 }}>
               <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-                <IconButton onClick={() => setOpenSidebar(false)}>
+                <IconButton
+                  onClick={() => setOpenSidebar(false)}
+                  sx={{ height: "100%" }}
+                >
                   <CloseIcon />
                 </IconButton>
               </Box>
 
-              {sidebar}
+              <Box onClick={() => setOpenSidebar(false)}>{sidebar}</Box>
             </Box>
           </Drawer>
 
-          <Box sx={{ p: 2 }}>
-            {children}
-          </Box>
-        </>
+          <Box sx={{ p: 2 }}>{children}</Box>
+        </Box>
       ) : (
-        <Stack direction="row">
-          <Box sx={{ width: 250, p: 2 }}>
-            {sidebar}
-          </Box>
+        <Stack direction="row" sx={{ flexGrow: 1, overflow: "hidden" }}>
+          <Box 
+            sx={{ 
+              height: "100%", 
+              backgroundColor: "#eff2fe", 
+              borderRight: "2px solid #eceef1",
+              overflow: "hidden", 
+              flexShrink: 0 
+            }}
+          >{sidebar}</Box>
 
-          <Box sx={{ flexGrow: 1, p: 2 }}>
-            {children}
-          </Box>
-
+          <Box 
+            component="main" 
+            sx={{ 
+              flexGrow: 1, 
+              overflowY: "auto", 
+              backgroundColor: "#f8f9fa", 
+              height: "100%" 
+            }}
+          >{children}</Box>
         </Stack>
       )}
     </Box>

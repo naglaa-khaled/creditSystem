@@ -1,32 +1,42 @@
 import { useEffect, useState, useMemo } from "react";
 import SharedTable from "../../../../Shared/components/SharedTable/SharedTable";
 import { FilterBar } from "../../../../Shared/components/FilterBar/FilterBar";
-import { getCourses } from "../../../../../API/SyudentAffairsData/Courses";
-import { type ICourse, type Column } from "../../../../Shared/Interfaces/index";
+import {
+  getGrades,
+  exportCourseGrades
+  
+} from "../../../../../API//SyudentAffairsData/Grades";
 import { Box, CircularProgress, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { type Column, type IGrades} from "../../../../Shared/Interfaces";
 import { SemesterCard } from "../../../../Shared/components/CourseCard/CourseCard";
-import SchoolIcon from "@mui/icons-material/School";
-const CoursePage = () => {
+import GradeIcon from "@mui/icons-material/Grade";
+const SchedaulPage = () => {
   const theme = useTheme();
-
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const [isLoading, setIsLoading] = useState(false);
-  const [allCourses, setAllCourses] = useState<ICourse[]>([]);
+const [isLoading, setIsLoading] = useState(false); 
+  const [allGrades, setAllGrades] = useState<IGrades[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeApiFilters, setActiveApiFilters] = useState({
     year: "",
     semester: "",
   });
 
-  const loadDataFromApi = async (year?: string, semester?: string) => {
-    setIsLoading(true);
+ 
+
+  const [selectedGroup, setSelectedGroup] = useState<{
+    level: string;
+    semester: string;
+  } | null>(null);
+
+const loadDataFromApi = async (year?: string, semester?: string) => {
+    setIsLoading(true); 
     try {
-      const data = await getCourses(year, semester);
-      setAllCourses(data);
+      const data = await getGrades(year, semester);
+      setAllGrades(data);
     } catch (error) {
-      console.error("Failed to load courses:", error);
+      console.error("Failed to load Grades:", error);
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); 
     }
   };
 
@@ -34,24 +44,24 @@ const CoursePage = () => {
     loadDataFromApi();
   }, []);
 
-  const [selectedGroup, setSelectedGroup] = useState<{
-    level: string;
-    semester: string;
-  } | null>(null);
+
+
+
+
 
   const filteredData = useMemo(() => {
-    return allCourses.filter((course) => {
-      const name = course.courseNameEn || "";
-      return name.toLowerCase().includes(searchTerm.toLowerCase());
-    });
-  }, [allCourses, searchTerm]);
-  const groupedCourses = useMemo(() => {
-    const groups: Record<string, ICourse[]> = {};
+    return allGrades.filter((schedaul) =>
+      schedaul.courseName.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+  }, [allGrades, searchTerm]);
 
-    filteredData.forEach((course) => {
-      const key = `${course.level}-${course.semester}`;
+  const groupedSchedaul = useMemo(() => {
+    const groups: Record<string, IGrades[]> = {};
+
+    filteredData.forEach((Grades) => {
+      const key = `${Grades.courseLevel}-${Grades.courseSemester}`;
       if (!groups[key]) groups[key] = [];
-      groups[key].push(course);
+      groups[key].push(Grades);
     });
 
     return groups;
@@ -63,24 +73,45 @@ const CoursePage = () => {
     loadDataFromApi(updatedFilters.year, updatedFilters.semester);
   };
 
-  const coursesColumns: Column<ICourse>[] = [
-    { id: "courseNameEn", label: "Name" },
-    { id: "courseID", label: "ID" },
-    { id: "creditHours", label: "Email" },
-    { id: "level", label: "Year" },
-    { id: "semester", label: "Semester" },
+  const SchedaulTable: Column<IGrades>[] = [
+    { id: "courseID", label: "Course ID" },
+    { id: "courseName", label: "Course Name" },
+    { id: "courseLevel", label: "courseLevel" },
+    { id: "courseSemester", label: "courseSemester" },
+    { id: "studentID", label: "studentID" },
+    { id: "studentName", label: "studentName" },
+    { id: "numericGrade", label: "numericGrade" },
+    { id: "letterGrade", label: "letterGrade" },
+    { id: "midterm", label: "midterm" },
+    { id: "final", label: "final" },
+
   ];
   useEffect(() => {
-    if (Object.keys(groupedCourses).length === 0) {
+    if (Object.keys(groupedSchedaul).length === 0 && searchTerm !== "") {
       setSelectedGroup(null);
     }
-  }, [groupedCourses]);
+  }, [groupedSchedaul, searchTerm]);
+
+  const handleExport = async (e: React.MouseEvent, level: string, semester: string) => {
+  e.stopPropagation(); 
+  
+  const groupKey = `${level}-${semester}`;
+  const firstCourseId = groupedSchedaul[groupKey]?.[0]?.courseID;
+
+  if (firstCourseId) {
+    try {
+      await exportCourseGrades(firstCourseId);
+    } catch (error) {
+      console.error("Failed to export course grades:", error);}
+  }
+};
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div style={{ padding: isMobile ? "10px" : "20px" }}>
       <h2 style={{ marginBottom: "20px", color: "var(--primary)" }}>
-        Courses Management
+        Grades Management
       </h2>
+
       <Box
         sx={{
           display: "flex",
@@ -94,10 +125,11 @@ const CoursePage = () => {
           <FilterBar
             onSearch={(value: string) => setSearchTerm(value)}
             onFilterChange={handleApiFilterChange}
-            
           />
         </Box>
+
       </Box>
+
       <Box
         sx={{
           display: "grid",
@@ -110,25 +142,22 @@ const CoursePage = () => {
           mb: 5,
         }}
       >
-    
         {isLoading ? (
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gridColumn: "1/-1",
-              py: 10,
-              gap: 2,
-            }}
-          >
+          <Box sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gridColumn: "1/-1",
+            py: 10,
+            gap: 2,
+          }}>
             <CircularProgress size={50} />
-          <Typography variant="h6" sx={{ color: "var(--primary)" }}>
-            Loading Courses...
-          </Typography>
+            <Typography variant="h6" sx={{ color: "var(--primary)" }}>
+              Loading Grades...
+            </Typography>
           </Box>
-        ) : Object.keys(groupedCourses).length > 0 ? (
-          Object.keys(groupedCourses)
+        ) : Object.keys(groupedSchedaul).length > 0 ? (
+          Object.keys(groupedSchedaul)
             .sort((a, b) => {
               const [levelA, semA] = a.split("-");
               const [levelB, semB] = b.split("-");
@@ -141,26 +170,24 @@ const CoursePage = () => {
             .map((key) => {
               const [level, semester] = key.split("-");
               const isActive =
-                selectedGroup?.level === level &&
-                selectedGroup?.semester === semester;
-
+                selectedGroup?.level === level && selectedGroup?.semester === semester;
               return (
                 <SemesterCard
-                text="Courses"
-                icon={<SchoolIcon />}
+                icon={<GradeIcon />}
                   key={key}
                   level={level}
                   semester={semester}
-                  count={groupedCourses[key].length}
+                  count={groupedSchedaul[key].length}
                   isActive={isActive}
+                  text="Grades"
                   onClick={() =>
                     setSelectedGroup(isActive ? null : { level, semester })
                   }
+                  onExport={(e) => handleExport(e, level, semester)}
                 />
               );
             })
         ) : (
-          // 2. تحديث رسالة "لا توجد بيانات" لتكون أوضح
           <Box sx={{
             gridColumn: "1/-1",
             textAlign: "center",
@@ -171,13 +198,14 @@ const CoursePage = () => {
           }}>
             <Typography variant="h6" sx={{ color: "var(--primary)", opacity: 0.7 }}>
               {searchTerm 
-                ? `No courses found matching "${searchTerm}"` 
-                : "No courses available for the selected filters."}
+                ? `No grades found matching "${searchTerm}"` 
+                : "No grades available for the selected filters."}
             </Typography>
           </Box>
         )}
       </Box>
-      {selectedGroup &&Object.keys(groupedCourses).length > 0 && (
+
+      {selectedGroup && (
         <Box
           sx={{
             mt: 4,
@@ -197,7 +225,7 @@ const CoursePage = () => {
             }}
           >
             <h3 style={{ margin: 0, color: "var(--primary)" }}>
-              Courses - Level {selectedGroup.level} / Semester{" "}
+              Grades - Level {selectedGroup.level} / Semester{" "}
               {selectedGroup.semester}
             </h3>
             <button
@@ -214,20 +242,23 @@ const CoursePage = () => {
           </Box>
 
           <SharedTable
-            columns={coursesColumns}
+            columns={SchedaulTable}
             data={
-              groupedCourses[
+              groupedSchedaul[
                 `${selectedGroup.level}-${selectedGroup.semester}`
               ] || []
             }
             idField="courseID"
-            detailsPath="/student-affairs/courses/details"
+            detailsPath="/admin/schedule/details"
             isAdmin={false}
+            showView={false}
           />
         </Box>
       )}
+
+      
     </div>
   );
 };
 
-export default CoursePage;
+export default SchedaulPage;

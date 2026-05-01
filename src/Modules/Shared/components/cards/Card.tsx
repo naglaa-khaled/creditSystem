@@ -16,6 +16,8 @@ const SharedCard = ({ icon, title, value }: SharedCardProps) => {
         alignItems: "center",
         justifyContent: "space-between",
         minHeight: 140, 
+        borderRadius: "16px",
+        boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
       }}
     >
       <CardContent sx={{ p: 0 }}>

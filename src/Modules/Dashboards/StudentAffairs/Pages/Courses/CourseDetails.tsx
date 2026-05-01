@@ -28,10 +28,10 @@ const CourseDetails = () => {
     <>
       <DetailsLayout
         PageName="Courses"
-        title={profile.course.courseName}
+        title={profile.courseNameEn}
         isAdmin={false}
         tableTitle="Enrolled Courses"
-        tableData={profile.enrolledStudents}
+        tableData={profile.students}
         tableColumns={[
           { id: "studentID", label: "Student ID" },
           { id: "studentName", label: "Student Name" },
@@ -39,14 +39,11 @@ const CourseDetails = () => {
         ]}
       >
         <Grid container spacing={3}>
-          <InfoField label="Course ID" value={profile.course.courseID} />
+          <InfoField label="Course ID" value={profile.courseID} />
           <InfoField
             label="Credits Hours"
-            value={profile.course.creditsHours}
+            value={profile.creditHours}
           />
-          <InfoField label="Level" value={profile.course.level} isGpa />
-          <InfoField label="Course Type" value={profile.course.courseType} />
-          <InfoField label="Semester" value={profile.course.semester} />
         </Grid>
       </DetailsLayout>
     </>

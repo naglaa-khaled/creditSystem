@@ -3,23 +3,23 @@ import SharedTable from "../../../../Shared/components/SharedTable/SharedTable";
 import { FilterBar } from "../../../../Shared/components/FilterBar/FilterBar";
 import FormModal from "../../../../Shared/components/Modals/FormModel";
 import {
-  getCourses,
-  addCourse,
-  deleteCourse,
-} from "../../../../../API/SyudentAffairsData/Courses";
+  getSchedules,
+  addSchedule,
+  deleteSchedule,
+} from "../../../../../API/SyudentAffairsData/Schedual";
 import CustomButton from "../../../../Shared/components/Button/Button";
 import { Box, useMediaQuery, useTheme } from "@mui/material";
 import ConfirmDeleteModal from "../../../../Shared/components/Modals/DeleteModal";
 import AddIcon from "@mui/icons-material/Add";
 import { type FieldValues } from "react-hook-form";
-import { type Column, type ICourse } from "../../../../Shared/Interfaces";
+import { type Column, type ISchedule} from "../../../../Shared/Interfaces";
 import { SemesterCard } from "../../../../Shared/components/CourseCard/CourseCard";
 
-const CoursePage = () => {
+const SchedaulPage = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
-  const [allCourses, setAllCourses] = useState<ICourse[]>([]);
+  const [allSchedual, setAllSchedual] = useState<ISchedule[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeApiFilters, setActiveApiFilters] = useState({
     year: "",
@@ -27,32 +27,63 @@ const CoursePage = () => {
   });
 
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [selectedCourseId, setSelectedCourseId] = useState<
+  const [selectedSchedualeId, setselectedSchedualeId] = useState<
     string | number | null
   >(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const CourseFields = [
-    { name: "courseName", label: "Course Name", required: true },
-    { name: "courseID", label: "Course Code/ID", required: true },
-    {
-      name: "creditsHours",
-      label: "Credits Hours",
-      type: "number",
-      required: true,
-    },
-    {
-      name: "level",
-      label: "Level",
-      select: true,
-      options: [
-        { value: "1", label: "Level 1" },
-        { value: "2", label: "Level 2" },
-        { value: "3", label: "Level 3" },
-        { value: "4", label: "Level 4" },
-        { value: "5", label: "Level 5" },
-      ],
-    },
-  ];
+ const SchedualField = [
+  { name: "courseName", label: "Course Name", required: true },
+  { name: "courseID", label: "Course Code/ID", required: true },
+  {
+    name: "day",
+    label: "Day",
+    select: true,
+    required: true,
+    options: [
+      { value: "Sunday", label: "Sunday" },
+      { value: "Monday", label: "Monday" },
+      { value: "Tuesday", label: "Tuesday" },
+      { value: "Wednesday", label: "Wednesday" },
+      { value: "Thursday", label: "Thursday" },
+    ],
+  },
+  { 
+    name: "startTime", 
+    label: "Start Time", 
+    type: "time", 
+    required: true 
+  },
+  { 
+    name: "endTime", 
+    label: "End Time", 
+    type: "time", 
+    required: true 
+  },
+  { name: "room", label: "Room / Hall", required: true },
+  {
+    name: "courseLevel",
+    label: "Level",
+    select: true,
+    required: true,
+    options: [
+      { value: "1", label: "Level 1" },
+      { value: "2", label: "Level 2" },
+      { value: "3", label: "Level 3" },
+      { value: "4", label: "Level 4" },
+      { value: "5", label: "Level 5" },
+    ],
+  },
+  {
+    name: "courseSemester",
+    label: "Semester",
+    select: true,
+    required: true,
+    options: [
+      { value: "1", label: "Semester 1" },
+      { value: "2", label: "Semester 2" },
+    ],
+  },
+];
   const [selectedGroup, setSelectedGroup] = useState<{
     level: string;
     semester: string;
@@ -60,12 +91,12 @@ const CoursePage = () => {
 
   const loadDataFromApi = async (year?: string, semester?: string) => {
     try {
-      const data = await getCourses(year, semester);
+      const data = await getSchedules(year, semester);
       setTimeout(() => {
-        setAllCourses(data);
+        setAllSchedual(data);
       }, 0);
     } catch (error) {
-      console.error("Failed to load courses:", error);
+      console.error("Failed to load Scheduals:", error);
     }
   };
 
@@ -74,29 +105,29 @@ const CoursePage = () => {
   }, []);
 
   const handleOpenDeleteModal = (id: string | number) => {
-    setSelectedCourseId(id);
+    setselectedSchedualeId(id);
     setDeleteModalOpen(true);
   };
 
-  //delete course handler
+  //delete Schedual handler
   const handleConfirmDelete = async () => {
-    if (selectedCourseId) {
+    if (selectedSchedualeId) {
       try {
-        await deleteCourse(selectedCourseId);
-        setAllCourses((prev) =>
-          prev.filter((course) => course.courseID !== selectedCourseId),
+        await deleteSchedule(selectedSchedualeId);
+        setAllSchedual((prev) =>
+          prev.filter((schedual) => schedual.courseID !== selectedSchedualeId),
         );
         setDeleteModalOpen(false);
-        setSelectedCourseId(null);
+        setselectedSchedualeId(null);
       } catch (error) {
         console.error("Delete failed", error);
       }
     }
   };
-  //add course handler
-  const handleSavecourse = async (data: FieldValues) => {
+  //add Schedual handler
+  const handleSaveSchedual = async (data: FieldValues) => {
     try {
-      await addCourse(data);
+      await addSchedule(data);
       setIsAddModalOpen(false);
       loadDataFromApi();
     } catch (error) {
@@ -105,18 +136,18 @@ const CoursePage = () => {
   };
 
   const filteredData = useMemo(() => {
-    return allCourses.filter((course) =>
-      course.courseName.toLowerCase().includes(searchTerm.toLowerCase()),
+    return allSchedual.filter((schedaul) =>
+      schedaul.courseName.toLowerCase().includes(searchTerm.toLowerCase()),
     );
-  }, [allCourses, searchTerm]);
+  }, [allSchedual, searchTerm]);
 
-  const groupedCourses = useMemo(() => {
-    const groups: Record<string, ICourse[]> = {};
+  const groupedSchedaul = useMemo(() => {
+    const groups: Record<string, ISchedule[]> = {};
 
-    filteredData.forEach((course) => {
-      const key = `${course.level}-${course.semester}`;
+    filteredData.forEach((schedual) => {
+      const key = `${schedual.courseLevel}-${schedual.courseSemester}`;
       if (!groups[key]) groups[key] = [];
-      groups[key].push(course);
+      groups[key].push(schedual);
     });
 
     return groups;
@@ -128,18 +159,20 @@ const CoursePage = () => {
     loadDataFromApi(updatedFilters.year, updatedFilters.semester);
   };
 
-  const CourseColumns: Column<ICourse>[] = [
+  const SchdualTable: Column<ISchedule>[] = [
     { id: "courseID", label: "Course ID" },
     { id: "courseName", label: "Course Name" },
-    { id: "creditsHours", label: "Credits" },
-    { id: "level", label: "Level" },
-    { id: "semester", label: "Semester" },
+    { id: "day", label: "day" },
+    { id: "startTime", label: "startTime" },
+    { id: "endTime", label: "endTime" },
+    { id: "room", label: "room" },
+
   ];
 
   return (
     <div style={{ padding: isMobile ? "10px" : "20px" }}>
       <h2 style={{ marginBottom: "20px", color: "var(--primary)" }}>
-        Courses Management
+        Schedual Management
       </h2>
 
       <Box
@@ -158,7 +191,7 @@ const CoursePage = () => {
           />
         </Box>
         <CustomButton
-          label="Add Course"
+          label="Add Schedual"
           icon={<AddIcon />}
           variantType="primary"
           onClick={() => setIsAddModalOpen(true)}
@@ -177,7 +210,7 @@ const CoursePage = () => {
           mb: 5,
         }}
       >
-        {allCourses.length === 0 ? (
+        {allSchedual.length === 0 ? (
           <Box
             sx={{
               textAlign: "center",
@@ -188,8 +221,8 @@ const CoursePage = () => {
           >
             Loading data...
           </Box>
-        ) : Object.keys(groupedCourses).length > 0 ? (
-          Object.keys(groupedCourses)
+        ) : Object.keys(groupedSchedaul).length > 0 ? (
+          Object.keys(groupedSchedaul)
             .sort((a, b) => {
               const [levelA, semA] = a.split("-");
               const [levelB, semB] = b.split("-");
@@ -207,10 +240,11 @@ const CoursePage = () => {
 
               return (
                 <SemesterCard
+                text="Schedual"
                   key={key}
                   level={level}
                   semester={semester}
-                  count={groupedCourses[key].length}
+                  count={groupedSchedaul[key].length}
                   isActive={isActive}
                   onClick={() =>
                     setSelectedGroup(isActive ? null : { level, semester })
@@ -227,7 +261,7 @@ const CoursePage = () => {
               color: "#aaa",
             }}
           >
-            No courses found for the selected filters.
+            No Schedual found for the selected filters.
           </Box>
         )}
       </Box>
@@ -252,7 +286,7 @@ const CoursePage = () => {
             }}
           >
             <h3 style={{ margin: 0, color: "var(--primary)" }}>
-              Courses - Level {selectedGroup.level} / Semester{" "}
+              Schedual - Level {selectedGroup.level} / Semester{" "}
               {selectedGroup.semester}
             </h3>
             <button
@@ -269,14 +303,14 @@ const CoursePage = () => {
           </Box>
 
           <SharedTable
-            columns={CourseColumns}
+            columns={SchdualTable}
             data={
-              groupedCourses[
+              groupedSchedaul[
                 `${selectedGroup.level}-${selectedGroup.semester}`
               ] || []
             }
             idField="courseID"
-            detailsPath="/admin/courses/details"
+            detailsPath="/admin/schedule/details"
             isAdmin={true}
             onDelete={handleOpenDeleteModal}
           />
@@ -287,17 +321,17 @@ const CoursePage = () => {
         open={isDeleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
         onConfirm={handleConfirmDelete}
-        message="Are you sure you want to delete this Course record?"
+        message="Are you sure you want to delete this schedual record?"
       />
       <FormModal
         open={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        onSave={handleSavecourse}
-        title="Add New Course"
-        fields={CourseFields}
+        onSave={handleSaveSchedual}
+        title="Add New Schedaul"
+        fields={SchedualField}
       />
     </div>
   );
 };
 
-export default CoursePage;
+export default SchedaulPage;

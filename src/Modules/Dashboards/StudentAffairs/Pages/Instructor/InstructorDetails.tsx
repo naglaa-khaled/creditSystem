@@ -31,7 +31,7 @@ const InstructorDetails = () => {
     <>
       <DetailsLayout
         PageName="Instructors"
-        title={instructor.name}
+        title={instructor.nameEn}
         isAdmin={false}
         tableTitle="Assigned Courses"
         tableData={instructor.coursesList || []}

@@ -26,9 +26,9 @@ import {
 
 const DashboardHome = () => {
   const [stats, setStats] = useState({
-    students: 0,
-    professors: 0,
-    courses: 0,
+    totalStudents: 0,
+    totalInstructors: 0,
+    totalCourses: 0,
   });
   const [recentStudents, setRecentStudents] = useState<IStudent[]>([]);
 
@@ -52,7 +52,7 @@ const DashboardHome = () => {
 
   return (
     <Box sx={{ p: 3, backgroundColor: "#f9fafb", minHeight: "100vh" }}>
-      <Typography variant="h5" sx={{ fontWeight: "bold", mb: 0.5 }}>
+      <Typography variant="h5" sx={{ fontWeight: "bold", mb: 2 ,color:"var(--primary)", fontSize: "1.8rem"}}>
         Dashboard
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
@@ -62,23 +62,23 @@ const DashboardHome = () => {
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <SharedCard
-            icon={<SchoolIcon sx={{ fontSize: 40, color: "#5d5fef" }} />}
+            icon={<SchoolIcon sx={{ fontSize: 40, color: "var(--primary)" }} />}
             title="Total Students"
-            value={stats.students}
+            value={stats.totalStudents}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <SharedCard
-            icon={<PersonIcon sx={{ fontSize: 40, color: "#5d5fef" }} />}
+            icon={<PersonIcon sx={{ fontSize: 40, color: "var(--primary)" }} />}
             title="Total Professors"
-            value={stats.professors}
+            value={stats.totalInstructors}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <SharedCard
-            icon={<MenuBookIcon sx={{ fontSize: 40, color: "#5d5fef" }} />}
+            icon={<MenuBookIcon sx={{ fontSize: 40, color: "var(--primary)" }} />}
             title="Total Courses"
-            value={stats.courses}
+            value={stats.totalCourses}
           />
         </Grid>
       </Grid>
@@ -176,7 +176,7 @@ const DashboardHome = () => {
 
               <Button
                 component={Link}
-                to={`${basePath}/professors`}
+                to={`${basePath}/instructors`}
                 fullWidth
                 variant="contained"
                 startIcon={<SchoolIcon />}

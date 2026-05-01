@@ -16,33 +16,44 @@ interface SidebarItem {
 
 interface SidebarProps {
   items: SidebarItem[];
+  onItemClick?: () => void;
 }
 
-const Sidebar = ({ items }: SidebarProps) => {
+const Sidebar = ({ items, onItemClick }: SidebarProps) => {
   const location = useLocation();
 
   return (
     <Box
       sx={{
-        width: 240,
+        width: { xs: 240, sm: 250, md: 260 },
         height: "100vh",
-        backgroundColor: "var(--bg)",
+        backgroundColor:"#eff2fe",
         color: "var(--primary)",
         display: "flex",
         flexDirection: "column",
-        borderRight: "1px solid var(--gray)",
       }}
     >
       <List>
         {items?.length > 0 &&
           items.map((item, index) => {
-            const isActive = location.pathname === item.path;
-
+            const path = item.path || "";
+            const currentPath = location.pathname;
+            const isActive = [
+              "/admin",
+              "/student-affairs",
+              "/doctors",
+            ].includes(path)
+              ? currentPath === path
+              : currentPath.toLowerCase().startsWith(path.toLowerCase());
             return (
               <ListItem key={index} disablePadding>
                 <ListItemButton
                   component={NavLink}
                   to={item.path || "#"}
+                  onClick={() => {
+                    console.log("clicked");
+                    if (onItemClick) onItemClick(); 
+                  }}
                   sx={{
                     margin: "8px 12px",
                     borderRadius: "10px",

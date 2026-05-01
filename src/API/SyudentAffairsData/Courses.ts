@@ -7,9 +7,8 @@ import {  type ICourse, type IApiResponse,  type IFullCourseProfile} from "../..
 
 export const addCourse = async (courseData: Partial<ICourse>): Promise<IApiResponse> => {
   try {
-    await axiosInstance.post(`/student-affairs/courses`, courseData);
+    await axiosInstance.post(`/student-affairs/courses/`, courseData);
     return { success: true };
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     console.log("Mock Add Course:", courseData);
     return { success: true }; 
@@ -28,37 +27,40 @@ export const deleteCourse = async (courseId: string | number): Promise<IApiRespo
 };
 export const getCourseProfile = async (courseId: string | number): Promise<IFullCourseProfile> => {
   try {
-    const res = await axiosInstance.get(`/student-affairs/course-profile/${courseId}`);
+    const res = await axiosInstance.get(`student-affairs/course-enrollments/${courseId}`);
     return res.data; 
   } catch (error) {
     return {
-      course: { 
+
         courseID: "CSC305", 
-        courseName: "Database System", 
-        creditsHours: 3, 
-        level: "300",
-        courseType: "Core",
-        semester: "Semester 2",
-        status: "Active"
-      },
-      enrolledStudents: [
-        { studentID: "1", studentName: "Ramy", status: "Registered", StudentYear: "1st" },
-        { studentID: "2", studentName: "Alaa", status: "Registered", StudentYear: "2st" },
-        { studentID: "3", studentName: "Ragia Farid", status: "Registered", StudentYear: "3st" },
+        courseNameEn: "Database System", 
+        creditHours: 3, 
+      students: [
+        { studentID: "1", studentName: "Ramy", status: "Registered" },
+        { studentID: "2", studentName: "Alaa", status: "Registered" },
+        { studentID: "3", studentName: "Ragia Farid", status: "Registered" },
       ]
     };
   }
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const getCourses = async (year?: string, semester?: string): Promise<ICourse[]> => {
   try {
-    const res = await axiosInstance.get(`/student-affairs/courses`);
+    const res = await axiosInstance.get(`student-affairs/view-courses`, {
+      params: { 
+        level: year || undefined, 
+        semester: semester || undefined 
+      },
+    });
     return res.data;
   } catch (error) {
     return [
-      { courseID: "CSC301", courseName: "Algorithms", creditsHours: 4, status: "Enrolled" ,semester: "Semester 2", level: "300", courseType: "Core"},
-      { courseID: "CSC305", courseName: "Database System", creditsHours: 3, status: "Enrolled",semester: "Semester 2", level: "300", courseType: "Core" }
+      { courseID: "CSC301", courseNameEn: "Algorithms", creditHours: 4 ,semester: " 2", level: "3", courseType: "Core"},
+      { courseID: "CSC305", courseNameEn: "Database System", creditHours: 3,semester: " 2", level: "3", courseType: "Core" },
+      { courseID: "CSC304", courseNameEn: "Software", creditHours: 3,semester: " 2", level: "1", courseType: "Core" },
+      { courseID: "CSC307", courseNameEn: "embedded system", creditHours: 12,semester: " 1", level: "1", courseType: "Core" },
+      { courseID: "CSC307", courseNameEn: "embedded system", creditHours: 12,semester: " 2", level: "1", courseType: "Core" },
+      { courseID: "CSC307", courseNameEn: "embedded system", creditHours: 12,semester: " 1", level: "3", courseType: "Core" },
     ];
   }
 };

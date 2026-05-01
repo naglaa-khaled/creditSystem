@@ -5,13 +5,13 @@ import {
   getInstructors,
   
 } from "../../../../../API/SyudentAffairsData/Instructor";
-import { Box, useMediaQuery, useTheme } from "@mui/material";
+import { Box, CircularProgress, Typography, useMediaQuery, useTheme } from "@mui/material";
 import {  type Column,type IInstructor } from "../../../../Shared/Interfaces";
 
 const Instructors = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-
+const [isLoading, setIsLoading] = useState(false);
   const [allInstructors, setAllInstructors] = useState<IInstructor[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
  
@@ -19,14 +19,15 @@ const Instructors = () => {
 
 
 
-  const loadDataFromApi = async () => {
+ const loadDataFromApi = async () => {
+    setIsLoading(true); 
     try {
       const data = await getInstructors();
-      setTimeout(() => {
-        setAllInstructors(data);
-      }, 0);
+      setAllInstructors(data);
     } catch (error) {
-      console.error("Failed to load students:", error);
+      console.error("Failed to load instructors:", error); 
+    } finally {
+      setIsLoading(false); 
     }
   };
 
@@ -41,7 +42,7 @@ const Instructors = () => {
 
   const filteredData = useMemo(() => {
     return allInstructors.filter((Instructor) =>
-      Instructor.name.toLowerCase().includes(searchTerm.toLowerCase()),
+      Instructor.nameEn.toLowerCase().includes(searchTerm.toLowerCase()),
     );
   }, [allInstructors, searchTerm]);
 
@@ -49,7 +50,7 @@ const Instructors = () => {
 
 const InstructorColumns: Column<IInstructor>[] = [
   { id: "instructorID", label: "ID" },
-  { id: "name", label: "Name" },
+  { id: "nameEn", label: "Name" },
   { id: "email", label: "Email" },
   { id: "totalCourses", label: "Total Courses" },
 ];
@@ -75,6 +76,23 @@ const InstructorColumns: Column<IInstructor>[] = [
           />
         </Box>
       </Box>
+      {isLoading ? (
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            py: 10,
+            gap: 2
+          }}
+        >
+          <CircularProgress size={50} />
+          <Typography variant="h6" sx={{ color: "var(--primary)" }}>
+            Loading Instructors...
+          </Typography>
+        </Box>
+      ) : filteredData.length > 0 ? (
 
       <SharedTable
         columns={InstructorColumns}
@@ -85,8 +103,24 @@ const InstructorColumns: Column<IInstructor>[] = [
       />
 
       
-      
+      ): (
+        <Box
+          sx={{
+            textAlign: "center",
+            py: 10,
+            border: "1px dashed #ccc",
+            borderRadius: "8px",
+            backgroundColor: "#f9f9f9"
+          }}
+        >
+          <Typography variant="h6" color="var(--primary)">
+            {searchTerm ? `No instructors found matching "${searchTerm}"` : "No instructors available."}
+          </Typography>
+        </Box>
+      )}
     </div>
+
+
   );
 };
 

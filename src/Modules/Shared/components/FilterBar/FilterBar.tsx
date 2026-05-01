@@ -31,6 +31,9 @@ export const FilterBar = ({ onSearch, onFilterChange }: FilterBarProps) => {
             <MenuItem value="">All Years</MenuItem>
             <MenuItem value="1">1st Year</MenuItem>
             <MenuItem value="2">2nd Year</MenuItem>
+            <MenuItem value="3">3nd Year</MenuItem>
+            <MenuItem value="4">4nd Year</MenuItem>
+            <MenuItem value="5">5nd Year</MenuItem>
           </Select>
 
           <Select

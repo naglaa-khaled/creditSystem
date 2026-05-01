@@ -49,7 +49,7 @@ const SharedTable = <T extends Record<string, any>>({
       }}
     >
       <Table>
-        <TableHead sx={{ backgroundColor: "#f9fafb" }}>
+        <TableHead sx={{ backgroundColor: "#eff2fe" }}>
           <TableRow>
             {columns.map((column) => (
               <TableCell

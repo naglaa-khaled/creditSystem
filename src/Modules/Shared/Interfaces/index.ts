@@ -18,12 +18,12 @@ export interface IFullStudentProfile {
   courses: ICourse[];
 }
 export interface IFullCourseProfile {
-  course: ICourse;
-  enrolledStudents: {
+courseID:string;
+courseNameEn:string;
+creditHours:number;
+  students: {
     studentID: string | number;
     studentName: string;
-    StudentYear: string;
-
     status: string;
   }[];
 }
@@ -31,19 +31,18 @@ export interface IFullCourseProfile {
 // --- Course Related Interfaces ---
 export interface ICourse {
   courseID: string;
-  courseName: string;
-  creditsHours: number;
-  semester: string;
-  level: string;
-  courseType: string;
-  status: string;
+  courseNameEn: string;
+  creditHours: number;
+  semester?: string;
+  level?: string;
+  courseType?: string;
 }
 
 // --- API Responses ---
 export interface IDashboardStats {
-  students: number;
-  professors: number;
-  courses: number;
+  totalStudents: number,
+    totalInstructors: number,
+    totalCourses: number,
 }
 
 export interface IRecentStudentResponse {
@@ -85,8 +84,31 @@ export interface IInstructorCourse {
 
 export interface IInstructor {
   instructorID: number;
-  name: string;
+  nameEn: string;
   email: string;
   totalCourses: number;
   coursesList: IInstructorCourse[]; 
+}
+// Schedual
+export interface ISchedule {
+  courseName: string;
+  courseID: string;
+  day: string;
+  startTime: string;
+  endTime: string;
+  room: string;
+  courseLevel: number;
+  courseSemester: number;
+}
+export interface IGrades {
+  studentID: string | number;
+  studentName: string;
+  courseID: string;
+  courseName: string;
+  courseLevel: number;
+  courseSemester: number;
+  letterGrade: string;
+  numericGrade: number;
+  midterm: number;
+  final: number;
 }

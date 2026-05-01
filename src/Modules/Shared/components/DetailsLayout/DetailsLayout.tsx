@@ -8,9 +8,9 @@ import { type IDetailsLayoutProps } from "../../Interfaces/index";
 
 
 
-const DetailsLayout = ({
+const DetailsLayout = <T extends Record<string, unknown>,>({
   title, isAdmin, tableTitle, tableData, tableColumns, onEdit,PageName, children
-}: IDetailsLayoutProps) => {
+}: IDetailsLayoutProps<T>) => {
   const navigate = useNavigate();
 
   return (
