@@ -19,7 +19,6 @@ export const deleteCourse = async (courseId: string | number): Promise<IApiRespo
   try {
     await axiosInstance.delete(`/student-affairs/courses/${courseId}`);
     return { success: true };
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     console.log("Mock Delete Course ID:", courseId);
     return { success: true }; 
@@ -30,17 +29,8 @@ export const getCourseProfile = async (courseId: string | number): Promise<IFull
     const res = await axiosInstance.get(`student-affairs/course-enrollments/${courseId}`);
     return res.data; 
   } catch (error) {
-    return {
-
-        courseID: "CSC305", 
-        courseNameEn: "Database System", 
-        creditHours: 3, 
-      students: [
-        { studentID: "1", studentName: "Ramy", status: "Registered" },
-        { studentID: "2", studentName: "Alaa", status: "Registered" },
-        { studentID: "3", studentName: "Ragia Farid", status: "Registered" },
-      ]
-    };
+    console.error(error);
+    throw error; 
   }
 };
 
@@ -54,14 +44,8 @@ export const getCourses = async (year?: string, semester?: string): Promise<ICou
     });
     return res.data;
   } catch (error) {
-    return [
-      { courseID: "CSC301", courseNameEn: "Algorithms", creditHours: 4 ,semester: " 2", level: "3", courseType: "Core"},
-      { courseID: "CSC305", courseNameEn: "Database System", creditHours: 3,semester: " 2", level: "3", courseType: "Core" },
-      { courseID: "CSC304", courseNameEn: "Software", creditHours: 3,semester: " 2", level: "1", courseType: "Core" },
-      { courseID: "CSC307", courseNameEn: "embedded system", creditHours: 12,semester: " 1", level: "1", courseType: "Core" },
-      { courseID: "CSC307", courseNameEn: "embedded system", creditHours: 12,semester: " 2", level: "1", courseType: "Core" },
-      { courseID: "CSC307", courseNameEn: "embedded system", creditHours: 12,semester: " 1", level: "3", courseType: "Core" },
-    ];
+    console.error(error);
+    throw error; 
   }
 };
 export const updateCourse = async (courseId: string | number, updatedData: Partial<ICourse>): Promise<IApiResponse> => {

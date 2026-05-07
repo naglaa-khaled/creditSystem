@@ -26,8 +26,8 @@ export const getStudentProfile = async (studentId: studentId): Promise<IFullStud
         completedHours: 78,
       },
       courses: [
-        { courseID: "CSC301", courseNameEn: "Algorithms", creditHours: 4 ,semester: "Semester 2", level: "300", courseType: "Core"},
-        { courseID: "CSC305", courseNameEn: "Database System", creditHours: 3,semester: "Semester 2", level: "300", courseType: "Core" }
+        { courseID: "CSC301", courseNameEn: "Algorithms", creditHours: 4 ,semester: "Semester 2", level: "300", courseType: "Core",status: "Enrolled" },
+        { courseID: "CSC305", courseNameEn: "Database System", creditHours: 3,semester: "Semester 2", level: "300", courseType: "Core",status: "Enrolled"  }
       ]
     };
   }

@@ -15,6 +15,7 @@ export const getInstructors = async (): Promise<IInstructor[]> => {
         totalCourses: 2,
         coursesList: [{ courseID: "1", courseName: "Database", studentsCount: 1 }]
       }
+      
     ];
   }
 };

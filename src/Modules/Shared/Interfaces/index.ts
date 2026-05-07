@@ -24,9 +24,15 @@ creditHours:number;
   students: {
     studentID: string | number;
     studentName: string;
+  course: ICourse;
+  enrolledStudents: {
+    studentID: string | number;
+    studentName: string;
+    StudentYear: string;
+
     status: string;
   }[];
-}
+}}
 
 // --- Course Related Interfaces ---
 export interface ICourse {
@@ -36,6 +42,7 @@ export interface ICourse {
   semester?: string;
   level?: string;
   courseType?: string;
+  status: string;
 }
 
 // --- API Responses ---
@@ -43,6 +50,9 @@ export interface IDashboardStats {
   totalStudents: number,
     totalInstructors: number,
     totalCourses: number,
+  students: number;
+  professors: number;
+  courses: number;
 }
 
 export interface IRecentStudentResponse {
@@ -85,6 +95,7 @@ export interface IInstructorCourse {
 export interface IInstructor {
   instructorID: number;
   nameEn: string;
+  name?: string;
   email: string;
   totalCourses: number;
   coursesList: IInstructorCourse[]; 

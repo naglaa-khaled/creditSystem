@@ -106,7 +106,7 @@ const CoursePage = () => {
 
   const filteredData = useMemo(() => {
     return allCourses.filter((course) =>
-      course.courseName.toLowerCase().includes(searchTerm.toLowerCase()),
+      course.courseNameEn.toLowerCase().includes(searchTerm.toLowerCase()),
     );
   }, [allCourses, searchTerm]);
 
@@ -130,8 +130,8 @@ const CoursePage = () => {
 
   const CourseColumns: Column<ICourse>[] = [
     { id: "courseID", label: "Course ID" },
-    { id: "courseName", label: "Course Name" },
-    { id: "creditsHours", label: "Credits" },
+    { id: "courseNameEn", label: "Course Name" },
+    { id: "creditHours", label: "Credits" },
     { id: "level", label: "Level" },
     { id: "semester", label: "Semester" },
   ];
@@ -207,6 +207,8 @@ const CoursePage = () => {
 
               return (
                 <SemesterCard
+                text="Courses"
+                icon="📚"
                   key={key}
                   level={level}
                   semester={semester}

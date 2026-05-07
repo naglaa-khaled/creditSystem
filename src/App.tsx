@@ -8,6 +8,7 @@ import ChangePass from "./Modules/AuthModule/components/ChangePass/ChangePass";
 import ForgetPass from "./Modules/AuthModule/components/ForgetPass/ForgetPass";
 import Regulations from "./Modules/AuthModule/components/Regulations/Regulations";
 import CheckEmail from "./Modules/AuthModule/components/CheckEmail/CheckEmail";
+
 import StudentAffairsDashboard from "./Modules/Dashboards/StudentAffairs/Dashboard";
 import DashboardHome from "./Modules/Dashboards/StudentAffairs/Pages/DashboardHome";
 import StudentsPage from "./Modules/Dashboards/StudentAffairs/Pages/Students/StudentsPage";
@@ -25,8 +26,21 @@ import Instructor from "./Modules/Dashboards/StudentAffairs/Pages/Instructor/Ins
 import InstructorDetails from "./Modules/Dashboards/StudentAffairs/Pages/Instructor/InstructorDetails";
 import Schedual from "./Modules/Dashboards/Admin/Pages/Scheduals/Schedual";
 import SchedualDetails from "./Modules/Dashboards/Admin/Pages/Scheduals/SchedualDetails";
-import SchedualPage from "./Modules/Dashboards/StudentAffairs/Pages/Schedual/Schedual"
-import GradesPage from "./Modules/Dashboards/StudentAffairs/Pages/Grades/Grades"
+import SchedualPage from "./Modules/Dashboards/StudentAffairs/Pages/Schedual/Schedual";
+import GradesPage from "./Modules/Dashboards/StudentAffairs/Pages/Grades/Grades";
+import DoctorDashboard from "./Modules/Dashboards/Doctors/DoctorDashboard";
+import Docgrades from "./Modules/Dashboards/Doctors/Pages/Docgrades";
+import Docourses from "./Modules/Dashboards/Doctors/Pages/Docourses";
+import Schedule from "./Modules/Dashboards/Doctors/Pages/Schedule";
+import Dashborarddoc from "./Modules/Dashboards/Doctors/Pages/Dashborarddoc";
+import DoCourseStudents from "./Modules/Dashboards/Doctors/Pages/DoCourseStudents";
+import Grads from "./Modules/Dashboards/Doctors/Pages/Grads";
+import ProtectedRoute from "./Modules/AuthModule/components/Protectedroute/ProtectedRoute";
+import AuthContextProvider from "./context/AuthContext";
+import NotFound from "./Modules/AuthModule/components/NotFound/NotFound";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 function App() {
   const routes = createBrowserRouter([
     {
@@ -48,22 +62,30 @@ function App() {
     },
     {
       path: "/student-affairs",
-      element: <StudentAffairsDashboard />,
+      element: (
+        <ProtectedRoute>
+          <StudentAffairsDashboard />
+        </ProtectedRoute>
+      ),
       children: [
         { index: true, element: <DashboardHome /> },
         { path: "students", element: <StudentsPage /> },
         { path: "students/details/:id", element: <StudentDetailsPage /> },
         { path: "courses", element: <CoursesPage /> },
-        {path: "courses/details/:id", element: <CourseDetails /> },
+        { path: "courses/details/:id", element: <CourseDetails /> },
         { path: "instructors", element: <Instructor /> },
-        {path: "instructors/details/:id", element: <InstructorDetails /> },
-        {path: "schedule", element: <SchedualPage /> },
-        {path: "grades", element: <GradesPage /> },
+        { path: "instructors/details/:id", element: <InstructorDetails /> },
+        { path: "schedule", element: <SchedualPage /> },
+        { path: "grades", element: <GradesPage /> },
       ],
     },
     {
       path: "/admin",
-      element: <AdminDashboard />,
+      element: (
+        <ProtectedRoute>
+          <AdminDashboard />
+        </ProtectedRoute>
+      ),
       children: [
         { index: true, element: <DashboardHome /> },
         { path: "students", element: <Students /> },
@@ -74,15 +96,35 @@ function App() {
         { path: "instructors/details/:id", element: <AInstructorDetails /> },
         { path: "schedule", element: <Schedual /> },
         { path: "schedule/details/:id", element: <SchedualDetails /> },
-
-
+      ],
+    },
+    {
+      path: "/doctors",
+      element: (
+        <ProtectedRoute>
+          {" "}
+          <DoctorDashboard />{" "}
+        </ProtectedRoute>
+      ),
+      errorElement: <NotFound />,
+      children: [
+        { index: true, element: <Dashborarddoc /> },
+        { path: "dashboarddoc", element: <Dashborarddoc /> },
+        { path: "docgrads", element: <Docgrades /> },
+        { path: "courses", element: <Docourses /> },
+        { path: "schedule", element: <Schedule /> },
+        { path: "docourse/:courseId", element: <DoCourseStudents /> },
+        { path: "grads", element: <Grads /> },
       ],
     },
   ]);
 
   return (
     <>
-      <RouterProvider router={routes}></RouterProvider>
+      <AuthContextProvider>
+        <ToastContainer position="top-right" autoClose={3000} theme="colored" />
+        <RouterProvider router={routes}></RouterProvider>
+      </AuthContextProvider>
     </>
   );
 }
