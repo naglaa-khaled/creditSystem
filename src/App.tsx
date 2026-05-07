@@ -7,7 +7,7 @@ import ResetPass from "./Modules/AuthModule/components/ResetPass/ResetPass";
 import ChangePass from "./Modules/AuthModule/components/ChangePass/ChangePass";
 import ForgetPass from "./Modules/AuthModule/components/ForgetPass/ForgetPass";
 import Regulations from "./Modules/AuthModule/components/Regulations/Regulations";
-import CheckEmail from "./Modules/AuthModule/components/CheckEmail/CheckEmail";
+
 import StudentAffairsDashboard from "./Modules/Dashboards/StudentAffairs/Dashboard";
 import DashboardHome from "./Modules/Dashboards/StudentAffairs/Pages/DashboardHome";
 import StudentsPage from "./Modules/Dashboards/StudentAffairs/Pages/Students/StudentsPage";
@@ -33,6 +33,8 @@ import Grads from "./Modules/Dashboards/Doctors/Pages/Grads";
 import ProtectedRoute from "./Modules/AuthModule/components/Protectedroute/ProtectedRoute";
 import AuthContextProvider from "./context/AuthContext";
 import NotFound from "./Modules/AuthModule/components/NotFound/NotFound";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 
 function App() {
@@ -50,10 +52,7 @@ function App() {
         { path: "changepass", element: <ChangePass /> },
       ],
     },
-    {
-      path: "/checkemail",
-      element: <CheckEmail />,
-    },
+   
     {
       path: "/student-affairs",
       element: <ProtectedRoute><StudentAffairsDashboard /></ProtectedRoute>,
@@ -82,22 +81,7 @@ function App() {
 
       ],
     },
-    // {
-    //   path: "/doctors",
-    //   element: <DoctorDashboard/>,
-    //   children: [
-    //     { index: true, element:<ProtectedRoute> <Dashborarddoc /> </ProtectedRoute>},
-    //      { path:"dashboarddoc", element: <ProtectedRoute> <Dashborarddoc /> </ProtectedRoute>},
-    //     { path: "docgrads", element: <ProtectedRoute><Docgrades/></ProtectedRoute> },
-    //     { path: "courses", element: <ProtectedRoute><Docourses /></ProtectedRoute> },
-    //     { path: "schedule", element:<ProtectedRoute> <Schedule /> </ProtectedRoute>},
-    //   { path: "docourse", element:<ProtectedRoute><DoCourseStudents/></ProtectedRoute> },
-    //   {path:"/doctors/docourse/:courseId" ,element:<ProtectedRoute><DoCourseStudents /></ProtectedRoute>} ,
-    //    { path: "grads", element: <Grads /> },
-
-
-    //   ],
-    // }
+    
     
 {
   path: "/doctors",
@@ -118,10 +102,20 @@ function App() {
   ]);
 
   return (
-    <>
-    <AuthContextProvider> <RouterProvider router={routes}></RouterProvider></AuthContextProvider>
-     
-    </>
+   <>
+    
+      
+       
+    <AuthContextProvider> 
+       <ToastContainer 
+          position="top-right" 
+          autoClose={3000} 
+          theme="colored" 
+        />
+      <RouterProvider router={routes}></RouterProvider>
+      </AuthContextProvider>
+     </>
+  
   );
 }
 
