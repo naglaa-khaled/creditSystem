@@ -1,16 +1,3 @@
-// import { Button, Stack, TextField, Typography } from "@mui/material";
-// import axios from "axios";
-// import { useForm } from "react-hook-form";
-// import { useNavigate } from "react-router-dom";
-
-
-
-// export default function ChangePass() {
-//      let {register,formState:{errors},handleSubmit} = useForm();
-//   let navigate = useNavigate();
-//   let onsubmit=async(data:any)=>{
-//    try{
-//     let response = await axios.post('https://upskilling-egypt.com:3007/api/auth/change-password',data,
 // import { Button, Paper, Stack, TextField, Typography } from "@mui/material";
 // import axios from "axios";
 // import { Box } from "lucide-react";
@@ -92,7 +79,7 @@
 
 //   )
 // }
-import { Button, Paper, TextField, Typography, InputAdornment, IconButton, Box, CircularProgress } from "@mui/material";
+import { Button, Paper, Stack, TextField, Typography, InputAdornment, IconButton, Box, CircularProgress } from "@mui/material";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -245,4 +232,3 @@ export default function ChangePass() {
     </Box>
   );
 }
-

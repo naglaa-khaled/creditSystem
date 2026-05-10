@@ -31,7 +31,7 @@ const CourseDetails = () => {
         title={profile.courseNameEn}
         isAdmin={false}
         tableTitle="Enrolled Courses"
-        tableData={profile.students}
+        tableData={profile.students.enrolledStudents}
         tableColumns={[
           { id: "studentID", label: "Student ID" },
           { id: "studentName", label: "Student Name" },

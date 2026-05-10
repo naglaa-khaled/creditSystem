@@ -38,13 +38,9 @@ const handleSaveEdit = async (updatedData: FieldValues) => {
 
     const response = await updateCourse(id, updatedData as ICourse);
 
-    if (response.success) {
-      setProfile((prev) => 
-        prev ? { ...prev, course: { ...prev.course, ...updatedData } as ICourse } : null
-      );
-      
+  if (response.success) {
+      setProfile((prev) => prev ? { ...prev, ...updatedData } : null);
       setEditModalOpen(false);
-      
     }
   } catch (error) {
     console.error("Update failed:", error);
@@ -58,28 +54,26 @@ const handleSaveEdit = async (updatedData: FieldValues) => {
     <>
       <DetailsLayout
         PageName="Courses"
-        title={profile.course.courseName}
+        title={profile.courseNameEn}
         isAdmin={true}
         tableTitle="Enrolled Courses"
-        tableData={profile.enrolledStudents}
+        tableData={profile.students.enrolledStudents}
         tableColumns={[
           { id: "studentID", label: "Student ID" },
-          { id: "studentName", label: "Student Name" },
-          { id: "StudentYear", label: "Student Year" },
-          
+          { id: "studentName", label: "Student Name" },          
           { id: "status", label: "Status" },
         ]}
         onEdit={() => setEditModalOpen(true)}
       >
         <Grid container spacing={3}>
-          <InfoField label="Course ID" value={profile.course.courseID} />
+          <InfoField label="Course ID" value={profile.courseID} />
           <InfoField
             label="Credits Hours"
-            value={profile.course.creditsHours}
+            value={profile.creditHours}
           />
-          <InfoField label="Level" value={profile.course.level} isGpa />
-          <InfoField label="Course Type" value={profile.course.courseType} />
-          <InfoField label="Semester" value={profile.course.semester} />
+          <InfoField label="Level" value={profile.level} isGpa />
+          <InfoField label="Course Type" value={profile.courseType} />
+          <InfoField label="Semester" value={profile.semester} />
         </Grid>
       </DetailsLayout>
       <FormModal
@@ -88,7 +82,7 @@ const handleSaveEdit = async (updatedData: FieldValues) => {
         onSave={handleSaveEdit}
         title="Edit Course Details"
         fields={editCourseFields}
-        initialData={profile.course} 
+        initialData={profile.courseID} 
       />
     </>
   );

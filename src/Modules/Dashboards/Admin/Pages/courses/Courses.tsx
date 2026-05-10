@@ -6,18 +6,28 @@ import {
   getCourses,
   addCourse,
   deleteCourse,
-} from "../../../../../API/SyudentAffairsData/Courses";
+} from "../../../../../API/AdminData/Courses";
+import SchoolIcon from "@mui/icons-material/School";
+
 import CustomButton from "../../../../Shared/components/Button/Button";
-import { Box, useMediaQuery, useTheme } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import ConfirmDeleteModal from "../../../../Shared/components/Modals/DeleteModal";
 import AddIcon from "@mui/icons-material/Add";
 import { type FieldValues } from "react-hook-form";
 import { type Column, type ICourse } from "../../../../Shared/Interfaces";
 import { SemesterCard } from "../../../../Shared/components/CourseCard/CourseCard";
+import { toast } from "react-toastify";
 
 const CoursePage = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const [isLoading, setIsLoading] = useState(false);
 
   const [allCourses, setAllCourses] = useState<ICourse[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -32,10 +42,10 @@ const CoursePage = () => {
   >(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const CourseFields = [
-    { name: "courseName", label: "Course Name", required: true },
+    { name: "nameEn", label: "Course Name", required: true },
     { name: "courseID", label: "Course Code/ID", required: true },
     {
-      name: "creditsHours",
+      name: "creditHours",
       label: "Credits Hours",
       type: "number",
       required: true,
@@ -52,6 +62,15 @@ const CoursePage = () => {
         { value: "5", label: "Level 5" },
       ],
     },
+    {
+      name: "semester",
+      label: "semester",
+      select: true,
+      options: [
+        { value: "1", label: "Semester 1" },
+        { value: "2", label: "Semester 2" },
+      ],
+    },
   ];
   const [selectedGroup, setSelectedGroup] = useState<{
     level: string;
@@ -59,13 +78,14 @@ const CoursePage = () => {
   } | null>(null);
 
   const loadDataFromApi = async (year?: string, semester?: string) => {
+    setIsLoading(true);
     try {
       const data = await getCourses(year, semester);
-      setTimeout(() => {
-        setAllCourses(data);
-      }, 0);
+      setAllCourses(data);
     } catch (error) {
       console.error("Failed to load courses:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -95,12 +115,28 @@ const CoursePage = () => {
   };
   //add course handler
   const handleSavecourse = async (data: FieldValues) => {
+    const formattedData = {
+      courseId: data.courseID,
+      nameEn: data.nameEn,
+      nameAr: data.nameEn,
+      hours: Number(data.creditHours),
+      level: Number(data.level),
+      semester: Number(data.semester),
+      courseType: "Active",
+    };
     try {
-      await addCourse(data);
-      setIsAddModalOpen(false);
-      loadDataFromApi();
+      const response = await addCourse(formattedData);
+      if (response.success) {
+        setIsAddModalOpen(false);
+        loadDataFromApi();
+        toast.success("Course Added Successfully!");
+      } else {
+        console.log(response);
+        toast.error("Fail To Add Course!");
+      }
     } catch (error) {
       console.error("Add failed", error);
+      toast.error("Fail To Add Course!");
     }
   };
 
@@ -177,16 +213,21 @@ const CoursePage = () => {
           mb: 5,
         }}
       >
-        {allCourses.length === 0 ? (
+        {isLoading ? (
           <Box
             sx={{
-              textAlign: "center",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
               gridColumn: "1/-1",
-              py: 5,
-              color: "#aaa",
+              py: 10,
+              gap: 2,
             }}
           >
-            Loading data...
+            <CircularProgress size={50} />
+            <Typography variant="h6" sx={{ color: "var(--primary)" }}>
+              Loading Courses...
+            </Typography>
           </Box>
         ) : Object.keys(groupedCourses).length > 0 ? (
           Object.keys(groupedCourses)
@@ -207,8 +248,8 @@ const CoursePage = () => {
 
               return (
                 <SemesterCard
-                text="Courses"
-                icon="📚"
+                  text="Courses"
+                  icon={<SchoolIcon />}
                   key={key}
                   level={level}
                   semester={semester}
@@ -223,13 +264,22 @@ const CoursePage = () => {
         ) : (
           <Box
             sx={{
-              textAlign: "center",
               gridColumn: "1/-1",
-              py: 5,
-              color: "#aaa",
+              textAlign: "center",
+              py: 10,
+              border: "1px dashed #ccc",
+              borderRadius: "16px",
+              backgroundColor: "#f9f9f9",
             }}
           >
-            No courses found for the selected filters.
+            <Typography
+              variant="h6"
+              sx={{ color: "var(--primary)", opacity: 0.7 }}
+            >
+              {searchTerm
+                ? `No courses found matching "${searchTerm}"`
+                : "No courses available for the selected filters."}
+            </Typography>
           </Box>
         )}
       </Box>

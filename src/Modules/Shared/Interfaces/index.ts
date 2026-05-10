@@ -21,6 +21,9 @@ export interface IFullCourseProfile {
 courseID:string;
 courseNameEn:string;
 creditHours:number;
+level: string;    
+  semester: string;
+  courseType: string;
   students: {
     studentID: string | number;
     studentName: string;
@@ -39,10 +42,19 @@ export interface ICourse {
   courseID: string;
   courseNameEn: string;
   creditHours: number;
-  semester?: string;
-  level?: string;
+  semester?: number;
+  level?: number;
   courseType?: string;
-  status: string;
+}
+export interface IAddCourse {
+  courseId: string;    
+  nameEn: string;      
+  nameAr?: string;     
+  hours: number;      
+  level: number;
+  semester: number;
+  courseType?: string;
+  status?: string;
 }
 
 // --- API Responses ---
@@ -122,4 +134,36 @@ export interface IGrades {
   numericGrade: number;
   midterm: number;
   final: number;
+}
+
+export interface ICardStats {
+  totalStudents: number;
+  totalCourses: number;
+  avgGrade: number;
+  completionRate: number;
+}
+
+export interface IStudentDistribution {
+  departmentOrLevel: string;
+  count: number;
+}
+
+export interface ITopCourse {
+  courseCode: string;
+  courseName: string;
+  enrolled: number;
+  percentage: number;
+}
+
+export interface IProfessorWorkload {
+  name: string;
+  coursesCount: number;
+  studentsCount: number;
+}
+
+export interface IReports {
+  cards: ICardStats;
+  studentDistribution: IStudentDistribution[];
+  topCourses: ITopCourse[];
+  professorWorkload: IProfessorWorkload[];
 }

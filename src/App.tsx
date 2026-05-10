@@ -1,5 +1,7 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./App.css";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import AuthLayout from "./Modules/Shared/components/AuthLayout/AuthLayout";
 import Login from "./Modules/AuthModule/components/Login/Login";
 import Register from "./Modules/AuthModule/components/Register/Register";
@@ -36,9 +38,7 @@ import Dashborarddoc from "./Modules/Dashboards/Doctors/Pages/Dashborarddoc";
 import DoCourseStudents from "./Modules/Dashboards/Doctors/Pages/DoCourseStudents";
 import Grads from "./Modules/Dashboards/Doctors/Pages/Grads";
 import ProtectedRoute from "./Modules/AuthModule/components/Protectedroute/ProtectedRoute";
-import AuthContextProvider from "./context/AuthContext";
 import NotFound from "./Modules/AuthModule/components/NotFound/NotFound";
-import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function App() {
@@ -121,10 +121,19 @@ function App() {
 
   return (
     <>
-      <AuthContextProvider>
-        <ToastContainer position="top-right" autoClose={3000} theme="colored" />
-        <RouterProvider router={routes}></RouterProvider>
-      </AuthContextProvider>
+    <ToastContainer 
+        position="bottom-center" 
+        autoClose={3000} 
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
+      <RouterProvider router={routes}></RouterProvider>
     </>
   );
 }

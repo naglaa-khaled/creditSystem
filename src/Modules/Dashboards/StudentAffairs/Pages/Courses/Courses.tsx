@@ -160,7 +160,6 @@ const CoursePage = () => {
               );
             })
         ) : (
-          // 2. تحديث رسالة "لا توجد بيانات" لتكون أوضح
           <Box sx={{
             gridColumn: "1/-1",
             textAlign: "center",
