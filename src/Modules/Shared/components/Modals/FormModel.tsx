@@ -13,6 +13,7 @@ export interface FieldConfig {
   options?: { value: string | number; label: string }[];
   required?: boolean;
   halfWidth?: boolean;
+  disabled?: boolean;
 }
 
 interface DynamicFormModalProps {
@@ -21,15 +22,22 @@ interface DynamicFormModalProps {
   onSave: (data: FieldValues) => void;
   title: string;
   fields: FieldConfig[];
-  initialData?: any; 
+  initialData?: any;
 }
 
-const FormModal = ({ open, onClose, onSave, title, fields, initialData }: DynamicFormModalProps) => {
-  const { 
-    control, 
-    handleSubmit, 
-    reset, 
-    formState: { errors } 
+const FormModal = ({
+  open,
+  onClose,
+  onSave,
+  title,
+  fields,
+  initialData,
+}: DynamicFormModalProps) => {
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
   } = useForm<FieldValues>();
 
   useEffect(() => {
@@ -48,14 +56,14 @@ const FormModal = ({ open, onClose, onSave, title, fields, initialData }: Dynami
       onClose={onClose}
       title={title}
       content={
-        <Box 
-          component="form" 
-          sx={{ 
-            display: "flex", 
-            flexWrap: "wrap", 
-            gap: 2, 
-            mt: 2, 
-            minWidth: { xs: "100%", sm: "70%" } 
+        <Box
+          component="form"
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 2,
+            mt: 2,
+            minWidth: { xs: "100%", sm: "70%" },
           }}
         >
           {fields.map((field) => (
@@ -64,12 +72,15 @@ const FormModal = ({ open, onClose, onSave, title, fields, initialData }: Dynami
               name={field.name}
               control={control}
               defaultValue=""
-              rules={{ 
+              rules={{
                 required: field.required ? `${field.label} is required` : false,
-                pattern: field.type === "email" ? {
-                  value: /\S+@\S+\.\S+/,
-                  message: "Invalid email format"
-                } : undefined
+                pattern:
+                  field.type === "email"
+                    ? {
+                        value: /\S+@\S+\.\S+/,
+                        message: "Invalid email format",
+                      }
+                    : undefined,
               }}
               render={({ field: { onChange, value } }) => (
                 <TextField
@@ -78,17 +89,31 @@ const FormModal = ({ open, onClose, onSave, title, fields, initialData }: Dynami
                   select={field.select}
                   type={field.type || "text"}
                   size="small"
-                  sx={{ flex: field.halfWidth ? "1 1 calc(50% - 10px)" : "1 1 100%" }}
+                  // 🌟 هنا زوّدنا الـ cursor جوه الـ sx عشان يقلب "not-allowed" لما الحقل يكون disabled
+                  sx={{
+                    flex: field.halfWidth ? "1 1 calc(50% - 10px)" : "1 1 100%",
+                    "& .MuiInputBase-input.Mui-disabled": {
+                      cursor: "not-allowed",
+                    },
+                    "& .MuiFormLabel-root.Mui-disabled": {
+                      cursor: "not-allowed",
+                    },
+                  }}
                   error={!!errors[field.name]}
                   helperText={errors[field.name]?.message as string}
-                  value={value ?? ""} 
+                  value={value ?? ""}
                   onChange={onChange}
+                  disabled={field.disabled}
+                  InputProps={{
+                    readOnly: field.disabled,
+                  }}
                 >
-                  {field.select && field.options?.map((opt) => (
-                    <MenuItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </MenuItem>
-                  ))}
+                  {field.select &&
+                    field.options?.map((opt) => (
+                      <MenuItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </MenuItem>
+                    ))}
                 </TextField>
               )}
             />
@@ -96,16 +121,24 @@ const FormModal = ({ open, onClose, onSave, title, fields, initialData }: Dynami
         </Box>
       }
       actions={
-        <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end", width: "100%", p: 1 }}>
-          <CustomButton 
-            label="Cancel" 
-            onClick={onClose} 
-            variantType="primary" 
+        <Box
+          sx={{
+            display: "flex",
+            gap: 2,
+            justifyContent: "flex-end",
+            width: "100%",
+            p: 1,
+          }}
+        >
+          <CustomButton
+            label="Cancel"
+            onClick={onClose}
+            variantType="primary"
           />
-          <CustomButton 
-            label={initialData ? "Save Changes" : "Add Item"} 
-            variantType="primary" 
-            onClick={handleSubmit(onSubmit)} 
+          <CustomButton
+            label={initialData ? "Save Changes" : "Add Item"}
+            variantType="primary"
+            onClick={handleSubmit(onSubmit)}
           />
         </Box>
       }

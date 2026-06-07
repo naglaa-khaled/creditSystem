@@ -18,7 +18,7 @@ import {
 } from "../../../../Shared/Interfaces/index";
 import { SemesterCard } from "../../../../Shared/components/CourseCard/CourseCard";
 import GroupsIcon from "@mui/icons-material/Groups";
-const SchedaulPage = () => {
+const StudentPage = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [isLoading, setIsLoading] = useState(false);
@@ -50,25 +50,36 @@ const SchedaulPage = () => {
     loadDataFromApi();
   }, []);
 
-  const filteredData = useMemo(() => {
-    return allStudents.filter((Student) =>
-      Student.nameEn.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
-  }, [allStudents, searchTerm]);
+const filteredData = useMemo(() => {
+  if (!allStudents) return [];
+
+  return allStudents.filter((student) => {
+    const name = student?.nameEn || student?.fullName || "";
+    
+    return name.toLowerCase().includes(searchTerm.toLowerCase());
+  });
+}, [allStudents, searchTerm]);
+console.log(filteredData);
 
   const groupedSchedaul = useMemo(() => {
     const groups: Record<string, IStudent[]> = {};
 
-    filteredData.forEach((Students) => {
-      const key = `${Students.year}-${Students.semester}`;
+    filteredData?.forEach((student) => {
+     const sYear =  student.year; 
+    const sSemester = student.semester;
+
+    if (student && sYear && sSemester) {
+      const key = `${sYear}-${sSemester}`;
       if (!groups[key]) groups[key] = [];
-      groups[key].push(Students);
+      groups[key].push(student);
+    }
     });
 
     return groups;
   }, [filteredData]);
 
   const handleApiFilterChange = (type: "year" | "semester", value: string) => {
+    console.log(type, value);
     const updatedFilters = { ...activeApiFilters, [type]: value };
     setActiveApiFilters(updatedFilters);
     loadDataFromApi(updatedFilters.year, updatedFilters.semester);
@@ -80,10 +91,10 @@ const SchedaulPage = () => {
   }, [groupedSchedaul, searchTerm]);
 
   const studentColumns: Column<IStudent>[] = [
-    { id: "nameEn", label: "Name" },
+    { id: "fullName", label: "Name" },
     { id: "studentID", label: "ID" },
     { id: "email", label: "Email" },
-    { id: "year", label: "Year" },
+{ id: "year", label: "Year" },
     { id: "gpa", label: "GPA" },
     { id: "semester", label: "Semester" },
   ];
@@ -254,4 +265,4 @@ const SchedaulPage = () => {
   );
 };
 
-export default SchedaulPage;
+export default StudentPage;

@@ -9,7 +9,7 @@ import ResetPass from "./Modules/AuthModule/components/ResetPass/ResetPass";
 import ChangePass from "./Modules/AuthModule/components/ChangePass/ChangePass";
 import ForgetPass from "./Modules/AuthModule/components/ForgetPass/ForgetPass";
 import Regulations from "./Modules/AuthModule/components/Regulations/Regulations";
-import CheckEmail from "./Modules/AuthModule/components/CheckEmail/CheckEmail";
+// import CheckEmail from "./Modules/AuthModule/components/CheckEmail/CheckEmail";
 
 import StudentAffairsDashboard from "./Modules/Dashboards/StudentAffairs/Dashboard";
 import DashboardHome from "./Modules/Dashboards/StudentAffairs/Pages/DashboardHome";
@@ -56,10 +56,10 @@ function App() {
         { path: "changepass", element: <ChangePass /> },
       ],
     },
-    {
-      path: "/checkemail",
-      element: <CheckEmail />,
-    },
+    // {
+    //   path: "/checkemail",
+    //   element: <CheckEmail />,
+    // },
     {
       path: "/student-affairs",
       element: (

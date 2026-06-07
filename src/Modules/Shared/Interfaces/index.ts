@@ -3,42 +3,52 @@
 // --- Student Related Interfaces ---
 export type studentId = number | string;
 export type CourseId = string | number;
+export interface IUserProfile {
+  fullName: string;
+  email: string;
+  role: string;
+}
 
 export interface IStudent {
   studentID: number | string;
-  nameEn: string;
+  nameEn?: string;
+  fullName?: string;
   email: string;
+  universityEmail?: string;
   year: string;
   semester: string;
   gpa?: string | number;
   completedHours?: string | number;
+  academicYear?: string;
 }
 export interface IFullStudentProfile {
   student: IStudent;
   courses: ICourse[];
 }
 export interface IFullCourseProfile {
-courseID:string;
-courseNameEn:string;
-creditHours:number;
-level: string;    
+  courseID: string;
+  courseName: string;
+  creditHours: number;
+  level: string;
   semester: string;
   courseType: string;
   students: {
     studentID: string | number;
     studentName: string;
-  course: ICourse;
-  enrolledStudents: {
-    studentID: string | number;
-    studentName: string;
-    StudentYear: string;
+    course: ICourse;
+    enrolledStudents: {
+      studentID: string | number;
+      studentName: string;
+      StudentYear: string;
 
-    status: string;
-  }[];
-}}
+      status: string;
+    }[];
+  };
+}
 
 // --- Course Related Interfaces ---
 export interface ICourse {
+  [key: string]: any;
   courseID: string;
   courseNameEn: string;
   creditHours: number;
@@ -47,10 +57,10 @@ export interface ICourse {
   courseType?: string;
 }
 export interface IAddCourse {
-  courseId: string;    
-  nameEn: string;      
-  nameAr?: string;     
-  hours: number;      
+  courseId: string;
+  nameEn: string;
+  nameAr?: string;
+  hours: number;
   level: number;
   semester: number;
   courseType?: string;
@@ -59,9 +69,9 @@ export interface IAddCourse {
 
 // --- API Responses ---
 export interface IDashboardStats {
-  totalStudents: number,
-    totalInstructors: number,
-    totalCourses: number,
+  totalStudents: number;
+  totalInstructors: number;
+  totalCourses: number;
   students: number;
   professors: number;
   courses: number;
@@ -88,7 +98,7 @@ export interface Column<T> {
   label: string;
 }
 
-export interface IDetailsLayoutProps<T extends Record<string, any>> {
+export interface IDetailsLayoutProps<T> {
   title?: string;
   isAdmin: boolean;
   tableTitle: string;
@@ -97,6 +107,7 @@ export interface IDetailsLayoutProps<T extends Record<string, any>> {
   tableColumns: Column<T>[];
   onEdit?: () => void;
   children?: React.ReactNode;
+  noDataMessage?: string;
 }
 export interface IInstructorCourse {
   courseID: string;
@@ -105,12 +116,11 @@ export interface IInstructorCourse {
 }
 
 export interface IInstructor {
-  instructorID: number;
-  nameEn: string;
-  name?: string;
+  instructorID: number | string;
+  fullName: string;
   email: string;
   totalCourses: number;
-  coursesList: IInstructorCourse[]; 
+  coursesList: IInstructorCourse[];
 }
 // Schedual
 export interface ISchedule {

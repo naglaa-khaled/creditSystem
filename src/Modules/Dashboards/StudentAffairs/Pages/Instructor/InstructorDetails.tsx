@@ -12,8 +12,6 @@ const InstructorDetails = () => {
   const { id } = useParams();
   const [instructor, setInstructor] = useState<IInstructor | null>(null);
 
-
-
   useEffect(() => {
     const loadData = async () => {
       const data = await getInstructorProfile(id as studentId);
@@ -22,8 +20,6 @@ const InstructorDetails = () => {
     loadData();
   }, [id]);
 
-
-
   if (!instructor)
     return <Typography sx={{ p: 4 }}>Loading Instructor Details...</Typography>;
 
@@ -31,10 +27,13 @@ const InstructorDetails = () => {
     <>
       <DetailsLayout
         PageName="Instructors"
-        title={instructor.nameEn}
+        title={instructor.fullName}
         isAdmin={false}
         tableTitle="Assigned Courses"
-        tableData={instructor.coursesList || []}
+        noDataMessage="no courses"
+        tableData={
+          (instructor.coursesList as unknown as Record<string, unknown>[]) || []
+        }
         tableColumns={[
           { id: "courseID", label: "Course ID" },
           { id: "courseName", label: "Course Name" },
@@ -47,15 +46,23 @@ const InstructorDetails = () => {
           <InfoField label="Total Courses" value={instructor.totalCourses} />
         </Grid>
       </DetailsLayout>
-
-      
     </>
   );
 };
 
-const InfoField = ({ label, value }: { label: string; value: string | number }) => (
+const InfoField = ({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | number;
+}) => (
   <Grid size={{ xs: 12, md: 4 }}>
-    <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 0.5 }}>
+    <Typography
+      variant="caption"
+      color="text.secondary"
+      sx={{ display: "block", mb: 0.5 }}
+    >
       {label}
     </Typography>
     <Typography variant="body2" sx={{ fontWeight: 600, color: "#1a202c" }}>

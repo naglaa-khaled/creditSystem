@@ -144,9 +144,9 @@ export default function Login() {
         toast.update(toastId, { render: `Welcome back, ${resData.name || 'User'}!`, type: "success", isLoading: false, autoClose: 2000 });
 
         setTimeout(() => {
-          if (userRole === "Admin") navigate('/admin', { replace: true });
+          if (userRole === "admin") navigate('/admin', { replace: true });
           else if (userRole === "instructor") navigate('/doctors/dashboarddoc', { replace: true });
-          else if (userRole === "Studentaffairs") navigate('/student-affairs', { replace: true });
+          else if (userRole === "studentaffairs") navigate('/student-affairs', { replace: true });
           else navigate('/', { replace: true });
         }, 1000);
       }
@@ -157,7 +157,7 @@ export default function Login() {
   };
 
   return (
-    <Stack sx={{ margin: 'auto', p: 4, width: '400px', borderRadius: 4, boxShadow: '0 8px 24px rgba(0,0,0,0.1)', mt: 8, bgcolor: 'white' }}>
+    <Stack sx={{ margin: 'auto', p: 4, width: '400px', borderRadius: 4, boxShadow: '0 8px 24px rgba(0,0,0,0.1)', bgcolor: 'white' }}>
       <Typography variant="h4" sx={{ textAlign: 'center', fontWeight: 'bold', color: '#394188', mb: 1 }}>
         Login
       </Typography>

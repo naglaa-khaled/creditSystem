@@ -10,16 +10,24 @@ export const getDashboardStats = async ():Promise<IDashboardStats> => {
   const res = await axiosInstance.get("student-affairs/dashboard-stats");
   return res.data;
 };
-export const getResentStudent = async ():Promise<IRecentStudentResponse> => {
+export const getRecentStudent = async (): Promise<IRecentStudentResponse> => {
+  try {
+    const res = await axiosInstance.get("Reports/recent-students");
+    
+    if (res.data) {
+      return res.data;
+    }
 
-  return {
-  recentStudentsData : [
-    { studentID: 1, nameEn: "Ramy", email: "ramygmail.com", year: "1", semester: "Semester 1" },
-    { studentID: 2, nameEn: "Alaa", email: "Alaagmail.com", year: "1", semester: "Semester 1" },
-    { studentID: 3, nameEn: "Ragia Farid", email: "Ragia@gmail.com", year: "1", semester: "Semester 1" }, 
-  ],
-  };
-  // const res = await axiosInstance.get("/dashboard-recent-students");
-  // return res.data;
+    return {
+      recentStudentsData: [
+        { studentID: 1, fullName: "Ramy", email: "ramy@gmail.com", year: "1", semester: "Semester 1" },
+        { studentID: 2, fullName: "Alaa", email: "alaa@gmail.com", year: "1", semester: "Semester 1" },
+        { studentID: 3, fullName: "Ragia Farid", email: "ragia@gmail.com", year: "1", semester: "Semester 1" },
+      ],
+    };
+  } catch (error) {
+    console.error("Error fetching recent students:", error);
+    throw error; 
+  }
 };
 

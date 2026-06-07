@@ -42,7 +42,7 @@ const [isLoading, setIsLoading] = useState(false);
 
   const filteredData = useMemo(() => {
     return allInstructors.filter((Instructor) =>
-      Instructor.nameEn.toLowerCase().includes(searchTerm.toLowerCase()),
+      Instructor.fullName.toLowerCase().includes(searchTerm.toLowerCase()),
     );
   }, [allInstructors, searchTerm]);
 
@@ -50,7 +50,7 @@ const [isLoading, setIsLoading] = useState(false);
 
 const InstructorColumns: Column<IInstructor>[] = [
   { id: "instructorID", label: "ID" },
-  { id: "nameEn", label: "Name" },
+  { id: "fullName", label: "Name" },
   { id: "email", label: "Email" },
   { id: "totalCourses", label: "Total Courses" },
 ];

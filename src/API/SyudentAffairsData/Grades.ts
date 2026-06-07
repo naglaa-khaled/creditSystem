@@ -6,12 +6,17 @@ import {
 } from "../../Modules/Shared/Interfaces";
 
 export const getGrades = async (
-  year?: string,
+  academicYear?: string,
   semester?: string,
+  level?: string,
 ): Promise<IGrades[]> => {
   try {
-    const res = await axiosInstance.get(`student-affairs/affairs-view-grades`, {
-      params: { year, semester },
+    const res = await axiosInstance.get(`student-affairs/view-all-grades`, {
+      params: {
+        academicYear, 
+        semester,
+        level,
+      },
     });
     return res.data;
   } catch (error) {
@@ -50,14 +55,14 @@ export const addGrades = async (
 export const exportCourseGrades = async (courseId: string) => {
   try {
     const res = await axiosInstance.get(`/student-affairs/export-course-csv`, {
-      params: { courseId }, 
-      responseType: 'blob', 
+      params: { courseId },
+      responseType: "blob",
     });
-    
+
     const url = window.URL.createObjectURL(new Blob([res.data]));
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
-    link.setAttribute('download', `Grades_${courseId}.csv`);
+    link.setAttribute("download", `Grades_${courseId}.csv`);
     document.body.appendChild(link);
     link.click();
     link.remove();

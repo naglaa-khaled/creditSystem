@@ -3,7 +3,7 @@
 
 // import { createContext, useEffect, useState, type PropsWithChildren } from "react";
 
-// export let AuthContext = createContext(null);
+// export const AuthContext = createContext(null);
 
 // export default function AuthContextProvider(props: PropsWithChildren) {
 //     const [loginData, setloginData] = useState(null);
@@ -38,21 +38,22 @@
 // }
 import { jwtDecode } from 'jwt-decode';
 import { createContext, useEffect, useState, type PropsWithChildren } from "react";
+import { toast } from 'react-toastify';
 
 // تعريف الـ Context مع قيم افتراضية عشان TypeScript ميزعلش
-export let AuthContext = createContext<any>(null);
+export const AuthContext = createContext<any>(null);
 
 export default function AuthContextProvider(props: PropsWithChildren) {
     const [loginData, setloginData] = useState(null);
 
     const saveLoginData = () => {
-        let encodedToken = localStorage.getItem("accessToken");
+        const encodedToken = localStorage.getItem("accessToken");
         
         // 1. التأكد إن فيه توكن فعلاً
         // 2. التأكد إن التوكن فيه 3 أجزاء (Header.Payload.Signature) عشان jwtDecode ميعملش Crash
         if (encodedToken && encodedToken.split('.').length === 3) {
             try {
-                let decodedToken = jwtDecode(encodedToken);
+                const decodedToken = jwtDecode(encodedToken);
                 console.log("Decoded Success:", decodedToken);
                 setloginData(decodedToken);
             } catch (error) {
@@ -75,7 +76,11 @@ export default function AuthContextProvider(props: PropsWithChildren) {
         localStorage.removeItem("accessToken"); 
         setloginData(null);
         // الأفضل نستخدم navigate لو متاح، بس window.location شغالة برضه
+        toast.success("Logged out successfully!");
+
+    setTimeout(() => {
         window.location.href = "/login"; 
+    }, 1000);
     };
 
     return (

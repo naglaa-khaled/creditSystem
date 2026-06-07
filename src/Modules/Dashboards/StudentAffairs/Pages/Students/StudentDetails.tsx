@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Grid as Grid, Typography } from "@mui/material";
+import {  Grid as Grid, Typography } from "@mui/material";
 import DetailsLayout from "../../../../Shared/components/DetailsLayout/DetailsLayout";
 import {
   getStudentProfile,
@@ -27,19 +27,21 @@ const StudentDetails = () => {
   }, [id]);
 
   if (!profile) return <Typography sx={{ p: 4 }}>Loading Student Details...</Typography>;
+  const hasCourses = profile.courses && profile.courses.length > 0;
 
   return (
     <>
       <DetailsLayout
         PageName="Students"
-        title={profile.student.nameEn}
+        title={profile.student.fullName || profile.student.nameEn }
         isAdmin={false}
         tableTitle="Enrolled Courses"
-        tableData={profile.courses}
+        noDataMessage="This student is not enrolled in any courses yet." 
+        tableData={hasCourses ? profile.courses : []}
         tableColumns={[
           { id: "courseID", label: "Course ID" },
-          { id: "courseName", label: "Course Name" },
-          { id: "credits", label: "Credits" },
+          { id: "courseNameEn", label: "Course Name" },
+          { id: "creditHours", label: "Credits" }, 
           { id: "status", label: "Status" },
         ]}
       >
@@ -51,6 +53,7 @@ const StudentDetails = () => {
           <InfoField label="Semester" value={profile.student.semester} />
           <InfoField label="Completed Hours" value={profile.student.completedHours} />
         </Grid>
+
       </DetailsLayout>
     </>
   );
@@ -72,7 +75,7 @@ const InfoField = ({ label, value, isGpa }: IInfoFieldProps) => (
         color: isGpa ? "#38a169" : "#1a202c",
       }}
     >
-      {value || "---"}
+{value !== undefined && value !== null && value !== "" ? value : "---"}
     </Typography>
   </Grid>
 );

@@ -11,6 +11,8 @@ import {
   type IInfoFieldProps,
 } from "../../../../Shared/Interfaces/index";
 import FormModal from "../../../../Shared/components/Modals/FormModel";
+import { updateStudent } from "../../../../../API/AdminData/Students";
+import { toast } from "react-toastify";
 
 const StudentDetails = () => {
   const { id } = useParams();
@@ -19,31 +21,77 @@ const StudentDetails = () => {
   const [isEditModalOpen, setEditModalOpen] = useState(false);
 
   const editFields = [
-    { name: "nameEn", label: "Full Name", required: true },
+    { name: "fullName", label: "Full Name", required: true },
     { name: "email", label: "Email", type: "email", required: true },
-    { name: "studentID", label: "Student ID", required: true },
-    { name: "year", label: "Academic Year", required: true },
-    { name: "semester", label: "Semester", required: true },
-    { name: "gpa", label: "GPA", halfWidth: true },
-    { name: "completedHours", label: "Completed Hours", halfWidth: true },
+    { name: "studentID", label: "Student ID", required: true, disabled: true },
+    {
+      name: "year",
+      label: "Academic Year",
+      required: true,
+      select: true,
+      options: [
+        { value: "1", label: "Year 1" },
+        { value: "2", label: "Year 2" },
+        { value: "3", label: "Year 3" },
+        { value: "4", label: "Year 4" },
+        { value: "5", label: "Year 5" },
+      ],
+    },
+    {
+      name: "semester",
+      label: "Semester",
+      required: true,
+      select: true,
+      options: [
+        { value: "1", label: "Semester 1" },
+        { value: "2", label: "Semester 2" },
+      ],
+    },
+    { name: "gpa", label: "GPA", halfWidth: true, disabled: true },
+    {
+      name: "completedHours",
+      label: "Completed Hours",
+      halfWidth: true,
+      disabled: true,
+    },
   ];
 
-useEffect(() => {
+  useEffect(() => {
     const loadData = async () => {
       const data = await getStudentProfile(id as studentId);
-      setStudent(data.student); 
+      setStudent(data.student);
       setCourses(data.courses);
     };
 
     loadData();
   }, [id]);
+  if (!student)
+    return <Typography sx={{ p: 4 }}>Loading Student Details...</Typography>;
+  const hasCourses = courses && courses.length > 0;
   const handleSaveEdit = async (updatedData: FieldValues) => {
     try {
-      console.log("Sending to API:", updatedData);
+      const apiPayload = {
+        name: updatedData.fullName,
+        email: updatedData.email,
+        year: updatedData.year?.toString(),
+        semester: updatedData.semester?.toString(),
+      };
+
+      console.log("Sending to API (Swagger Specs Only):", apiPayload);
+
+  await updateStudent(id as studentId, apiPayload);
+
       setStudent((prev) => ({ ...prev, ...updatedData }) as IStudent);
       setEditModalOpen(false);
+
+      // 🔥 توست النجاح الأخضر بـ سطر واحد بس!
+      toast.success("The student details have been successfully updated! ✅");
+
     } catch (error) {
       console.error("Update failed:", error);
+      
+      // 🔥 توست الفشل الأحمر لو حصل أي دروب في الـ Network أو السيرفر
+      toast.error("Failed to update student details. Please try again later. ❌");
     }
   };
 
@@ -51,10 +99,11 @@ useEffect(() => {
     <>
       <DetailsLayout
         PageName="Students"
-        title={student?.nameEn}
+        title={student?.fullName || student?.nameEn}
         isAdmin={true}
         tableTitle="Enrolled Courses"
-        tableData={courses}
+        noDataMessage="This student is not enrolled in any courses yet."
+        tableData={hasCourses ? courses : []}
         tableColumns={[
           { id: "courseID", label: "Course ID" },
           { id: "courseName", label: "Course Name" },
@@ -78,7 +127,7 @@ useEffect(() => {
         onSave={handleSaveEdit}
         title="Edit Student Details"
         fields={editFields}
-        initialData={student} 
+        initialData={student}
       />
     </>
   );
@@ -100,7 +149,7 @@ const InfoField = ({ label, value, isGpa }: IInfoFieldProps) => (
         color: isGpa ? "#38a169" : "#1a202c",
       }}
     >
-      {value || "---"}
+      {value !== undefined && value !== null && value !== "" ? value : "---"}
     </Typography>
   </Grid>
 );

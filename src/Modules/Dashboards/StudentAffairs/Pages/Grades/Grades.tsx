@@ -17,7 +17,7 @@ const [isLoading, setIsLoading] = useState(false);
   const [allGrades, setAllGrades] = useState<IGrades[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeApiFilters, setActiveApiFilters] = useState({
-    year: "",
+    level: "",
     semester: "",
   });
 
@@ -70,7 +70,7 @@ const loadDataFromApi = async (year?: string, semester?: string) => {
   const handleApiFilterChange = (type: "year" | "semester", value: string) => {
     const updatedFilters = { ...activeApiFilters, [type]: value };
     setActiveApiFilters(updatedFilters);
-    loadDataFromApi(updatedFilters.year, updatedFilters.semester);
+    loadDataFromApi(updatedFilters.level, updatedFilters.semester);
   };
 
   const SchedaulTable: Column<IGrades>[] = [

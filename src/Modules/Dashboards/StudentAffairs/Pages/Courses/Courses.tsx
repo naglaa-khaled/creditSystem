@@ -64,7 +64,7 @@ const CoursePage = () => {
   };
 
   const coursesColumns: Column<ICourse>[] = [
-    { id: "courseNameEn", label: "Name" },
+    { id: "courseName", label: "Name" },
     { id: "courseID", label: "ID" },
     { id: "creditHours", label: "Email" },
     { id: "level", label: "Year" },

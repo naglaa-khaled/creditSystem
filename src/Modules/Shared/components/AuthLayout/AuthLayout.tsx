@@ -31,7 +31,7 @@ export default function AuthLayout() {
             alt="Al-Azhar University Logo"
             sx={{ width: 90, height: "auto" }}
           />
-          <Typography variant="h6" fontWeight="bold" textAlign="center">
+          <Typography variant="h5" fontWeight="bold" textAlign="center">
             Al-Azhar University
           </Typography>
           <Typography

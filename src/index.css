@@ -2,8 +2,37 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  /* إلغاء لون الـ Autofill الأزرق لجميع حقول الإدخال في الموقع */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    /* بيستبدل اللون الأزرق باللون الأبيض داخل الحقل */
+    -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+    
+    /* بيحافظ على لون الخط الافتراضي (تقدري تغيريه لأي لون تحبيه) */
+    -webkit-text-fill-color: #000000 !important;
+    
+    /* انتقال ناعم لمنع أي وميض مفاجئ للون الأزرق أثناء التحميل */
+    transition: background-color 5000s ease-in-out 0s;
+}
+/* إخفاء أيقونة العين الافتراضية في متصفحات إيدج وكروم */
+input::-ms-reveal,
+input::-ms-clear {
+    display: none !important;
+}
+
+/* لمتصفحات وب كيت الأخرى لو ظهرت فيها مستقبلاً */
+input::-webkit-contacts-auto-fill-button,
+input::-webkit-credentials-auto-fill-button {
+    visibility: hidden;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+}
   
 }
+
 
 *:focus,
 *:focus-visible,

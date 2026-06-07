@@ -1,12 +1,13 @@
-import { Card, CardContent, Typography, Box } from "@mui/material";
+import { Card, CardContent, Typography, Box, Skeleton } from "@mui/material";
 
 interface SharedCardProps {
   icon: React.ReactNode;
   title: string;
   value: string | number;
+  loading?: boolean;
 }
 
-const SharedCard = ({ icon, title, value }: SharedCardProps) => {
+const SharedCard = ({ icon, title, value,loading }: SharedCardProps) => {
   return (
     <Card
       sx={{
@@ -28,11 +29,12 @@ const SharedCard = ({ icon, title, value }: SharedCardProps) => {
         >
           {title}
         </Typography>
-        <Typography
-          variant="h4" 
-          sx={{ fontWeight: "bold" }}
-        >
-          {value}
+        <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+          {loading ? (
+            <Skeleton width="60%" height={40} animation="wave" />
+          ) : (
+            value
+          )}
         </Typography>
       </CardContent>
       <Box sx={{  color: "var(--primary)" }} >{icon}</Box> 

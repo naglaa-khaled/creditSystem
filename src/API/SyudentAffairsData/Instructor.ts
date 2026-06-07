@@ -10,7 +10,7 @@ export const getInstructors = async (): Promise<IInstructor[]> => {
     return [
       {
         instructorID: 1,
-        nameEn: "Dr. Ahmed Hassan",
+        fullName: "Dr. Ahmed Hassan",
         email: "ahmed@univ.edu",
         totalCourses: 2,
         coursesList: [{ courseID: "1", courseName: "Database", studentsCount: 1 }]
@@ -22,13 +22,13 @@ export const getInstructors = async (): Promise<IInstructor[]> => {
 
 export const getInstructorProfile = async (id: string | number): Promise<IInstructor> => {
   try {
-    const res = await axiosInstance.get(`student-affairs/view-instructors-stats/${id}`);
+    const res = await axiosInstance.get(`student-affairs/instructor-details/${id}`);
     return res.data;
   } catch (error) {
     console.error("Error fetching instructor profile:", error);
     return {
         instructorID: Number(id),
-        nameEn: "Dr. Mohamed Kamal",
+        fullName: "Dr. Mohamed Kamal",
         email: "m.kamal@univ.edu",
         totalCourses: 1,
         coursesList: [{ courseID: "101", courseName: "Math101", studentsCount: 40 }]

@@ -28,9 +28,10 @@ const CourseDetails = () => {
     <>
       <DetailsLayout
         PageName="Courses"
-        title={profile.courseNameEn}
+        title={profile.courseName}
         isAdmin={false}
         tableTitle="Enrolled Courses"
+        noDataMessage="not student has registers in this course yet." 
         tableData={profile.students.enrolledStudents}
         tableColumns={[
           { id: "studentID", label: "Student ID" },
@@ -44,6 +45,9 @@ const CourseDetails = () => {
             label="Credits Hours"
             value={profile.creditHours}
           />
+          <InfoField label="Level" value={profile.level} />
+          <InfoField label="Semester" value={profile.semester} />
+          
         </Grid>
       </DetailsLayout>
     </>
