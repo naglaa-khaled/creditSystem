@@ -40,26 +40,13 @@ export const deleteCourse = async (
     return { success: true };
   }
 };
-export const getCourseProfile = async (
-  courseId: string | number,
-): Promise<IFullCourseProfile> => {
+export const getCourseProfile = async (courseId: string | number): Promise<IFullCourseProfile> => {
   try {
-    const res = await axiosInstance.get(`Admin/course-enrollments/${courseId}`);
-    return res.data;
+    const res = await axiosInstance.get(`admin/course-enrollments/${courseId}`);
+    return res.data; 
   } catch (error) {
-    return {
-      courseID: "CSC305",
-      courseNameEn: "Database System",
-      creditHours: 3,
-      level: "1", 
-      semester: "2", 
-      courseType: "Active",
-      students: [
-        { studentID: "1", studentName: "Ramy", status: "Registered" },
-        { studentID: "2", studentName: "Alaa", status: "Registered" },
-        { studentID: "3", studentName: "Ragia Farid", status: "Registered" },
-      ],
-    };
+    console.error(error);
+    throw error; 
   }
 };
 

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Grid as Grid, Typography } from "@mui/material";
 import DetailsLayout from "../../../../Shared/components/DetailsLayout/DetailsLayout";
-import { getCourseProfile, updateCourse } from "../../../../../API/SyudentAffairsData/Courses";
+import { getCourseProfile, updateCourse } from "../../../../../API/AdminData/Courses";
 import {
   type studentId,
   type IInfoFieldProps,
@@ -54,7 +54,7 @@ const handleSaveEdit = async (updatedData: FieldValues) => {
     <>
       <DetailsLayout
         PageName="Courses"
-        title={profile.courseNameEn}
+        title={profile.courseName}
         isAdmin={true}
         tableTitle="Enrolled Courses"
         tableData={profile.students.enrolledStudents}

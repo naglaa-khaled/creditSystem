@@ -171,7 +171,11 @@ const CoursePage = () => {
     { id: "level", label: "Level" },
     { id: "semester", label: "Semester" },
   ];
-
+  useEffect(() => {
+    if (Object.keys(groupedCourses).length === 0) {
+      setSelectedGroup(null);
+    }
+  }, [groupedCourses]);
   return (
     <div style={{ padding: isMobile ? "10px" : "20px" }}>
       <h2 style={{ marginBottom: "20px", color: "var(--primary)" }}>
@@ -284,7 +288,7 @@ const CoursePage = () => {
         )}
       </Box>
 
-      {selectedGroup && (
+      {selectedGroup && Object.keys(groupedCourses).length > 0 && (
         <Box
           sx={{
             mt: 4,
