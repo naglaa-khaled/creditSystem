@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Box, TextField, MenuItem } from "@mui/material";
+import { Box, TextField, MenuItem, InputAdornment, IconButton } from "@mui/material"; 
 import { useForm, Controller, type FieldValues } from "react-hook-form";
 import BasicModal from "./BasicModal";
 import CustomButton from "../Button/Button";
-import { useEffect } from "react";
+import { useEffect, useState } from "react"; 
+import Visibility from "@mui/icons-material/Visibility"; 
+import VisibilityOff from "@mui/icons-material/VisibilityOff"; 
 
 export interface FieldConfig {
   name: string;
@@ -40,20 +42,29 @@ const FormModal = ({
     formState: { errors },
   } = useForm<FieldValues>();
 
+  const [showPassword, setShowPassword] = useState(false);
+
   useEffect(() => {
     if (open) {
       reset(initialData || {});
     }
   }, [open, reset, initialData]);
 
+  const handleClose = () => {
+    setShowPassword(false);
+    onClose();
+  };
+
   const onSubmit = (data: FieldValues) => {
     onSave(data);
   };
 
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
   return (
     <BasicModal
       open={open}
-      onClose={onClose}
+      onClose={handleClose}
       title={title}
       content={
         <Box
@@ -87,9 +98,14 @@ const FormModal = ({
                   fullWidth
                   label={field.label}
                   select={field.select}
-                  type={field.type || "text"}
+                  type={
+                    field.type === "password"
+                      ? showPassword
+                        ? "text"
+                        : "password"
+                      : field.type || "text"
+                  }
                   size="small"
-                  // 🌟 هنا زوّدنا الـ cursor جوه الـ sx عشان يقلب "not-allowed" لما الحقل يكون disabled
                   sx={{
                     flex: field.halfWidth ? "1 1 calc(50% - 10px)" : "1 1 100%",
                     "& .MuiInputBase-input.Mui-disabled": {
@@ -105,7 +121,18 @@ const FormModal = ({
                   onChange={onChange}
                   disabled={field.disabled}
                   InputProps={{
-                    readOnly: field.disabled,
+                    ...(field.disabled ? { readOnly: true } : {}),
+                    endAdornment: field.type === "password" ? (
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={handleClickShowPassword}
+                          edge="end"
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ) : undefined,
                   }}
                 >
                   {field.select &&

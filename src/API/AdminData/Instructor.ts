@@ -1,66 +1,68 @@
 import axiosInstance from "../AxiosInstance";
-import { type IApiResponse, type IInstructor } from "../../Modules/Shared/Interfaces";
+import {
+  type IApiResponse,
+  type IInstructor,
+} from "../../Modules/Shared/Interfaces";
 
 export const getInstructors = async (): Promise<IInstructor[]> => {
   try {
-    const res = await axiosInstance.get(`student-affairs/view-instructors-stats`);
-    return res.data; 
+    const res = await axiosInstance.get(
+      `admin/view-instructors-stats`,
+    );
+    return res.data;
   } catch (error) {
     console.error("Error fetching all instructors:", error);
-    return [
-      {
-        instructorID: 1,
-        nameEn: "Dr. Ahmed Hassan",
-        email: "ahmed@univ.edu",
-        totalCourses: 2,
-        coursesList: [{ courseID: "1", courseName: "Database", studentsCount: 1 }]
-      }
-    ];
+    throw error;
   }
 };
 
-export const getInstructorProfile = async (id: string | number): Promise<IInstructor> => {
+export const getInstructorProfile = async (
+  id: string | number,
+): Promise<IInstructor> => {
   try {
-    const res = await axiosInstance.get(`student-affairs/view-instructors-stats/${id}`);
+    const res = await axiosInstance.get(
+      `Admin/instructor-details/${id}`,
+    );
     return res.data;
   } catch (error) {
     console.error("Error fetching instructor profile:", error);
-    return {
-        instructorID: Number(id),
-        nameEn: "Dr. Mohamed Kamal",
-        email: "m.kamal@univ.edu",
-        totalCourses: 1,
-        coursesList: [{ courseID: "101", courseName: "Math101", studentsCount: 40 }]
-    };
+    throw error;
   }
 };
-export const addInstructor = async (instructorData: Partial<IInstructor>): Promise<IApiResponse> => {
+export const addInstructor = async (
+  instructorData: Partial<IInstructor>,
+): Promise<IApiResponse> => {
   try {
-    await axiosInstance.post(`/student-affairs/instructors`, instructorData);
+    await axiosInstance.post(`Admin/add-instructor`, instructorData);
     return { success: true };
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     console.log("Mock Add Instructor:", instructorData);
-    return { success: true }; 
+    return { success: true };
   }
 };
-export const deleteInstructor = async (instructorId: string | number): Promise<IApiResponse> => {
+export const deleteInstructor = async (instructorId: string | number) => {
   try {
-    await axiosInstance.delete(`/student-affairs/instructors/${instructorId}`);
-    return { success: true };
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const numericId = Number(instructorId); 
+    const res = await axiosInstance.delete(`Admin/delete-instructor/${numericId}`);
+    
+    // بنرجع الـ status والـ data مع بعض
+    return { status: res.status, success: true }; 
   } catch (error) {
     console.log("Mock Delete Instructor ID:", instructorId);
-    return { success: true }; 
+    throw error; // بنعمل throw عشان الـ catch اللي في الشاشة تحس بالأيرور وتوقف الحذف الوهمي
   }
 };
-export const updateInstructor = async (id: string | number, updatedData: Partial<IInstructor>): Promise<IApiResponse> => {
+export const updateInstructor = async (
+  id: string | number,
+  updatedData: Partial<IInstructor>,
+): Promise<IApiResponse> => {
   try {
-    await axiosInstance.put(`/student-affairs/instructors/${id}`, updatedData);
+    await axiosInstance.put(`Admin/update-instructor/${id}`, updatedData);
     return { success: true };
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     console.log("Mock Update Instructor:", updatedData);
-    return { success: true }; 
+    return { success: true };
   }
 };

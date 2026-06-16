@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Grid, Typography } from "@mui/material";
 import DetailsLayout from "../../../../Shared/components/DetailsLayout/DetailsLayout";
-import { getInstructorProfile, updateInstructor } from "../../../../../API/SyudentAffairsData/Instructor";
+import {
+  getInstructorProfile,
+  updateInstructor,
+} from "../../../../../API/AdminData/Instructor";
 import {
   type studentId,
   type IInstructor,
@@ -16,7 +19,7 @@ const InstructorDetails = () => {
   const [isEditModalOpen, setEditModalOpen] = useState(false);
 
   const editInstructorFields = [
-    { name: "name", label: "Full Name", required: true },
+    { name: "fullName", label: "Full Name", required: true },
     { name: "email", label: "Email Address", type: "email", required: true },
     { name: "instructorID", label: "Instructor ID", required: true },
   ];
@@ -49,10 +52,12 @@ const InstructorDetails = () => {
     <>
       <DetailsLayout
         PageName="Instructors"
-        title={instructor.name}
+        title={instructor.fullName}
         isAdmin={true}
         tableTitle="Assigned Courses"
-        tableData={instructor.coursesList || []}
+        tableData={
+          (instructor.coursesList as unknown as Record<string, unknown>[]) || []
+        }
         tableColumns={[
           { id: "courseID", label: "Course ID" },
           { id: "courseName", label: "Course Name" },
@@ -61,9 +66,9 @@ const InstructorDetails = () => {
         onEdit={() => setEditModalOpen(true)}
       >
         <Grid container spacing={3}>
-          <InfoField label="Instructor ID" value={instructor.instructorID} />
-          <InfoField label="Email Address" value={instructor.email} />
-          <InfoField label="Total Courses" value={instructor.totalCourses} />
+          <InfoField label="Instructor ID" value={instructor?.instructorID} />
+          <InfoField label="Email Address" value={instructor?.email} />
+          <InfoField label="Total Courses" value={instructor?.totalCourses} />
         </Grid>
       </DetailsLayout>
 
@@ -79,13 +84,25 @@ const InstructorDetails = () => {
   );
 };
 
-const InfoField = ({ label, value }: { label: string; value: string | number }) => (
+const InfoField = ({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | number;
+}) => (
   <Grid size={{ xs: 12, md: 4 }}>
-    <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 0.5 }}>
+    <Typography
+      variant="caption"
+      color="text.secondary"
+      sx={{ display: "block", mb: 0.5 }}
+    >
       {label}
     </Typography>
     <Typography variant="body2" sx={{ fontWeight: 600, color: "#1a202c" }}>
-      {value || "---"}
+      {value !== undefined && value !== null && value !== ""
+        ? value
+        : "---"}
     </Typography>
   </Grid>
 );

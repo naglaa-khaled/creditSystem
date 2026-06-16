@@ -6,17 +6,19 @@ import {
   getInstructors,
   addInstructor,
   deleteInstructor,
-} from "../../../../../API/SyudentAffairsData/Instructor";
+} from "../../../../../API/AdminData/Instructor";
 import CustomButton from "../../../../Shared/components/Button/Button";
-import { Box, useMediaQuery, useTheme } from "@mui/material";
+import { Box, CircularProgress, Typography, useMediaQuery, useTheme } from "@mui/material";
 import ConfirmDeleteModal from "../../../../Shared/components/Modals/DeleteModal";
 import AddIcon from "@mui/icons-material/Add";
 import { type FieldValues } from "react-hook-form";
 import {  type Column,type IInstructor } from "../../../../Shared/Interfaces";
+import { toast } from "react-toastify";
 
 const InstructorPage = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+const [isLoading, setIsLoading] = useState(false);
 
   const [allInstructors, setAllInstructors] = useState<IInstructor[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -28,19 +30,21 @@ const InstructorPage = () => {
   >(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
  const InstructorFields = [
-  { name: "nameAr", label: "Instructor Name (Arabic)", required: true },
-  { name: "instructorID", label: "Instructor ID", required: true },
+  { name: "nameEn", label: "first Name ", required: true },
+  { name: "fullName", label: "Second Name ", required: true },
   { name: "email", label: "Email Address", type: "email", required: true },
+  { name: "password", label: "password", type: "password", required: true },
 ];
 
-  const loadDataFromApi = async () => {
+ const loadDataFromApi = async () => {
+    setIsLoading(true); 
     try {
       const data = await getInstructors();
-      setTimeout(() => {
-        setAllInstructors(data);
-      }, 0);
+      setAllInstructors(data);
     } catch (error) {
-      console.error("Failed to load students:", error);
+      console.error("Failed to load instructors:", error); 
+    } finally {
+      setIsLoading(false); 
     }
   };
 
@@ -54,42 +58,63 @@ const InstructorPage = () => {
   };
 
   //delete Instructor handler
-  const handleConfirmDelete = async () => {
-    if (selectedInstructorId) {
-      try {
-        await deleteInstructor(selectedInstructorId);
+const handleConfirmDelete = async () => {
+  if (selectedInstructorId) {
+    try {
+      const response = await deleteInstructor(selectedInstructorId);
+      
+      if (response && response.status === 200 && response.success) {
         setAllInstructors((prev) =>
-          prev.filter((Instructor) => Instructor.instructorID !== selectedInstructorId),
+          prev.filter((instructor) => {
+            const currentId = instructor?.instructorID;
+            return Number(currentId) !== Number(selectedInstructorId);
+          })
         );
         setDeleteModalOpen(false);
         setSelectedInstructorId(null);
-      } catch (error) {
-        console.error("Delete failed", error);
+        
+        toast.success("Instructor deleted successfully");
+      } else {
+        toast.error("Failed to delete from server");
       }
-    }
-  };
-  //add student handler
-  const handleSaveStudent = async (data: FieldValues) => {
-    try {
-      await addInstructor(data);
-      setIsAddModalOpen(false);
-      loadDataFromApi();
+
     } catch (error) {
-      console.error("Add failed", error);
+      console.error("Delete failed from server:", error);
+      toast.error("لا يمكن حذف هذا المحاضر نظراً لارتباطه بجدول محاضرات قائم.");
+      
+      setDeleteModalOpen(false);
+      setSelectedInstructorId(null);
     }
-  };
+  }
+};
+  //add student handler
+const handleSaveStudent = async (data: FieldValues) => {
+  try {
+    // بنبعت الداتا (nameEn, fullName, email, password) للسيرفر
+    await addInstructor(data);
+    
+    setIsAddModalOpen(false); // نقفل المودال لما ينجح بس
+    await loadDataFromApi(); // نحدث الجدول عشان يظهر الدكتور الجديد بالـ ID اللي السيرفر عمله
+    
+    toast.success("Instructor added successfully");
+  } catch (error) {
+    console.error("Add failed", error);
+    toast.error("Failed to add instructor. Please check your data.");
+  }
+};
 
   const filteredData = useMemo(() => {
-    return allInstructors.filter((Instructor) =>
-      Instructor.name.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
-  }, [allInstructors, searchTerm]);
+    return allInstructors.filter((Instructor) => {
+    const nameEn = Instructor?.nameEn || ""; 
+    return nameEn.toLowerCase().includes(searchTerm.toLowerCase());
+  });
+}, [allInstructors, searchTerm]);
 
 
 
 const InstructorColumns: Column<IInstructor>[] = [
   { id: "instructorID", label: "ID" },
-  { id: "name", label: "Name" },
+  { id: "nameEn", label: "Name" },
   { id: "email", label: "Email" },
   { id: "totalCourses", label: "Total Courses" },
 ];
@@ -121,6 +146,23 @@ const InstructorColumns: Column<IInstructor>[] = [
           onClick={() => setIsAddModalOpen(true)}
         />
       </Box>
+        {isLoading ? (
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            py: 10,
+            gap: 2
+          }}
+        >
+          <CircularProgress size={50} />
+          <Typography variant="h6" sx={{ color: "var(--primary)" }}>
+            Loading Instructors...
+          </Typography>
+        </Box>
+      ) : filteredData.length > 0 ? (
 
       <SharedTable
         columns={InstructorColumns}
@@ -130,6 +172,21 @@ const InstructorColumns: Column<IInstructor>[] = [
         isAdmin={true}
         onDelete={handleOpenDeleteModal}
       />
+      ): (
+        <Box
+          sx={{
+            textAlign: "center",
+            py: 10,
+            border: "1px dashed #ccc",
+            borderRadius: "8px",
+            backgroundColor: "#f9f9f9"
+          }}
+        >
+          <Typography variant="h6" color="var(--primary)">
+            {searchTerm ? `No instructors found matching "${searchTerm}"` : "No instructors available."}
+          </Typography>
+        </Box>
+        )}
 
       <ConfirmDeleteModal
         open={isDeleteModalOpen}
@@ -141,7 +198,7 @@ const InstructorColumns: Column<IInstructor>[] = [
         open={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onSave={handleSaveStudent}
-        title="Add New Student"
+        title="Add New Instructor"
         fields={InstructorFields} 
       />
     </div>

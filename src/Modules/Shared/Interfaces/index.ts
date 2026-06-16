@@ -121,6 +121,8 @@ export interface IInstructor {
   email: string;
   totalCourses: number;
   coursesList: IInstructorCourse[];
+  nameEn: "Ahmed Ali";
+  
 }
 // Schedual
 export interface ISchedule {
