@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 
 import axiosInstance from "../AxiosInstance"; 
 import {  type ICourse,  type IFullCourseProfile} from "../../Modules/Shared/Interfaces";

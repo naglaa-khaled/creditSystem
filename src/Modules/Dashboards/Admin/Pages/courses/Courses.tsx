@@ -42,7 +42,8 @@ const CoursePage = () => {
   >(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const CourseFields = [
-    { name: "nameEn", label: "Course Name", required: true },
+    { name: "nameEn", label: "English Course Name", required: true },
+    { name: "nameAr", label: "Arabic Course Name", required: true },
     { name: "courseID", label: "Course Code/ID", required: true },
     {
       name: "creditHours",
@@ -71,6 +72,14 @@ const CoursePage = () => {
         { value: "2", label: "Semester 2" },
       ],
     },
+    { name: "courseType", label: "Course Type", required: true,
+      select: true,
+      options: [
+        { value: "1", label: "optional" },
+        { value: "2", label: "mandatory" },
+      ],
+     },
+
   ];
   const [selectedGroup, setSelectedGroup] = useState<{
     level: string;
@@ -99,31 +108,44 @@ const CoursePage = () => {
   };
 
   //delete course handler
-  const handleConfirmDelete = async () => {
-    if (selectedCourseId) {
-      try {
-        await deleteCourse(selectedCourseId);
+const handleConfirmDelete = async () => {
+  if (selectedCourseId) {
+    try {
+      const response = await deleteCourse(selectedCourseId);
+      
+      if (response.success) {
         setAllCourses((prev) =>
           prev.filter((course) => course.courseID !== selectedCourseId),
         );
+        toast.success("Course deleted successfully!");
         setDeleteModalOpen(false);
         setSelectedCourseId(null);
-      } catch (error) {
-        console.error("Delete failed", error);
+      } else {
+        if (response.message) {
+          toast.error(response.message, { rtl: true });
+        } else {
+          toast.error("Failed to delete the course. Please try again.");
+        }
+        setDeleteModalOpen(false);
       }
+    } catch (error) {
+      console.error("Delete failed", error);
+      toast.error("An unexpected error occurred.");
     }
-  };
-  //add course handler
+  }
+};
+// add course handler
   const handleSavecourse = async (data: FieldValues) => {
     const formattedData = {
       courseId: data.courseID,
       nameEn: data.nameEn,
-      nameAr: data.nameEn,
+      nameAr: data.nameAr, 
       hours: Number(data.creditHours),
       level: Number(data.level),
       semester: Number(data.semester),
-      courseType: "Active",
+      courseType: data.courseType,
     };
+    
     try {
       const response = await addCourse(formattedData);
       if (response.success) {
@@ -131,12 +153,15 @@ const CoursePage = () => {
         loadDataFromApi();
         toast.success("Course Added Successfully!");
       } else {
-        console.log(response);
-        toast.error("Fail To Add Course!");
+        if (response.message) {
+          toast.error(response.message, { rtl: true });
+        } else {
+          toast.error("Failed to add course. Please check your data.");
+        }
       }
     } catch (error) {
       console.error("Add failed", error);
-      toast.error("Fail To Add Course!");
+      toast.error("An unexpected error occurred.");
     }
   };
 

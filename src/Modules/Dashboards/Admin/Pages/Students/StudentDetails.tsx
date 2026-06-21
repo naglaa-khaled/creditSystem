@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import { type FieldValues } from "react-hook-form";
 import { Grid as Grid, Typography } from "@mui/material";
 import DetailsLayout from "../../../../Shared/components/DetailsLayout/DetailsLayout";
-import { getStudentProfile } from "../../../../../API/SyudentAffairsData/Students";
 import {
   type ICourse,
   type IStudent,
@@ -11,7 +10,7 @@ import {
   type IInfoFieldProps,
 } from "../../../../Shared/Interfaces/index";
 import FormModal from "../../../../Shared/components/Modals/FormModel";
-import { updateStudent } from "../../../../../API/AdminData/Students";
+import { updateStudent,getStudentProfile } from "../../../../../API/AdminData/Students";
 import { toast } from "react-toastify";
 
 const StudentDetails = () => {
@@ -84,13 +83,11 @@ const StudentDetails = () => {
       setStudent((prev) => ({ ...prev, ...updatedData }) as IStudent);
       setEditModalOpen(false);
 
-      // 🔥 توست النجاح الأخضر بـ سطر واحد بس!
       toast.success("The student details have been successfully updated! ✅");
 
     } catch (error) {
       console.error("Update failed:", error);
       
-      // 🔥 توست الفشل الأحمر لو حصل أي دروب في الـ Network أو السيرفر
       toast.error("Failed to update student details. Please try again later. ❌");
     }
   };

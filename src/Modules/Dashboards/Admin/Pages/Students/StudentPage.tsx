@@ -121,7 +121,6 @@ const filteredData = useMemo(() => {
     return name.toLowerCase().includes(searchTerm.toLowerCase());
   });
 }, [allStudents, searchTerm]);
-console.log(filteredData);
  const groupedSchedaul = useMemo(() => {
     const groups: Record<string, IStudent[]> = {};
 
@@ -140,7 +139,6 @@ console.log(filteredData);
   }, [filteredData]);
 
   const handleApiFilterChange = (type: "year" | "semester", value: string) => {
-    console.log(type, value);
     const updatedFilters = { ...activeApiFilters, [type]: value };
     setActiveApiFilters(updatedFilters);
     loadDataFromApi(updatedFilters.year, updatedFilters.semester);

@@ -28,6 +28,7 @@ export interface IFullStudentProfile {
 export interface IFullCourseProfile {
   courseID: string;
   courseName: string;
+  courseNameEn: string;
   creditHours: number;
   level: string;
   semester: string;
@@ -35,16 +36,10 @@ export interface IFullCourseProfile {
   students: {
     studentID: string | number;
     studentName: string;
-    course: ICourse;
-    enrolledStudents: {
-      studentID: string | number;
-      studentName: string;
-      StudentYear: string;
-
       status: string;
     }[];
   };
-}
+
 
 // --- Course Related Interfaces ---
 export interface ICourse {
@@ -134,6 +129,11 @@ export interface ISchedule {
   room: string;
   courseLevel: number;
   courseSemester: number;
+  instructorName: string;
+  capacity: number;
+  id: string | number; 
+  level: number;
+  semester: number;
 }
 export interface IGrades {
   studentID: string | number;

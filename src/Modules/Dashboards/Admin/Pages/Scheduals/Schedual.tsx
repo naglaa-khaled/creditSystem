@@ -1,20 +1,26 @@
 import { useEffect, useState, useMemo } from "react";
-import SharedTable from "../../../../Shared/components/SharedTable/SharedTable";
 import { FilterBar } from "../../../../Shared/components/FilterBar/FilterBar";
 import FormModal from "../../../../Shared/components/Modals/FormModel";
 import {
   getSchedules,
   addSchedule,
   deleteSchedule,
-} from "../../../../../API/SyudentAffairsData/Schedual";
+} from "../../../../../API/AdminData/Schedual";
 import CustomButton from "../../../../Shared/components/Button/Button";
-import { Box, CircularProgress, Typography, useMediaQuery, useTheme } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import ConfirmDeleteModal from "../../../../Shared/components/Modals/DeleteModal";
 import AddIcon from "@mui/icons-material/Add";
 import { type FieldValues } from "react-hook-form";
 import AssignmentIcon from "@mui/icons-material/Assignment";
-import { type Column, type ISchedule } from "../../../../Shared/Interfaces";
+import { type ISchedule } from "../../../../Shared/Interfaces";
 import { SemesterCard } from "../../../../Shared/components/CourseCard/CourseCard";
+import WeeklyTimetable from "../../../../Shared/components/weekelyTimeTable/WeekelyTimeTable";
 
 const SchedaulPage = () => {
   const theme = useTheme();
@@ -119,7 +125,10 @@ const SchedaulPage = () => {
         await deleteSchedule(selectedSchedualeId);
         setAllSchedual((prev) =>
           prev.filter((schedual) => {
-            return schedual.courseID !== selectedSchedualeId;
+            return (
+              schedual.id !== selectedSchedualeId &&
+              schedual.courseID !== selectedSchedualeId
+            );
           }),
         );
         setDeleteModalOpen(false);
@@ -142,7 +151,9 @@ const SchedaulPage = () => {
 
   const filteredData = useMemo(() => {
     return allSchedual.filter((schedaul) =>
-      schedaul.courseName.toLowerCase().includes(searchTerm.toLowerCase()),
+      (schedaul.courseName || "")
+        .toLowerCase()
+        .includes((searchTerm || "").toLowerCase()),
     );
   }, [allSchedual, searchTerm]);
 
@@ -150,8 +161,8 @@ const SchedaulPage = () => {
     const groups: Record<string, ISchedule[]> = {};
 
     filteredData.forEach((schedual) => {
-      const level = schedual.courseLevel;
-      const semester = schedual.courseSemester;
+      const level = schedual.level;
+      const semester = schedual.semester;
       const key = `${level}-${semester}`;
 
       if (!groups[key]) groups[key] = [];
@@ -175,15 +186,6 @@ const SchedaulPage = () => {
     setActiveApiFilters(updatedFilters);
     loadDataFromApi(updatedFilters.year, updatedFilters.semester);
   };
-
-  const SchedaulTable: Column<ISchedule>[] = [
-    { id: "courseID", label: "Course ID" },
-    { id: "courseName", label: "Course Name" },
-    { id: "day", label: "day" },
-    { id: "startTime", label: "startTime" },
-    { id: "endTime", label: "endTime" },
-    { id: "room", label: "room" },
-  ];
 
   return (
     <div style={{ padding: isMobile ? "10px" : "20px" }}>
@@ -297,68 +299,31 @@ const SchedaulPage = () => {
         )}
       </Box>
 
-{selectedGroup && Object.keys(groupedSchedaul).length > 0 && (
-        <Box
-          sx={{
-            mt: 4,
-            p: 3,
-            bgcolor: "#fff",
-            borderRadius: "16px",
-            boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-            animation: "fadeIn 0.4s ease-out",
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              mb: 3,
-            }}
-          >
-            <h3 style={{ margin: 0, color: "var(--primary)" }}>
-              Schedual - Level {selectedGroup.level} / Semester{" "}
-              {selectedGroup.semester}
-            </h3>
-            <button
-              onClick={() => setSelectedGroup(null)}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                color: "#666",
-              }}
-            >
-              Close [x]
-            </button>
-          </Box>
-
-          <SharedTable
-            columns={SchedaulTable}
-            data={
-              groupedSchedaul[
-                `${selectedGroup.level}-${selectedGroup.semester}`
-              ] || []
-            }
-            idField="courseID"
-            detailsPath="/admin/schedule/details"
-            isAdmin={true}
-            onDelete={handleOpenDeleteModal}
-          />
-        </Box>
+      {selectedGroup && Object.keys(groupedSchedaul).length > 0 && (
+        <WeeklyTimetable
+          title={`📌 Schedules — Level ${selectedGroup.level} / Semester ${selectedGroup.semester}`}
+          data={
+            groupedSchedaul[
+              `${selectedGroup.level}-${selectedGroup.semester}`
+            ] || []
+          }
+          onClose={() => setSelectedGroup(null)}
+          onDelete={handleOpenDeleteModal}
+        />
       )}
 
       <ConfirmDeleteModal
         open={isDeleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
         onConfirm={handleConfirmDelete}
-        message="Are you sure you want to delete this schedual record?"
+        message="Are you sure you want to delete this schedule record?"
       />
+
       <FormModal
         open={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onSave={handleSaveSchedual}
-        title="Add New Schedaul"
+        title="Add New Schedule"
         fields={SchedualField}
       />
     </div>

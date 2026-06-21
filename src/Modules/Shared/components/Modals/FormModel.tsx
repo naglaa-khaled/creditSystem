@@ -1,11 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Box, TextField, MenuItem, InputAdornment, IconButton } from "@mui/material"; 
+import {
+  Box,
+  TextField,
+  MenuItem,
+  InputAdornment,
+  IconButton,
+} from "@mui/material";
 import { useForm, Controller, type FieldValues } from "react-hook-form";
 import BasicModal from "./BasicModal";
 import CustomButton from "../Button/Button";
-import { useEffect, useState } from "react"; 
-import Visibility from "@mui/icons-material/Visibility"; 
-import VisibilityOff from "@mui/icons-material/VisibilityOff"; 
+import { useEffect, useState } from "react";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 export interface FieldConfig {
   name: string;
@@ -95,6 +101,10 @@ const FormModal = ({
               }}
               render={({ field: { onChange, value } }) => (
                 <TextField
+                  inputProps={{
+                    ...(field.disabled ? { readOnly: true } : {}),
+                    ...(field as any).inputProps, 
+                  }}
                   fullWidth
                   label={field.label}
                   select={field.select}
@@ -122,17 +132,18 @@ const FormModal = ({
                   disabled={field.disabled}
                   InputProps={{
                     ...(field.disabled ? { readOnly: true } : {}),
-                    endAdornment: field.type === "password" ? (
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label="toggle password visibility"
-                          onClick={handleClickShowPassword}
-                          edge="end"
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    ) : undefined,
+                    endAdornment:
+                      field.type === "password" ? (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowPassword}
+                            edge="end"
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ) : undefined,
                   }}
                 >
                   {field.select &&

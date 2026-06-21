@@ -9,7 +9,8 @@ import {
 } from "../../Modules/Shared/Interfaces";
 
 // Courses.ts (API file)
-export const addCourse = async (courseData: IAddCourse): Promise<IApiResponse> => {
+// Courses.ts (API file)
+export const addCourse = async (courseData: IAddCourse): Promise<IApiResponse & { message?: string }> => {
   try {
     const response = await axiosInstance.post(`Admin/add-course`, null, {
       params: {
@@ -22,22 +23,54 @@ export const addCourse = async (courseData: IAddCourse): Promise<IApiResponse> =
         courseType: courseData.courseType
       },
     });
-    return { success: response.status === 200 };
-  } catch (error) {
+    return { success: response.status === 200 || response.status === 201 };
+  } catch (error: unknown) {
     console.error("Add Course Error Details:", error);
-    return { success: false };
+
+    let serverMessage = "";
+    if (typeof error === "object" && error !== null && "response" in error) {
+      const errData = (error as { response?: { data?: unknown } }).response?.data;
+      if (typeof errData === "string") {
+        serverMessage = errData;
+      } else if (
+        errData &&
+        typeof errData === "object" &&
+        "message" in errData &&
+        typeof errData.message === "string"
+      ) {
+        serverMessage = errData.message;
+      }
+    }
+
+    return { success: false, message: serverMessage };
   }
 };
 
 export const deleteCourse = async (
   courseId: string | number,
-): Promise<IApiResponse> => {
+): Promise<IApiResponse & { message?: string }> => {
   try {
     await axiosInstance.delete(`Admin/delete-course/${courseId}`);
     return { success: true };
-  } catch (error) {
-    console.log("Mock Delete Course ID:", courseId);
-    return { success: true };
+  } catch (error: unknown) {
+    console.error("Delete Course API Error:", error);
+
+    let serverMessage = "";
+    if (typeof error === "object" && error !== null && "response" in error) {
+      const errData = (error as { response?: { data?: unknown } }).response?.data;
+      if (typeof errData === "string") {
+        serverMessage = errData;
+      } else if (
+        errData &&
+        typeof errData === "object" &&
+        "message" in errData &&
+        typeof errData.message === "string"
+      ) {
+        serverMessage = errData.message;
+      }
+    }
+
+    return { success: false, message: serverMessage };
   }
 };
 export const getCourseProfile = async (courseId: string | number): Promise<IFullCourseProfile> => {
@@ -88,16 +121,28 @@ export const getCourses = async (
   }
 };
 export const updateCourse = async (
-  courseId: string | number,
-  updatedData: Partial<ICourse>,
+  courseId: string | number, 
+  updatedData: Partial<ICourse> 
 ): Promise<IApiResponse> => {
   try {
     const res = await axiosInstance.put(
-      `Admin/update-course/${courseId}`,
-      updatedData,
+      `Admin/update-course/${courseId}`, 
+      null, 
+      {
+        params: {
+          id: courseId, 
+          nameAr: updatedData.courseNameAr || "", 
+          nameEn: updatedData.courseNameEn, 
+          hours: Number(updatedData.creditHours), 
+          level: Number(updatedData.level),       
+          semester: Number(updatedData.semester), 
+          courseType: updatedData.courseType || "" 
+        },
+      }
     );
-    return res.data;
+    return { success: res.status === 200 || res.data?.success };
   } catch (error) {
+    console.error("Update Course API Error:", error);
     return { success: false };
   }
 };

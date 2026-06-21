@@ -28,11 +28,12 @@ const CourseDetails = () => {
     <>
       <DetailsLayout
         PageName="Courses"
+        
         title={profile.courseName}
         isAdmin={false}
         tableTitle="Enrolled Courses"
         noDataMessage="not student has registers in this course yet." 
-        tableData={profile.students.enrolledStudents}
+        tableData={profile.students}
         tableColumns={[
           { id: "studentID", label: "Student ID" },
           { id: "studentName", label: "Student Name" },

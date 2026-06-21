@@ -24,10 +24,10 @@ export const getStudents = async (year?: string, semester?: string): Promise<ISt
   throw error;
 }
 };
-
+ 
 export const getStudentProfile = async (studentId: studentId): Promise<IFullStudentProfile> => {
   try {
-    const res = await axiosInstance.get(`Admin/student-full-details/{studentId}${studentId}`);
+    const res = await axiosInstance.get(`Admin/student-full-details/${studentId}`);
     return res.data; 
   } catch (error) {
     console.error(error);

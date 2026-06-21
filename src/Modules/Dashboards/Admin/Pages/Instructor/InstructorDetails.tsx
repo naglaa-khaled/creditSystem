@@ -12,6 +12,7 @@ import {
 } from "../../../../Shared/Interfaces/index";
 import FormModal from "../../../../Shared/components/Modals/FormModel";
 import type { FieldValues } from "react-hook-form";
+import { toast } from "react-toastify";
 
 const InstructorDetails = () => {
   const { id } = useParams();
@@ -32,18 +33,54 @@ const InstructorDetails = () => {
     loadData();
   }, [id]);
 
-  const handleSaveEdit = async (updatedData: FieldValues) => {
-    try {
-      if (!id) return;
-      const response = await updateInstructor(id, updatedData as IInstructor);
-      if (response.success) {
-        setInstructor((prev) => (prev ? { ...prev, ...updatedData } : null));
-        setEditModalOpen(false);
+const handleSaveEdit = async (updatedData: FieldValues) => {
+  try {
+    if (!id) return;
+
+    const response = await updateInstructor(id, updatedData as IInstructor);
+
+    if (response && response.success) {
+      setInstructor((prev) => (prev ? { ...prev, ...updatedData } : null));
+      setEditModalOpen(false);
+      
+      toast.success("Instructor details updated successfully!");
+    } else {
+      if (response && response.message) {
+        toast.error(response.message, { rtl: true });
+      } else {
+        toast.error("Failed to update instructor details.");
       }
-    } catch (error) {
-      console.error("Update failed:", error);
     }
-  };
+  } catch (error: unknown) {
+    console.error("Update failed:", error);
+
+    type ErrorWithResponse = {
+      response?: {
+        data?: {
+          message?: string;
+        } | string;
+      };
+    };
+
+    const responseData =
+      typeof error === "object" && error !== null
+        ? (error as ErrorWithResponse).response?.data
+        : undefined;
+
+    const serverMessage =
+      typeof responseData === "string"
+        ? responseData
+        : typeof responseData === "object" && responseData !== null
+        ? responseData.message
+        : undefined;
+
+    if (typeof serverMessage === "string" && serverMessage) {
+      toast.error(serverMessage, { rtl: true });
+    } else {
+      toast.error("An unexpected error occurred while updating.");
+    }
+  }
+};
 
   if (!instructor)
     return <Typography sx={{ p: 4 }}>Loading Instructor Details...</Typography>;

@@ -30,8 +30,7 @@ const [isLoading, setIsLoading] = useState(false);
   >(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
  const InstructorFields = [
-  { name: "nameEn", label: "first Name ", required: true },
-  { name: "fullName", label: "Second Name ", required: true },
+  { name: "fullName", label: "Full Name ", required: true },
   { name: "email", label: "Email Address", type: "email", required: true },
   { name: "password", label: "password", type: "password", required: true },
 ];
@@ -87,19 +86,53 @@ const handleConfirmDelete = async () => {
     }
   }
 };
-  //add student handler
-const handleSaveStudent = async (data: FieldValues) => {
+  //add Instructor handler
+const handleSaveInstructor = async (data: FieldValues) => {
   try {
-    // بنبعت الداتا (nameEn, fullName, email, password) للسيرفر
-    await addInstructor(data);
+    const response = await addInstructor(data);
     
-    setIsAddModalOpen(false); // نقفل المودال لما ينجح بس
-    await loadDataFromApi(); // نحدث الجدول عشان يظهر الدكتور الجديد بالـ ID اللي السيرفر عمله
-    
-    toast.success("Instructor added successfully");
-  } catch (error) {
+    if (response && response.success) {
+      setIsAddModalOpen(false); 
+      await loadDataFromApi(); 
+      
+      toast.success("Instructor added successfully");
+    } else {
+      if (response && response.message) {
+        toast.error(response.message, { rtl: true });
+      } else {
+        toast.error("Failed to add instructor. Please check your data.");
+      }
+    }
+  } catch (error: unknown) {
     console.error("Add failed", error);
-    toast.error("Failed to add instructor. Please check your data.");
+
+    let serverMessage: string | undefined;
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "response" in error &&
+      typeof (error as { response?: unknown }).response === "object" &&
+      (error as { response?: unknown }).response !== null
+    ) {
+      const response = (error as { response?: { data?: unknown } }).response;
+      const data = response?.data;
+      if (typeof data === "string") {
+        serverMessage = data;
+      } else if (
+        typeof data === "object" &&
+        data !== null &&
+        "message" in data &&
+        typeof (data as { message?: unknown }).message === "string"
+      ) {
+        serverMessage = (data as { message?: string }).message;
+      }
+    }
+
+    if (serverMessage) {
+      toast.error(serverMessage, { rtl: true });
+    } else {
+      toast.error("An unexpected error occurred while adding the instructor.");
+    }
   }
 };
 
@@ -197,7 +230,7 @@ const InstructorColumns: Column<IInstructor>[] = [
       <FormModal
         open={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        onSave={handleSaveStudent}
+        onSave={handleSaveInstructor}
         title="Add New Instructor"
         fields={InstructorFields} 
       />

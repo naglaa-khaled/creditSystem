@@ -29,16 +29,61 @@ export const getInstructorProfile = async (
     throw error;
   }
 };
+type AxiosErrorLike = {
+  response?: {
+    data?: unknown;
+  };
+};
+
+const getServerErrorMessage = (error: unknown): string => {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "response" in error
+  ) {
+    const err = error as AxiosErrorLike;
+    const data = err.response?.data;
+    if (typeof data === "string") return data;
+    if (
+      typeof data === "object" &&
+      data !== null &&
+      "message" in data &&
+      typeof (data as { message?: unknown }).message === "string"
+    ) {
+      return (data as { message?: string }).message ?? "";
+    }
+  }
+  return "";
+};
+
 export const addInstructor = async (
   instructorData: Partial<IInstructor>,
-): Promise<IApiResponse> => {
+): Promise<IApiResponse & { message?: string }> => {
   try {
-    await axiosInstance.post(`Admin/add-instructor`, instructorData);
-    return { success: true };
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (error) {
-    console.log("Mock Add Instructor:", instructorData);
-    return { success: true };
+    const res = await axiosInstance.post(`Admin/add-instructor`, instructorData);
+    return { success: res.status === 200 || res.status === 201 };
+  } catch (error: unknown) {
+    console.error("Add Instructor API Error:", error);
+
+    const serverMessage = getServerErrorMessage(error);
+
+    return { success: false, message: serverMessage };
+  }
+};
+
+export const updateInstructor = async (
+  id: string | number,
+  updatedData: Partial<IInstructor>,
+): Promise<IApiResponse & { message?: string }> => {
+  try {
+    const res = await axiosInstance.put(`Admin/update-instructor/${id}`, updatedData);
+    return { success: res.status === 200 || res.status === 204 };
+  } catch (error: unknown) {
+    console.error("Update Instructor API Error:", error);
+
+    const serverMessage = getServerErrorMessage(error);
+
+    return { success: false, message: serverMessage };
   }
 };
 export const deleteInstructor = async (instructorId: string | number) => {
@@ -46,23 +91,10 @@ export const deleteInstructor = async (instructorId: string | number) => {
     const numericId = Number(instructorId); 
     const res = await axiosInstance.delete(`Admin/delete-instructor/${numericId}`);
     
-    // بنرجع الـ status والـ data مع بعض
     return { status: res.status, success: true }; 
   } catch (error) {
     console.log("Mock Delete Instructor ID:", instructorId);
-    throw error; // بنعمل throw عشان الـ catch اللي في الشاشة تحس بالأيرور وتوقف الحذف الوهمي
+    throw error; 
   }
 };
-export const updateInstructor = async (
-  id: string | number,
-  updatedData: Partial<IInstructor>,
-): Promise<IApiResponse> => {
-  try {
-    await axiosInstance.put(`Admin/update-instructor/${id}`, updatedData);
-    return { success: true };
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (error) {
-    console.log("Mock Update Instructor:", updatedData);
-    return { success: true };
-  }
-};
+
