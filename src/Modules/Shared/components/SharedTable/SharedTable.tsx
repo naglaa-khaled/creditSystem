@@ -29,6 +29,7 @@ interface SharedTableProps<T extends Record<string, any>> {
   idField: keyof T;
   onDelete?: (id: string | number) => void;
   onEdit?: (item: T) => void;
+  onEditStatus?: (item: T) => void;
 }
 
 const SharedTable = <T extends Record<string, any>>({
@@ -40,12 +41,12 @@ const SharedTable = <T extends Record<string, any>>({
   idField,
   onDelete,
   onEdit,
+  onEditStatus,
 }: SharedTableProps<T>) => {
   const navigate = useNavigate();
   const theme = useTheme();
 
-  const shouldShowActions = isAdmin || showView || onEdit;
-  return (
+const shouldShowActions = isAdmin || showView || onEdit || !!onEditStatus || !!onDelete;  return (
     <TableContainer
       component={Paper}
       sx={{
@@ -180,7 +181,23 @@ const SharedTable = <T extends Record<string, any>>({
                               },
                             }}
                           >
-                            <EditIcon sx={{ color: theme.palette.success.main, fontSize: 20 }} />
+                            <EditIcon
+                              sx={{
+                                color: theme.palette.success.main,
+                                fontSize: 20,
+                              }}
+                            />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                      {onEditStatus && (
+                        <Tooltip title="Update Status">
+                          <IconButton
+                            onClick={() =>
+                              onEditStatus(row)
+                            } 
+                          >
+                            <EditIcon />
                           </IconButton>
                         </Tooltip>
                       )}
@@ -199,9 +216,13 @@ const SharedTable = <T extends Record<string, any>>({
                               }
                             }}
                             sx={{
-backgroundColor: theme.palette.error.light,
+                              backgroundColor: theme.palette.error.light,
                               "&:hover": {
-"&:hover": { backgroundColor: theme.palette.error.main, color: "#fff" },                              },
+                                "&:hover": {
+                                  backgroundColor: theme.palette.error.main,
+                                  color: "#fff",
+                                },
+                              },
                             }}
                           >
                             <DeleteOutlineIcon

@@ -1,4 +1,11 @@
-import { Box, Typography, Avatar, Paper, Grid as Grid, useTheme } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Avatar,
+  Paper,
+  Grid as Grid,
+  useTheme,
+} from "@mui/material";
 import SharedTable from "../SharedTable/SharedTable";
 import CustomButton from "../Button/Button";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
@@ -13,9 +20,12 @@ const DetailsLayout = <T extends Record<string, unknown>>({
   tableData,
   tableColumns,
   onEdit,
+  showTableActions = false,
   PageName,
   children,
   noDataMessage = "No data available",
+  onDeleteStudent,
+  onUpdateStatus,
 }: IDetailsLayoutProps<T>) => {
   const navigate = useNavigate();
   const hasData = tableData && tableData.length > 0;
@@ -45,7 +55,7 @@ const DetailsLayout = <T extends Record<string, unknown>>({
           borderRadius: "16px",
           border: `1px solid ${theme.palette.divider}`,
           boxShadow: "none",
-          backgroundColor: "background.paper"
+          backgroundColor: "background.paper",
         }}
       >
         <Grid container spacing={3} sx={{ alignItems: "flex-start" }}>
@@ -93,7 +103,10 @@ const DetailsLayout = <T extends Record<string, unknown>>({
         </Grid>
       </Paper>
 
-      <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 ,color: "text.primary"}}>
+      <Typography
+        variant="h6"
+        sx={{ mb: 2, fontWeight: 600, color: "text.primary" }}
+      >
         {tableTitle}
       </Typography>
 
@@ -109,8 +122,10 @@ const DetailsLayout = <T extends Record<string, unknown>>({
             columns={tableColumns}
             data={tableData}
             idField={tableColumns[0]?.id || "id"}
-            isAdmin={false}
+            isAdmin={showTableActions}
             showView={false}
+            onDelete={onDeleteStudent} 
+            onEditStatus={onUpdateStatus}
           />
         </Box>
       ) : (

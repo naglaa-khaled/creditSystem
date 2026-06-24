@@ -30,6 +30,11 @@ export interface IFullStudentProfile {
   student: IStudent;
   courses: ICourse[];
 }
+export interface IEnrolledStudent {
+  studentID: string | number;
+  studentName: string;
+  status: string;
+}
 export interface IFullCourseProfile {
   courseID: string;
   courseName: string;
@@ -41,10 +46,9 @@ export interface IFullCourseProfile {
   students: {
     studentID: string | number;
     studentName: string;
-      status: string;
-    }[];
-  };
-
+    status: string;
+  }[];
+}
 
 // --- Course Related Interfaces ---
 export interface ICourse {
@@ -108,6 +112,9 @@ export interface IDetailsLayoutProps<T> {
   onEdit?: () => void;
   children?: React.ReactNode;
   noDataMessage?: string;
+  onDeleteStudent?: (id: string | number) => void;
+  onUpdateStatus?: (item: T) => void;
+  showTableActions?: boolean;
 }
 export interface IInstructorCourse {
   courseID: string;
@@ -121,8 +128,7 @@ export interface IInstructor {
   email: string;
   totalCourses: number;
   coursesList: IInstructorCourse[];
-  nameEn: "Ahmed Ali";
-  
+  nameEn?: "Ahmed Ali";
 }
 // Schedual
 export interface ISchedule {
@@ -136,7 +142,7 @@ export interface ISchedule {
   courseSemester: number;
   instructorName: string;
   capacity: number;
-  id: string | number; 
+  id: string | number;
   level: number;
   semester: number;
 }
@@ -184,11 +190,11 @@ export interface IReports {
   topCourses: ITopCourse[];
   professorWorkload: IProfessorWorkload[];
 }
-export interface IUsers{
+export interface IUsers {
   userID: number | string;
-    fullName: string;
-    email: string;
-    role: string;
-    isActive: boolean;
-    password?: string;
+  fullName: string;
+  email: string;
+  role: string;
+  isActive: boolean;
+  password?: string;
 }
