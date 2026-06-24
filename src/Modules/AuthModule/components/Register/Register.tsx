@@ -790,14 +790,13 @@ export default function Register() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        minHeight: "100vh",
-        py: 4,
+
         bgcolor: "background.default",
       }}
     >
       <Paper
         elevation={3}
-        sx={{ width: { xs: "90%", sm: 450 }, p: 4, borderRadius: 4 }}
+        sx={{ width: { xs: "95%", sm: 450 }, p: 4, borderRadius: 4 }}
       >
         <Box sx={{ textAlign: "center", mb: 3 }}>
           <Typography variant="h4" fontWeight="bold" color="text.secondary">

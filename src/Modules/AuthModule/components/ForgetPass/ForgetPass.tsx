@@ -172,7 +172,7 @@ export default function ForgetPass() {
   return (
     <Box
       sx={{
-        minHeight: "80vh",
+        minHeight: {md:"80vh"},
         display: "flex",
         alignItems: "center",
         justifyContent: "center",

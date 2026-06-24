@@ -26,8 +26,6 @@ export default function AuthLayout() {
             margin: "auto",
             bgcolor: "background.paper",
             border: `1px solid ${theme.palette.divider}`,
-            width: "100%",
-            maxWidth: 450, 
             boxShadow: theme.palette.mode === "light" ? 3 : "none",
           }}
         >

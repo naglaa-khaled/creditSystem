@@ -158,7 +158,7 @@ export default function Login() {
   };
 
   return (
-    <Stack sx={{ margin: 'auto', p: 4, width: '400px', borderRadius: 4, boxShadow: '0 8px 24px rgba(0,0,0,0.1)', bgcolor: 'background.paper', // ديناميكي حسب الوضع
+    <Stack sx={{ margin: 'auto', p: 4, borderRadius: 4,width: {  sm: '400px' }, boxShadow: '0 8px 24px rgba(0,0,0,0.1)', bgcolor: 'background.paper', // ديناميكي حسب الوضع
       border: `1px solid ${theme.palette.divider}` }}>
       <Typography variant="h4" sx={{ textAlign: 'center', fontWeight: 'bold', color: 'text.secondary', mb: 1 }}>
         Login

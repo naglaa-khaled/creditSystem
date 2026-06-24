@@ -46,12 +46,14 @@ const SharedTable = <T extends Record<string, any>>({
   const navigate = useNavigate();
   const theme = useTheme();
 
-const shouldShowActions = isAdmin || showView || onEdit || !!onEditStatus || !!onDelete;  return (
+  const shouldShowActions =
+    isAdmin || showView || onEdit || !!onEditStatus || !!onDelete;
+  return (
     <TableContainer
       component={Paper}
       sx={{
         borderRadius: 4,
-        overflow: "hidden",
+        overflowX: "auto",
         border: `1px solid ${theme.palette.divider}`,
         boxShadow: "none",
       }}
@@ -192,11 +194,7 @@ const shouldShowActions = isAdmin || showView || onEdit || !!onEditStatus || !!o
                       )}
                       {onEditStatus && (
                         <Tooltip title="Update Status">
-                          <IconButton
-                            onClick={() =>
-                              onEditStatus(row)
-                            } 
-                          >
+                          <IconButton onClick={() => onEditStatus(row)}>
                             <EditIcon />
                           </IconButton>
                         </Tooltip>

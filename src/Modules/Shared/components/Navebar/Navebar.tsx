@@ -173,7 +173,7 @@ const Navebar = ({ toggleSidebar }: NavebarProps) => {
               component="img"
               src={photo}
               alt="Logo"
-              sx={{ width: 50, height: 50 }}
+              sx={{ width: 42, height: 42 }}
             />
             <Typography
               fontWeight="bold"
