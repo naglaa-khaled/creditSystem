@@ -7,9 +7,16 @@ import {
   getStudents,
   addStudent,
   deleteStudent,
+  exportLevelStudents,
 } from "../../../../../API/AdminData/Students";
 import CustomButton from "../../../../Shared/components/Button/Button";
-import { Box, CircularProgress, Typography, useMediaQuery, useTheme } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import ConfirmDeleteModal from "../../../../Shared/components/Modals/DeleteModal";
 import AddIcon from "@mui/icons-material/Add";
 import { type FieldValues } from "react-hook-form";
@@ -60,7 +67,7 @@ const StudentsPage = () => {
       ],
     },
   ];
-    const [selectedGroup, setSelectedGroup] = useState<{
+  const [selectedGroup, setSelectedGroup] = useState<{
     level: string;
     semester: string;
   } | null>(null);
@@ -112,27 +119,27 @@ const StudentsPage = () => {
     }
   };
 
-const filteredData = useMemo(() => {
-  if (!allStudents) return [];
+  const filteredData = useMemo(() => {
+    if (!allStudents) return [];
 
-  return allStudents.filter((student) => {
-    const name = student?.nameEn || student?.fullName || "";
-    
-    return name.toLowerCase().includes(searchTerm.toLowerCase());
-  });
-}, [allStudents, searchTerm]);
- const groupedSchedaul = useMemo(() => {
+    return allStudents.filter((student) => {
+      const name = student?.nameEn || student?.fullName || "";
+
+      return name.toLowerCase().includes(searchTerm.toLowerCase());
+    });
+  }, [allStudents, searchTerm]);
+  const groupedSchedaul = useMemo(() => {
     const groups: Record<string, IStudent[]> = {};
 
     filteredData?.forEach((student) => {
-     const sYear =  student.year; 
-    const sSemester = student.semester;
+      const sYear = student.year;
+      const sSemester = student.semester;
 
-    if (student && sYear && sSemester) {
-      const key = `${sYear}-${sSemester}`;
-      if (!groups[key]) groups[key] = [];
-      groups[key].push(student);
-    }
+      if (student && sYear && sSemester) {
+        const key = `${sYear}-${sSemester}`;
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(student);
+      }
     });
 
     return groups;
@@ -187,7 +194,7 @@ const filteredData = useMemo(() => {
         />
       </Box>
 
- <Box
+      <Box
         sx={{
           display: "grid",
           gridTemplateColumns: {
@@ -200,7 +207,16 @@ const filteredData = useMemo(() => {
         }}
       >
         {isLoading ? (
-          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gridColumn: "1/-1", py: 10, gap: 2 }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gridColumn: "1/-1",
+              py: 10,
+              gap: 2,
+            }}
+          >
             <CircularProgress size={50} />
             <Typography variant="h6" sx={{ color: "var(--primary)" }}>
               Loading Students Grid...
@@ -216,7 +232,9 @@ const filteredData = useMemo(() => {
             })
             .map((key) => {
               const [level, semester] = key.split("-");
-              const isActive = selectedGroup?.level === level && selectedGroup?.semester === semester;
+              const isActive =
+                selectedGroup?.level === level &&
+                selectedGroup?.semester === semester;
               return (
                 <SemesterCard
                   icon={<GroupsIcon />}
@@ -226,16 +244,38 @@ const filteredData = useMemo(() => {
                   count={groupedSchedaul[key].length}
                   isActive={isActive}
                   text="Student"
-                  onClick={() => setSelectedGroup(isActive ? null : { level, semester })}
-                  // إذا كنتِ لا تحتاجي الـ export في الـ Admin ممكن تشيليه أو تسيبيها فاضية
-                  onExport={(e) => e.stopPropagation()} 
+                  exportLabel="Dawnload Students Data"
+                  onClick={() =>
+                    setSelectedGroup(isActive ? null : { level, semester })
+                  }
+                  onExport={async () => {
+                    try {
+                      await exportLevelStudents(`level ${level}`);
+                    } catch (error) {
+                      console.error("Export failed", error);
+                    }
+                  }}
                 />
               );
             })
         ) : (
-          <Box sx={{ gridColumn: "1/-1", textAlign: "center", py: 10, border: "1px dashed #ccc", borderRadius: "16px", backgroundColor: "#f9f9f9" }}>
-            <Typography variant="h6" sx={{ color: "var(--primary)", opacity: 0.7 }}>
-              {searchTerm ? `No Students found matching "${searchTerm}"` : "No Students available."}
+          <Box
+            sx={{
+              gridColumn: "1/-1",
+              textAlign: "center",
+              py: 10,
+              border: "1px dashed #ccc",
+              borderRadius: "16px",
+              backgroundColor: "#f9f9f9",
+            }}
+          >
+            <Typography
+              variant="h6"
+              sx={{ color: "var(--primary)", opacity: 0.7 }}
+            >
+              {searchTerm
+                ? `No Students found matching "${searchTerm}"`
+                : "No Students available."}
             </Typography>
           </Box>
         )}
@@ -252,13 +292,26 @@ const filteredData = useMemo(() => {
             animation: "fadeIn 0.4s ease-out",
           }}
         >
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 3,
+            }}
+          >
             <h3 style={{ margin: 0, color: "var(--primary)" }}>
-              Students List - Level {selectedGroup.level} / Semester {selectedGroup.semester}
+              Students List - Level {selectedGroup.level} / Semester{" "}
+              {selectedGroup.semester}
             </h3>
             <button
               onClick={() => setSelectedGroup(null)}
-              style={{ background: "none", border: "none", cursor: "pointer", color: "#666" }}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                color: "#666",
+              }}
             >
               Close [x]
             </button>
@@ -266,7 +319,11 @@ const filteredData = useMemo(() => {
 
           <SharedTable
             columns={studentColumns}
-            data={groupedSchedaul[`${selectedGroup.level}-${selectedGroup.semester}`] || []}
+            data={
+              groupedSchedaul[
+                `${selectedGroup.level}-${selectedGroup.semester}`
+              ] || []
+            }
             idField="studentID"
             detailsPath="/admin/students/details"
             isAdmin={true} // تفعيل أوبشن الـ Admin عشان يظهر الـ Actions

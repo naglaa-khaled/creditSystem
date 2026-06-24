@@ -1,5 +1,5 @@
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"; // الأيقونة الأنسب للمظهر الهابط
-import DownloadIcon from "@mui/icons-material/Download"; 
+import DownloadIcon from "@mui/icons-material/Download";
 import { Box, IconButton, Button, Typography } from "@mui/material";
 import { type ReactNode } from "react";
 
@@ -9,30 +9,60 @@ interface ISemesterCardProps {
   count: number;
   isActive: boolean;
   onClick: () => void;
-  onExport?: (e: React.MouseEvent) => void; 
+  onExport?: (e: React.MouseEvent) => void;
   icon: ReactNode;
+  exportLabel?: string;
   text: string;
 }
 
-// دالة ديناميكية لتوليد الألوان بناءً على الـ Level لتتناسق تلقائياً كالصورة
 const getCardColors = (level: string) => {
   const lvl = level.toString().trim();
   if (lvl === "1" || lvl.toLowerCase() === "one") {
-    return { bg: "#e8f5e9", text: "#2e7d32", iconBg: "#e8f5e9", iconColor: "#2e7d32" }; // الأخضر
+    return {
+      bg: "#e8f5e9",
+      text: "#2e7d32",
+      iconBg: "#e8f5e9",
+      iconColor: "#2e7d32",
+    }; // الأخضر
   }
   if (lvl === "2") {
-    return { bg: "#e3f2fd", text: "#1565c0", iconBg: "#e3f2fd", iconColor: "#1565c0" }; // الأزرق
+    return {
+      bg: "#e3f2fd",
+      text: "#1565c0",
+      iconBg: "#e3f2fd",
+      iconColor: "#1565c0",
+    }; // الأزرق
   }
   if (lvl === "3") {
-    return { bg: "#fff3e0", text: "#ef6c00", iconBg: "#fff3e0", iconColor: "#ef6c00" }; // البرتقالي
+    return {
+      bg: "#fff3e0",
+      text: "#ef6c00",
+      iconBg: "#fff3e0",
+      iconColor: "#ef6c00",
+    }; // البرتقالي
   }
   if (lvl === "4") {
-    return { bg: "#e3f2fd", text: "#1565c0", iconBg: "#e3f2fd", iconColor: "#1565c0" }; // الأزرق للمستوى الرابع
+    return {
+      bg: "#e3f2fd",
+      text: "#1565c0",
+      iconBg: "#e3f2fd",
+      iconColor: "#1565c0",
+    }; // الأزرق للمستوى الرابع
   }
   if (lvl === "5") {
-    return { bg: "#ffebee", text: "#c62828", iconBg: "#ffebee", iconColor: "#c62828" }; // الأحمر
+    return {
+      bg: "#ffebee",
+      text: "#c62828",
+      iconBg: "#ffebee",
+      iconColor: "#c62828",
+    }; // الأحمر
   }
-  return { bg: "#f3e5f5", text: "#7b1fa2", iconBg: "#f3e5f5", iconColor: "#7b1fa2" }; // الموف الافتراضي للمستويات الأخرى
+  return {
+    bg: "#f3e5f5",
+    text: "#7b1fa2",
+    iconBg: "#f3e5f5",
+    iconColor: "#7b1fa2",
+  }; // الموف الافتراضي للمستويات الأخرى
 };
 
 export const SemesterCard = ({
@@ -44,6 +74,7 @@ export const SemesterCard = ({
   onExport,
   text,
   icon,
+  exportLabel = "Download Data",
 }: ISemesterCardProps) => {
   const colors = getCardColors(level);
 
@@ -52,12 +83,15 @@ export const SemesterCard = ({
       onClick={onClick}
       sx={{
         borderRadius: "16px",
-        border: isActive ? "2px solid #3f51b5" : "1px solid #e2e8f0",
-        bgcolor: "white",
+        border: (theme) =>
+          isActive
+            ? `2px solid ${theme.palette.primary.main}`
+            : `1px solid ${theme.palette.divider}`,
+        bgcolor: "background.paper",
         cursor: "pointer",
         transition: "all 0.3s ease",
         boxShadow: isActive
-          ? "0 8px 30px rgba(63, 81, 181, 0.12)"
+          ? (theme) => `0 8px 30px ${theme.palette.primary.main}20` // إضافة شفافية للون الأساسي
           : "0 2px 12px rgba(0,0,0,0.03)",
         "&:hover": {
           transform: "translateY(-4px)",
@@ -70,7 +104,16 @@ export const SemesterCard = ({
         height: "100%",
       }}
     >
-      <Box sx={{ p: 2.5, display: "flex", alignItems: "flex-start", justifyContent: "space-between", width: "100%", flexGrow: 1 }}>
+      <Box
+        sx={{
+          p: 2.5,
+          display: "flex",
+          alignItems: "flex-start",
+          justifyContent: "space-between",
+          width: "100%",
+          flexGrow: 1,
+        }}
+      >
         <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
           <Box
             sx={{
@@ -88,18 +131,27 @@ export const SemesterCard = ({
             {icon}
           </Box>
 
-          {/* نصوص المستويات والترم */}
           <Box sx={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-            <Typography component="h3" sx={{ margin: 0, fontSize: "1.25rem", fontWeight: 700, color: "#1e293b" }}>
+            <Typography
+              component="h3"
+              sx={{
+                margin: 0,
+                fontSize: "1.25rem",
+                fontWeight: 700,
+                color: "text.primary",
+              }}
+            >
               Level {level}
             </Typography>
-            <Typography variant="body2" sx={{ color: "#64748b", margin: 0, fontSize: "0.875rem" }}>
+            <Typography
+              variant="body2"
+              sx={{ color: "text.secondary", margin: 0, fontSize: "0.875rem" }}
+            >
               Semester {semester}
             </Typography>
           </Box>
         </Box>
 
-        {/* كبسولة عدد الطلاب بألوانها المطابقة */}
         <Box
           sx={{
             backgroundColor: colors.bg,
@@ -117,57 +169,54 @@ export const SemesterCard = ({
         </Box>
       </Box>
 
-      {/* خط فاصل أنيق يفصل بين البيانات والتحكم السفلي */}
-      <Box sx={{ height: "1px", bgcolor: "#f1f5f9", mx: 2.5 }} />
+      <Box sx={{ height: "1px", bgcolor: "divider", mx: 2.5 }} />
 
-      {/* الشريط السفلي الذي يحتوي على أزرار الأكشن التفاعلية */}
-      <Box 
-        sx={{ 
-          px: 2.5, 
-          py: 1.25, 
-          display: "flex", 
-          alignItems: "center", 
-justifyContent: onExport ? "space-between" : "center",
-          bgcolor: "#fafafa" ,
-          mt: "auto"
+      <Box
+        sx={{
+          px: 2.5,
+          py: 1.25,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: onExport ? "space-between" : "center",
+          bgcolor: (theme) =>
+            theme.palette.mode === "light"
+              ? "#fafafa"
+              : "rgba(255,255,255,0.03)",
+          mt: "auto",
         }}
       >
-       {onExport && (
+        {onExport && (
           <Button
             variant="text"
             startIcon={<DownloadIcon sx={{ fontSize: "18px !important" }} />}
             onClick={(e) => {
-              e.stopPropagation(); 
+              e.stopPropagation();
               onExport(e);
             }}
             sx={{
-              color: "#2e7d32",
+              color: "success.main",
+              "&:hover": { backgroundColor: "success.light" },
               fontSize: "0.85rem",
               fontWeight: 600,
               textTransform: "uppercase",
               p: "4px 8px",
               borderRadius: "6px",
-              "&:hover": {
-                backgroundColor: "#e8f5e9",
-              },
             }}
           >
-            Download Data
+            {exportLabel}
           </Button>
         )}
 
-        {/* سهم التوسيع المحسن */}
-        <IconButton 
-          size="small" 
+        <IconButton
+          size="small"
           disableRipple
-          sx={{ 
-            color: isActive ? "#3f51b5" : "#94a3b8",
+          sx={{
+            color: isActive ? "primary.main" : "text.disabled",
             transition: "transform 0.3s ease",
             transform: isActive ? "rotate(180deg)" : "rotate(0deg)",
-            // التعديل 6: إضافة خلفية خفيفة جداً عند تمرير الماوس فوق السهم عندما يكون منفرداً لزيادة حيوية التصميم
             "&:hover": {
-              bgcolor: onExport ? "transparent" : "rgba(0, 0, 0, 0.04)"
-            }
+              bgcolor: onExport ? "transparent" : "rgba(0, 0, 0, 0.04)",
+            },
           }}
         >
           <KeyboardArrowDownIcon />

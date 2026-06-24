@@ -146,3 +146,71 @@ export const updateCourse = async (
     return { success: false };
   }
 };
+// إضافة دالة لحذف تسجيل طالب في مادة
+export const dropStudentRegistration = async (
+  studentId: number,
+  courseId: string
+): Promise<IApiResponse & { message?: string }> => {
+  try {
+    const response = await axiosInstance.delete(`Admin/drop-student-registration`, {
+      params: { studentId, courseId },
+    });
+    return { success: response.status === 200 };
+  } catch (error: unknown) {
+    console.error("Drop Registration Error:", error);
+
+    let serverMessage = "Failed to drop registration";
+    const errData = typeof error === "object" && error !== null ? (error as { response?: { data?: unknown } }).response?.data : undefined;
+    if (
+      errData &&
+      typeof errData === "object" &&
+      "message" in errData &&
+      typeof (errData as { message?: unknown }).message === "string"
+    ) {
+      serverMessage = (errData as { message: string }).message;
+    }
+
+    return {
+      success: false,
+      message: serverMessage,
+    };
+  }
+};
+
+// إضافة دالة لتحديث حالة تسجيل طالب
+export const updateRegistrationStatus = async (
+  studentId: number,
+  courseId: string,
+  newStatus: string
+): Promise<IApiResponse & { message?: string }> => {
+  try {
+    const response = await axiosInstance.patch(`Admin/update-registration-status`, null, {
+      params: { studentId, courseId, newStatus },
+    });
+    return { success: response.status === 200 };
+  } catch (error: unknown) {
+    console.error("Update Status Error:", error);
+
+    let message = "Failed to update status";
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "response" in error
+    ) {
+      const errData = (error as { response?: { data?: unknown } }).response?.data;
+      if (
+        errData &&
+        typeof errData === "object" &&
+        "message" in errData &&
+        typeof (errData as { message?: unknown }).message === "string"
+      ) {
+        message = (errData as { message: string }).message;
+      }
+    }
+
+    return {
+      success: false,
+      message,
+    };
+  }
+};

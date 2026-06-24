@@ -16,7 +16,7 @@ export const FilterBar = ({ onSearch, onFilterChange }: FilterBarProps) => {
         placeholder="Search by name..."
         size="small"
         onChange={(e) => onSearch(e.target.value)} 
-        sx={{ width: isTabletOrMobile || !onFilterChange ? "100%" : "300px", bgcolor: "white" }} 
+        sx={{ width: isTabletOrMobile || !onFilterChange ? "100%" : "300px", bgcolor: "background.paper" }} 
       />
 
       {onFilterChange && (
@@ -26,7 +26,7 @@ export const FilterBar = ({ onSearch, onFilterChange }: FilterBarProps) => {
             size="small"
             defaultValue=""
             onChange={(e) => onFilterChange("year", e.target.value as string)}
-            sx={{ flex: 1, minWidth: isTabletOrMobile ? "0" : "150px", bgcolor: "white", borderRadius: "8px" }}
+            sx={{ flex: 1, minWidth: isTabletOrMobile ? "0" : "150px", bgcolor: "background.paper", borderRadius: "8px" }}
           >
             <MenuItem value="">All Years</MenuItem>
             <MenuItem value="1">1st Year</MenuItem>
@@ -41,7 +41,7 @@ export const FilterBar = ({ onSearch, onFilterChange }: FilterBarProps) => {
             size="small"
             defaultValue=""
             onChange={(e) => onFilterChange("semester", e.target.value as string)}
-            sx={{ flex: 1, minWidth: isTabletOrMobile ? "0" : "150px", bgcolor: "white", borderRadius: "8px" }}
+            sx={{ flex: 1, minWidth: isTabletOrMobile ? "0" : "150px", bgcolor: "background.paper", borderRadius: "8px" }}
           >
             <MenuItem value="">All Semesters</MenuItem>
             <MenuItem value="1">Semester 1</MenuItem>

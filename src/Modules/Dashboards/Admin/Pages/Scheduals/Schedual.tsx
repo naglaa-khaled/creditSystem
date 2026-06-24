@@ -5,6 +5,7 @@ import {
   getSchedules,
   addSchedule,
   deleteSchedule,
+  updateSchedule,
 } from "../../../../../API/AdminData/Schedual";
 import CustomButton from "../../../../Shared/components/Button/Button";
 import {
@@ -21,6 +22,7 @@ import AssignmentIcon from "@mui/icons-material/Assignment";
 import { type ISchedule } from "../../../../Shared/Interfaces";
 import { SemesterCard } from "../../../../Shared/components/CourseCard/CourseCard";
 import WeeklyTimetable from "../../../../Shared/components/weekelyTimeTable/WeekelyTimeTable";
+import { toast } from "react-toastify";
 
 const SchedaulPage = () => {
   const theme = useTheme();
@@ -32,15 +34,16 @@ const SchedaulPage = () => {
     year: "",
     semester: "",
   });
-
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [scheduleToEdit, setScheduleToEdit] = useState<ISchedule | null>(null);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedSchedualeId, setselectedSchedualeId] = useState<
     string | number | null
   >(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const SchedualField = [
-    { name: "courseName", label: "Course Name", required: true },
-    { name: "courseID", label: "Course Code/ID", required: true },
+    { name: "courseID", label: "Course ID", required: true },
+    { name: "instructorId", label: "Instructor ID", required: true },
     {
       name: "day",
       label: "Day",
@@ -100,7 +103,6 @@ const SchedaulPage = () => {
     setIsLoading(true);
     try {
       const data = await getSchedules(year, semester);
-      console.log("Schedual data from API:", data);
       setAllSchedual(data);
     } catch (error) {
       console.error("Failed to load Scheduals:", error);
@@ -112,29 +114,43 @@ const SchedaulPage = () => {
   useEffect(() => {
     loadDataFromApi();
   }, []);
+  const handleOpenEditModal = (lecture: ISchedule) => {
+    setScheduleToEdit(lecture);
+    setIsEditModalOpen(true);
+  };
 
   const handleOpenDeleteModal = (id: string | number) => {
     setselectedSchedualeId(id);
     setDeleteModalOpen(true);
   };
 
-  //delete Schedual handler
   const handleConfirmDelete = async () => {
     if (selectedSchedualeId) {
       try {
-        await deleteSchedule(selectedSchedualeId);
+        const targetSchedule = allSchedual.find(
+          (s) =>
+            s.id === selectedSchedualeId || s.courseID === selectedSchedualeId,
+        );
+
+        const targetId = targetSchedule?.courseID || selectedSchedualeId;
+
+        await deleteSchedule(targetId);
+        toast.success("Schedule deleted successfully!");
+
         setAllSchedual((prev) =>
           prev.filter((schedual) => {
             return (
               schedual.id !== selectedSchedualeId &&
-              schedual.courseID !== selectedSchedualeId
+              schedual.courseID !== targetId
             );
           }),
         );
+
         setDeleteModalOpen(false);
         setselectedSchedualeId(null);
       } catch (error) {
         console.error("Delete failed", error);
+        toast.error("Failed to delete schedule.");
       }
     }
   };
@@ -144,11 +160,28 @@ const SchedaulPage = () => {
       await addSchedule(data);
       setIsAddModalOpen(false);
       loadDataFromApi();
+      toast.success("New schedule added successfully!");
     } catch (error) {
       console.error("Add failed", error);
+      toast.error("Failed to add schedule.");
     }
   };
+  const handleUpdateSchedule = async (data: FieldValues) => {
+    if (scheduleToEdit) {
+      try {
+        const targetId = scheduleToEdit.courseID || scheduleToEdit.id;
 
+        await updateSchedule(targetId, data);
+        setIsEditModalOpen(false);
+        setScheduleToEdit(null);
+        loadDataFromApi();
+        toast.success("Schedule updated successfully!");
+      } catch (error) {
+        console.error("Update failed", error);
+        toast.error("Failed to update schedule.");
+      }
+    }
+  };
   const filteredData = useMemo(() => {
     return allSchedual.filter((schedaul) =>
       (schedaul.courseName || "")
@@ -301,7 +334,7 @@ const SchedaulPage = () => {
 
       {selectedGroup && Object.keys(groupedSchedaul).length > 0 && (
         <WeeklyTimetable
-          title={`📌 Schedules — Level ${selectedGroup.level} / Semester ${selectedGroup.semester}`}
+          title={`Schedules — Level ${selectedGroup.level} / Semester ${selectedGroup.semester}`}
           data={
             groupedSchedaul[
               `${selectedGroup.level}-${selectedGroup.semester}`
@@ -309,6 +342,7 @@ const SchedaulPage = () => {
           }
           onClose={() => setSelectedGroup(null)}
           onDelete={handleOpenDeleteModal}
+          onEdit={handleOpenEditModal}
         />
       )}
 
@@ -325,6 +359,17 @@ const SchedaulPage = () => {
         onSave={handleSaveSchedual}
         title="Add New Schedule"
         fields={SchedualField}
+      />
+      <FormModal
+        open={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setScheduleToEdit(null);
+        }}
+        onSave={handleUpdateSchedule}
+        title="Edit Schedule"
+        fields={SchedualField}
+        initialData={scheduleToEdit || undefined}
       />
     </div>
   );

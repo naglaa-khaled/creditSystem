@@ -22,10 +22,12 @@ export const getSchedules = async (courseLevel?: string, courseSemester?: string
 };
 
 
-export const deleteSchedule = async (courseId: string|number): Promise<IApiResponse> => {
-  console.log("Deleting schedule for course:", courseId);
-  // const res = await axiosInstance.delete(`/student-affairs/delete-schedule/${courseId}`);
-  return { success: true }; 
+export const deleteSchedule = async (courseId: string | number): Promise<IApiResponse> => {
+  console.log(`Deleting schedule for course: ${courseId}`);
+  const res = await axiosInstance.delete<IApiResponse>(
+    `Admin/delete-offering/${courseId}`
+  );
+  return res.data;
 };
 
 
@@ -34,3 +36,15 @@ export const addSchedule = async (scheduleData: Partial<ISchedule>): Promise<IAp
   // const res = await axiosInstance.post(`/student-affairs/add-schedule`, scheduleData);
   return { success: true }; 
 };
+export const updateSchedule = async (
+  courseId: string | number,
+  updatedData: Partial<ISchedule>
+): Promise<IApiResponse> => {
+  console.log(`Updating schedule for course ${courseId}:`, updatedData);
+    const res = await axiosInstance.put<IApiResponse>(
+    `Admin/update-offering/${courseId}`,
+    updatedData
+  );
+    return res.data;
+};
+

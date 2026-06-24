@@ -1,4 +1,3 @@
-
 // import {
 //   Paper,
 //   Typography,
@@ -32,16 +31,15 @@
 //         data
 //       );
 
-     
 //       toast.success("Account created successfully! Please check your email.");
 
 //       // 2. التحويل لصفحة CheckEmail بعد ثانيتين
 //       setTimeout(() => {
 //         navigate("/checkemail");
-//       }, 1000); 
+//       }, 1000);
 
 //     } catch (error: any) {
-     
+
 //       const message = error.response?.data?.message || "Registration failed. Try again.";
 //       toast.error(message);
 //       console.log(error);
@@ -83,7 +81,7 @@
 //               <Checkbox
 //                 checked={agree}
 //                 onChange={(e) => setAgree(e.target.checked)}
-//                 sx={{ color: "#394188", "&.Mui-checked": { color: "#394188" } }}
+//                 sx={{ color: "text.secondary", "&.Mui-checked": { color: "#394188" } }}
 //               />
 //             }
 //             label={
@@ -101,12 +99,12 @@
 //             fullWidth
 //             variant="contained"
 //             disabled={!agree}
-//             sx={{ 
-//               bgcolor: "#394188", 
-//               mt: 3, 
-//               py: 1.2, 
-//               borderRadius: 2, 
-//               "&:hover": { bgcolor: "#2e356e" } 
+//             sx={{
+//               bgcolor: "#394188",
+//               mt: 3,
+//               py: 1.2,
+//               borderRadius: 2,
+//               "&:hover": { bgcolor: "#2e356e" }
 //             }}
 //           >
 //             Register
@@ -170,27 +168,25 @@
 //     }
 //   };
 
- 
 //   if (isSuccess) {
 //     return (
 //       <Stack sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
 //         <Confetti width={width} height={height} numberOfPieces={300} recycle={false} />
-        
+
 //         <Paper elevation={6} sx={{ width: 450, p: 5, textAlign: "center", borderRadius: 4 }}>
 //           <MarkEmailReadIcon sx={{ fontSize: 100, color: "#4caf50", mb: 2 }} />
-          
+
 //           <Typography variant="h4" fontWeight="bold" gutterBottom color="#394188">
 //             Welcome Aboard! 🎉
 //           </Typography>
-          
+
 //           <Typography variant="body1" color="text.secondary" sx={{ mb: 4, lineHeight: 1.7 }}>
-//             Your account has been created successfully. 
+//             Your account has been created successfully.
 //             <br />
-//             We've sent a <b>verification link</b> to your email. 
+//             We've sent a <b>verification link</b> to your email.
 //             Please check your inbox to activate your account.
 //           </Typography>
 
-         
 //         </Paper>
 //       </Stack>
 //     );
@@ -249,12 +245,12 @@
 //             fullWidth
 //             variant="contained"
 //             disabled={!agree || loading}
-//             sx={{ 
-//               bgcolor: "#394188", 
-//               mt: 3, 
-//               py: 1.2, 
-//               borderRadius: 2, 
-//               "&:hover": { bgcolor: "#2e356e" } 
+//             sx={{
+//               bgcolor: "#394188",
+//               mt: 3,
+//               py: 1.2,
+//               borderRadius: 2,
+//               "&:hover": { bgcolor: "#2e356e" }
 //             }}
 //           >
 //             {loading ? "Registering..." : "Register"}
@@ -292,8 +288,8 @@
 //   } = useForm();
 
 //   const [agree, setAgree] = useState(false);
-//   const [isSuccess, setIsSuccess] = useState(false); 
-//   const [loading, setLoading] = useState(false); 
+//   const [isSuccess, setIsSuccess] = useState(false);
+//   const [loading, setLoading] = useState(false);
 //   const { width, height } = useWindowSize();
 //   const navigate = useNavigate();
 
@@ -317,7 +313,6 @@
 //     }
 //   };
 
-  
 //   if (isSuccess) {
 //     return (
 //       <Box
@@ -335,32 +330,31 @@
 //         }}
 //       >
 //        {/* <Confetti width={width} height={height} numberOfPieces={300} recycle={false} /> */}
-        
-//         <Paper 
-//           elevation={6} 
-//           sx={{ 
-//             width: { xs: "90%", sm: 450 }, 
-//             p: 5, 
-//             textAlign: "center", 
+
+//         <Paper
+//           elevation={6}
+//           sx={{
+//             width: { xs: "90%", sm: 450 },
+//             p: 5,
+//             textAlign: "center",
 //             borderRadius: 4,
 //             position: "relative",
-//             zIndex: 10000 
+//             zIndex: 10000
 //           }}
 //         >
 //           <MarkEmailReadIcon sx={{ fontSize: 100, color: "#4caf50", mb: 2 }} />
-          
+
 //           <Typography variant="h4" fontWeight="bold" gutterBottom color="#394188">
 //             Welcome ! 🎉
 //           </Typography>
-          
+
 //           <Typography variant="body1" color="text.secondary" sx={{ mb: 4, lineHeight: 1.7 }}>
-//             Your account has been created successfully. 
+//             Your account has been created successfully.
 //             <br />
-//             We've sent a <b>verification link</b> to your email. 
+//             We've sent a <b>verification link</b> to your email.
 //             Please check your inbox to activate your account.
 //           </Typography>
 
-   
 //         </Paper>
 //       </Box>
 //     );
@@ -419,12 +413,12 @@
 //             fullWidth
 //             variant="contained"
 //             disabled={!agree || loading}
-//             sx={{ 
-//               bgcolor: "#394188", 
-//               mt: 3, 
-//               py: 1.2, 
-//               borderRadius: 2, 
-//               "&:hover": { bgcolor: "#2e356e" } 
+//             sx={{
+//               bgcolor: "#394188",
+//               mt: 3,
+//               py: 1.2,
+//               borderRadius: 2,
+//               "&:hover": { bgcolor: "#2e356e" }
 //             }}
 //           >
 //             {loading ? "Registering..." : "Register"}
@@ -587,7 +581,6 @@
 //             }}
 //           />
 
-    
 //           <TextField
 //             {...register("year", { required: "Academic Year is required" })}
 //             select
@@ -673,6 +666,7 @@ import {
   MenuItem,
   InputAdornment,
   CircularProgress,
+  useTheme,
 } from "@mui/material";
 import axios from "axios";
 import { useForm } from "react-hook-form";
@@ -683,7 +677,7 @@ import MarkEmailReadIcon from "@mui/icons-material/MarkEmailRead";
 import PersonIcon from "@mui/icons-material/Person";
 import EmailIcon from "@mui/icons-material/Email";
 import SchoolIcon from "@mui/icons-material/School";
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 export default function Register() {
   const {
@@ -697,35 +691,37 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [serverData, setServerData] = useState<any>(null); // لحفظ بيانات الإيميل الجامعي
   const navigate = useNavigate();
-
+  const theme = useTheme();
   const onsubmit = async (data: any) => {
     setLoading(true);
-    
+
     // تجهيز البيانات بناءً على تجربة الـ Swagger الناجحة
     const studentData = {
       fullName: data.fullName,
       email: data.email,
-      year: String(data.year) // تحويل القيمة لنص لضمان قبول السيرفر
+      year: String(data.year), // تحويل القيمة لنص لضمان قبول السيرفر
     };
 
     try {
       const response = await axios.post(
         "https://credithourssystemw.premiumasp.net/api/StudentRegister/register",
-        studentData
+        studentData,
       );
 
       setServerData(response.data); // حفظ الرد لإظهار الإيميل الجامعي
       setIsSuccess(true);
       toast.success("Registration Successful!");
     } catch (error: any) {
-      const message = error.response?.data || "Registration failed. Please check your data.";
-      toast.error(typeof message === 'string' ? message : "Error in registration");
+      const message =
+        error.response?.data || "Registration failed. Please check your data.";
+      toast.error(
+        typeof message === "string" ? message : "Error in registration",
+      );
       console.log("Registration Error:", error);
     } finally {
       setLoading(false);
     }
   };
-
 
   if (isSuccess) {
     return (
@@ -736,64 +732,75 @@ export default function Register() {
           left: 0,
           width: "100vw",
           height: "100vh",
-          bgcolor: "#f4f6f8",
+          bgcolor: "background.default",
           zIndex: 9999,
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          p: 2
+          p: 2,
         }}
       >
-      <Paper
-  elevation={6}
-  sx={{
-    width: { xs: "100%", sm: 500 },
-    p: { xs: 3, sm: 6 },
-    textAlign: "center",
-    borderRadius: 4,
-  }}
->
+        <Paper elevation={0} sx={{ width: { xs: "100%", sm: 500 }, p: 6, textAlign: "center", borderRadius: 4, border: `1px solid ${theme.palette.divider}`, bgcolor: 'background.paper' }}>
+          <MarkEmailReadIcon sx={{ fontSize: 80, color: "success.main", mb: 2 }} />
 
-  <MarkEmailReadIcon sx={{ fontSize: 80, color: "#4caf50", mb: 2 }} />
+          <Typography
+            variant="h4"
+            fontWeight="bold"
+            gutterBottom
+            color="text.primary"
+          >
+            Welcome to Al-Azhar University! 🎉
+          </Typography>
 
- 
-  <Typography variant="h4" fontWeight="bold" gutterBottom color="#394188">
-    Welcome to Al-Azhar University! 🎉
-  </Typography>
+          <Typography
+            variant="body1"
+            color="text.secondary"
+            sx={{ mb: 4, lineHeight: 1.7, fontSize: "1.1rem" }}
+          >
+            Your account has been created successfully.
+            <br />
+            Please <b>check your email</b> to find your university login details
+            and activation link.
+          </Typography>
 
-
-  <Typography variant="body1" color="text.secondary" sx={{ mb: 4, lineHeight: 1.7, fontSize: '1.1rem' }}>
-    Your account has been created successfully. 
-    <br />
-    Please <b>check your email</b> to find your university login details and activation link.
-  </Typography>
-
-  {/* زر العودة لتسجيل الدخول */}
-  <Button
-    variant="contained"
-    fullWidth
-    onClick={() => navigate("/login")}
-    sx={{ 
-      bgcolor: "#394188", 
-      py: 1.5, 
-      borderRadius: 2, 
-      fontSize: '16px', 
-      textTransform: 'none',
-      "&:hover": { bgcolor: "#2e356e" }
-    }}
-  >
-    Go to Login Page
-  </Button>
-</Paper>
+          {/* زر العودة لتسجيل الدخول */}
+          <Button
+            variant="contained"
+            fullWidth
+            onClick={() => navigate("/login")}
+            sx={{
+              bgcolor:theme.palette.primary.main,
+              py: 1.5,
+              borderRadius: 2,
+              fontSize: "16px",
+              textTransform: "none",
+              "&:hover": { bgcolor: "main.primary.dark" },
+            }}
+          >
+            Go to Login Page
+          </Button>
+        </Paper>
       </Box>
     );
   }
 
   return (
-    <Stack sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", py: 4, bgcolor: '#f9f9f9' }}>
-      <Paper elevation={3} sx={{ width: { xs: "90%", sm: 450 }, p: 4, borderRadius: 4 }}>
+    <Stack
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "100vh",
+        py: 4,
+        bgcolor: "background.default",
+      }}
+    >
+      <Paper
+        elevation={3}
+        sx={{ width: { xs: "90%", sm: 450 }, p: 4, borderRadius: 4 }}
+      >
         <Box sx={{ textAlign: "center", mb: 3 }}>
-           <Typography variant="h4" fontWeight="bold" color="#394188">
+          <Typography variant="h4" fontWeight="bold" color="text.secondary">
             Join Us
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -814,17 +821,19 @@ export default function Register() {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <PersonIcon sx={{ color: "#394188" }} />
+                  <PersonIcon sx={{ color: "text.secondary" }} />
                 </InputAdornment>
               ),
             }}
           />
 
-     
           <TextField
             {...register("email", {
               required: "Email is required",
-              pattern: { value: /^\S+@\S+$/i, message: "Invalid email address" },
+              pattern: {
+                value: /^\S+@\S+$/i,
+                message: "Invalid email address",
+              },
             })}
             fullWidth
             type="email"
@@ -836,13 +845,12 @@ export default function Register() {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <EmailIcon sx={{ color: "#394188" }} />
+                  <EmailIcon sx={{ color: "text.secondary" }} />
                 </InputAdornment>
               ),
             }}
           />
 
-     
           <TextField
             {...register("year", { required: "Academic Year is required" })}
             select
@@ -855,32 +863,36 @@ export default function Register() {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <SchoolIcon sx={{ color: "#394188" }} />
+                  <SchoolIcon sx={{ color: "text.secondary" }} />
                 </InputAdornment>
               ),
             }}
           >
             {[1, 2, 3, 4, 5].map((option) => (
               <MenuItem key={option} value={String(option)}>
-               {option}
+                {option}
               </MenuItem>
             ))}
           </TextField>
 
-      
           <FormControlLabel
             sx={{ mt: 2 }}
             control={
               <Checkbox
                 checked={agree}
                 onChange={(e) => setAgree(e.target.checked)}
-                sx={{ color: "#394188", "&.Mui-checked": { color: "#394188" } }}
+                sx={{ color: "text.secondary", "&.Mui-checked": { color: "text.secondary" } }}
               />
             }
             label={
               <Typography variant="body2" color="text.secondary">
                 I agree to the{" "}
-                <Link component={RouterLink} to="/regulations" underline="hover" sx={{ color: "#394188", fontWeight: "bold" }}>
+                <Link
+                  component={RouterLink}
+                  to="/regulations"
+                  underline="hover"
+                  sx={{ color: "text.secondary", fontWeight: "bold" }}
+                >
                   Student Regulations
                 </Link>
               </Typography>
@@ -894,25 +906,29 @@ export default function Register() {
             variant="contained"
             disabled={!agree || loading}
             sx={{
-              bgcolor: "#394188",
+              bgcolor: "primary.main",
               mt: 4,
               py: 1.8,
               borderRadius: 3,
               fontSize: "16px",
               fontWeight: "bold",
               textTransform: "none",
-              boxShadow: '0 4px 12px rgba(57, 65, 136, 0.3)',
-              "&:hover": { bgcolor: "#2e356e", boxShadow: 'none' },
+              boxShadow: "0 4px 12px rgba(57, 65, 136, 0.3)",
+              "&:hover": { bgcolor: "primary.dark", boxShadow: "none" },
             }}
           >
-            {loading ? <CircularProgress size={26} color="inherit" /> : "Register Now"}
+            {loading ? (
+              <CircularProgress size={26} color="inherit" />
+            ) : (
+              "Register Now"
+            )}
           </Button>
 
           <Button
             fullWidth
             startIcon={<ArrowBackIcon />}
-            onClick={() => navigate('/login')}
-            sx={{ mt: 2, color: "text.secondary", textTransform: 'none' }}
+            onClick={() => navigate("/login")}
+            sx={{ mt: 2, color: "text.secondary", textTransform: "none" }}
           >
             Back to Login
           </Button>

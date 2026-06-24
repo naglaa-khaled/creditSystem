@@ -81,6 +81,7 @@ const FormModal = ({
             gap: 2,
             mt: 2,
             minWidth: { xs: "100%", sm: "70%" },
+            color: (theme) => theme.palette.text.primary,
           }}
         >
           {fields.map((field) => (
@@ -88,7 +89,6 @@ const FormModal = ({
               key={field.name}
               name={field.name}
               control={control}
-              defaultValue=""
               rules={{
                 required: field.required ? `${field.label} is required` : false,
                 pattern:
@@ -124,6 +124,7 @@ const FormModal = ({
                     "& .MuiFormLabel-root.Mui-disabled": {
                       cursor: "not-allowed",
                     },
+                    backgroundColor: (theme) => theme.palette.background.paper,
                   }}
                   error={!!errors[field.name]}
                   helperText={errors[field.name]?.message as string}

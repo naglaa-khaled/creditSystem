@@ -72,14 +72,16 @@ const CoursePage = () => {
         { value: "2", label: "Semester 2" },
       ],
     },
-    { name: "courseType", label: "Course Type", required: true,
+    {
+      name: "courseType",
+      label: "Course Type",
+      required: true,
       select: true,
       options: [
         { value: "1", label: "optional" },
         { value: "2", label: "mandatory" },
       ],
-     },
-
+    },
   ];
   const [selectedGroup, setSelectedGroup] = useState<{
     level: string;
@@ -108,44 +110,44 @@ const CoursePage = () => {
   };
 
   //delete course handler
-const handleConfirmDelete = async () => {
-  if (selectedCourseId) {
-    try {
-      const response = await deleteCourse(selectedCourseId);
-      
-      if (response.success) {
-        setAllCourses((prev) =>
-          prev.filter((course) => course.courseID !== selectedCourseId),
-        );
-        toast.success("Course deleted successfully!");
-        setDeleteModalOpen(false);
-        setSelectedCourseId(null);
-      } else {
-        if (response.message) {
-          toast.error(response.message, { rtl: true });
+  const handleConfirmDelete = async () => {
+    if (selectedCourseId) {
+      try {
+        const response = await deleteCourse(selectedCourseId);
+
+        if (response.success) {
+          setAllCourses((prev) =>
+            prev.filter((course) => course.courseID !== selectedCourseId),
+          );
+          toast.success("Course deleted successfully!");
+          setDeleteModalOpen(false);
+          setSelectedCourseId(null);
         } else {
-          toast.error("Failed to delete the course. Please try again.");
+          if (response.message) {
+            toast.error(response.message, { rtl: true });
+          } else {
+            toast.error("Failed to delete the course. Please try again.");
+          }
+          setDeleteModalOpen(false);
         }
-        setDeleteModalOpen(false);
+      } catch (error) {
+        console.error("Delete failed", error);
+        toast.error("An unexpected error occurred.");
       }
-    } catch (error) {
-      console.error("Delete failed", error);
-      toast.error("An unexpected error occurred.");
     }
-  }
-};
-// add course handler
+  };
+  // add course handler
   const handleSavecourse = async (data: FieldValues) => {
     const formattedData = {
       courseId: data.courseID,
       nameEn: data.nameEn,
-      nameAr: data.nameAr, 
+      nameAr: data.nameAr,
       hours: Number(data.creditHours),
       level: Number(data.level),
       semester: Number(data.semester),
       courseType: data.courseType,
     };
-    
+
     try {
       const response = await addCourse(formattedData);
       if (response.success) {
@@ -203,7 +205,7 @@ const handleConfirmDelete = async () => {
   }, [groupedCourses]);
   return (
     <div style={{ padding: isMobile ? "10px" : "20px" }}>
-      <h2 style={{ marginBottom: "20px", color: "var(--primary)" }}>
+      <h2 style={{ marginBottom: "20px", color: theme.palette.primary.main }}>
         Courses Management
       </h2>
 
@@ -254,7 +256,7 @@ const handleConfirmDelete = async () => {
             }}
           >
             <CircularProgress size={50} />
-            <Typography variant="h6" sx={{ color: "var(--primary)" }}>
+            <Typography variant="h6" sx={{ color: theme.palette.primary.main }}>
               Loading Courses...
             </Typography>
           </Box>
@@ -296,14 +298,15 @@ const handleConfirmDelete = async () => {
               gridColumn: "1/-1",
               textAlign: "center",
               py: 10,
-              border: "1px dashed #ccc",
+              border: "1px dashed",
+              borderColor: "divider", 
               borderRadius: "16px",
-              backgroundColor: "#f9f9f9",
+              backgroundColor: "background.default",
             }}
           >
             <Typography
               variant="h6"
-              sx={{ color: "var(--primary)", opacity: 0.7 }}
+              sx={{ color: theme.palette.primary.main, opacity: 0.7 }}
             >
               {searchTerm
                 ? `No courses found matching "${searchTerm}"`
@@ -318,9 +321,9 @@ const handleConfirmDelete = async () => {
           sx={{
             mt: 4,
             p: 3,
-            bgcolor: "#fff",
+            bgcolor: "background.paper",
             borderRadius: "16px",
-            boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+            boxShadow: 2,
             animation: "fadeIn 0.4s ease-out",
           }}
         >
@@ -332,7 +335,7 @@ const handleConfirmDelete = async () => {
               mb: 3,
             }}
           >
-            <h3 style={{ margin: 0, color: "var(--primary)" }}>
+            <h3 style={{ margin: 0, color: theme.palette.primary.main }}>
               Courses - Level {selectedGroup.level} / Semester{" "}
               {selectedGroup.semester}
             </h3>
@@ -342,10 +345,10 @@ const handleConfirmDelete = async () => {
                 background: "none",
                 border: "none",
                 cursor: "pointer",
-                color: "#666",
+                color: theme.palette.text.secondary,
               }}
             >
-              Close [x]
+              Close
             </button>
           </Box>
 

@@ -21,62 +21,63 @@ const CourseDetails = () => {
   const [profile, setProfile] = useState<IFullCourseProfile | null>(null);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
 
-const editCourseFields = [
-  { 
-    name: "courseNameEn", 
-    label: "English Course Name", 
-    required: true 
-  }, { 
-    name: "courseNameAr", 
-    label: "Arabic Course Name", 
-    required: true 
-  },
-  { 
-    name: "courseID", 
-    label: "Course ID", 
-    required: true 
-  },
-  {
-    name: "creditHours",
-    label: "Credits Hours",
-    type: "number",
-    required: true,
-    inputProps: { min: 1, max: 4 }
-  },
-  { 
-    name: "level", 
-    label: "Level", 
-    required: true,
-    select: true, 
-    options: [
-      { value: 1, label: "Level 1" },
-      { value: 2, label: "Level 2" },
-      { value: 3, label: "Level 3" },
-      { value: 4, label: "Level 4" },
-      { value: 5, label: "Level 5" },
-    ]
-  },
-  { 
-    name: "courseType", 
-    label: "Course Type", 
-    required: true,
-    select: true, 
-    options: [
-      { value: "Core", label: "Core (إجباري)" },
-      { value: "Elective", label: "Elective (اختياري)" },
-    ]
-  },
-  { 
-    name: "semester", 
-    label: "Semester", 
-    required: true,
-    select: true, 
-    options: [
-      { value: 1, label: "Semester 1" },
-      { value: 2, label: "Semester 2" },
-    ]
-  },
-];
+  const editCourseFields = [
+    {
+      name: "courseNameEn",
+      label: "English Course Name",
+      required: true,
+    },
+    {
+      name: "courseNameAr",
+      label: "Arabic Course Name",
+      required: true,
+    },
+    {
+      name: "courseID",
+      label: "Course ID",
+      required: true,
+    },
+    {
+      name: "creditHours",
+      label: "Credits Hours",
+      type: "number",
+      required: true,
+      inputProps: { min: 1, max: 4 },
+    },
+    {
+      name: "level",
+      label: "Level",
+      required: true,
+      select: true,
+      options: [
+        { value: 1, label: "Level 1" },
+        { value: 2, label: "Level 2" },
+        { value: 3, label: "Level 3" },
+        { value: 4, label: "Level 4" },
+        { value: 5, label: "Level 5" },
+      ],
+    },
+    {
+      name: "courseType",
+      label: "Course Type",
+      required: true,
+      select: true,
+      options: [
+        { value: "Core", label: "Core (إجباري)" },
+        { value: "Elective", label: "Elective (اختياري)" },
+      ],
+    },
+    {
+      name: "semester",
+      label: "Semester",
+      required: true,
+      select: true,
+      options: [
+        { value: 1, label: "Semester 1" },
+        { value: 2, label: "Semester 2" },
+      ],
+    },
+  ];
   useEffect(() => {
     const loadData = async () => {
       const data = await getCourseProfile(id as studentId);
@@ -87,7 +88,6 @@ const editCourseFields = [
   const handleSaveEdit = async (updatedData: FieldValues) => {
     try {
       if (!id) return;
-      
 
       const response = await updateCourse(id, updatedData as ICourse);
 
@@ -154,7 +154,7 @@ const InfoField = ({ label, value, isGpa }: IInfoFieldProps) => (
       variant="body2"
       sx={{
         fontWeight: 600,
-        color: isGpa ? "#38a169" : "#1a202c",
+        color: isGpa ? "success.main" : "primary.main",
       }}
     >
       {value || "---"}

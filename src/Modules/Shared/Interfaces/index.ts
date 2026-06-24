@@ -1,5 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
+export interface Column<T> {
+  id: keyof T;
+  label: string;
+  align?: "left" | "center" | "right";
+  render?: (row: T) => React.ReactNode;
+}
 // --- Student Related Interfaces ---
 export type studentId = number | string;
 export type CourseId = string | number;
@@ -178,4 +183,12 @@ export interface IReports {
   studentDistribution: IStudentDistribution[];
   topCourses: ITopCourse[];
   professorWorkload: IProfessorWorkload[];
+}
+export interface IUsers{
+  userID: number | string;
+    fullName: string;
+    email: string;
+    role: string;
+    isActive: boolean;
+    password?: string;
 }

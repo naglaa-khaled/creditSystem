@@ -1,4 +1,4 @@
-import { Box, Typography, Avatar, Paper, Grid as Grid } from "@mui/material";
+import { Box, Typography, Avatar, Paper, Grid as Grid, useTheme } from "@mui/material";
 import SharedTable from "../SharedTable/SharedTable";
 import CustomButton from "../Button/Button";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
@@ -19,6 +19,7 @@ const DetailsLayout = <T extends Record<string, unknown>>({
 }: IDetailsLayoutProps<T>) => {
   const navigate = useNavigate();
   const hasData = tableData && tableData.length > 0;
+  const theme = useTheme();
 
   return (
     <Box sx={{ p: { xs: 2, md: 3 } }}>
@@ -42,8 +43,9 @@ const DetailsLayout = <T extends Record<string, unknown>>({
           p: 3,
           mb: 4,
           borderRadius: "16px",
-          border: "1px solid #eceef1",
+          border: `1px solid ${theme.palette.divider}`,
           boxShadow: "none",
+          backgroundColor: "background.paper"
         }}
       >
         <Grid container spacing={3} sx={{ alignItems: "flex-start" }}>
@@ -52,7 +54,7 @@ const DetailsLayout = <T extends Record<string, unknown>>({
               sx={{
                 width: 80,
                 height: 80,
-                bgcolor: "#2d3192",
+                bgcolor: "primary.main",
                 fontSize: "1.8rem",
                 fontWeight: "bold",
               }}
@@ -72,7 +74,7 @@ const DetailsLayout = <T extends Record<string, unknown>>({
             >
               <Typography
                 variant="h5"
-                sx={{ fontWeight: "bold", color: "#1a202c" }}
+                sx={{ fontWeight: "bold", color: "text.primary" }}
               >
                 {title || "Loading..."}
               </Typography>
@@ -91,7 +93,7 @@ const DetailsLayout = <T extends Record<string, unknown>>({
         </Grid>
       </Paper>
 
-      <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+      <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 ,color: "text.primary"}}>
         {tableTitle}
       </Typography>
 
@@ -99,7 +101,7 @@ const DetailsLayout = <T extends Record<string, unknown>>({
         <Box
           sx={{
             borderRadius: "12px",
-            border: "1px solid #eceef1",
+            border: `1px solid ${theme.palette.divider}`,
             overflow: "hidden",
           }}
         >
@@ -117,12 +119,12 @@ const DetailsLayout = <T extends Record<string, unknown>>({
             p: 4,
             textAlign: "center",
             borderRadius: "12px",
-            border: "1px dashed #ccc",
-            bgcolor: "#fafafa",
+            border: `1px dashed ${theme.palette.divider}`,
+            bgcolor: "background.default",
           }}
         >
           <Typography
-            sx={{ color: "var(--primary)", fontWeight: "bold" }}
+            sx={{ color: "text.secondary", fontWeight: "bold" }}
             variant="h5"
           >
             {" "}

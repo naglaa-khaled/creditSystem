@@ -176,6 +176,7 @@ console.log(filteredData);
                   count={groupedSchedaul[key].length}
                   isActive={isActive}
                   text="Student"
+                  exportLabel="Download Students Data"
                   onClick={() =>
                     setSelectedGroup(isActive ? null : { level, semester })
                   }

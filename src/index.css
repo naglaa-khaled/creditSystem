@@ -1,36 +1,33 @@
-*{
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  /* إلغاء لون الـ Autofill الأزرق لجميع حقول الإدخال في الموقع */
-input:-webkit-autofill,
-input:-webkit-autofill:hover, 
-input:-webkit-autofill:focus, 
-input:-webkit-autofill:active {
-    /* بيستبدل اللون الأزرق باللون الأبيض داخل الحقل */
-    -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
-    
-    /* بيحافظ على لون الخط الافتراضي (تقدري تغيريه لأي لون تحبيه) */
-    -webkit-text-fill-color: #000000 !important;
-    
-    /* انتقال ناعم لمنع أي وميض مفاجئ للون الأزرق أثناء التحميل */
-    transition: background-color 5000s ease-in-out 0s;
-}
-/* إخفاء أيقونة العين الافتراضية في متصفحات إيدج وكروم */
-input::-ms-reveal,
-input::-ms-clear {
-    display: none !important;
-}
 
-/* لمتصفحات وب كيت الأخرى لو ظهرت فيها مستقبلاً */
-input::-webkit-contacts-auto-fill-button,
-input::-webkit-credentials-auto-fill-button {
+  /* إلغاء لون الـ Autofill الأزرق لجميع حقول الإدخال في الموقع */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+   -webkit-box-shadow: 0 0 0 1000px #e8f0fe inset ; 
+    -webkit-text-fill-color: #000000 ;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  /* إخفاء أيقونة العين الافتراضية في متصفحات إيدج وكروم */
+  input::-ms-reveal,
+  input::-ms-clear {
+    display: none !important;
+  }
+
+  /* لمتصفحات وب كيت الأخرى لو ظهرت فيها مستقبلاً */
+  input::-webkit-contacts-auto-fill-button,
+  input::-webkit-credentials-auto-fill-button {
     visibility: hidden;
     pointer-events: none;
     position: absolute;
     right: 0;
-}
-  
+  }
+
 }
 
 
@@ -41,9 +38,9 @@ button:focus-visible,
 input:focus,
 textarea:focus,
 select:focus {
-  outline: none !important;  
-  box-shadow: none !important; 
-  border: none !important;  
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 
 
@@ -53,17 +50,7 @@ select:focus {
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-  --primary: #394188;
-  --secondary: #DBDEFF;
-  --error: #E70909;
-  --success: #077707;
-  --gray: #E8E8EB;
-  --darkGray:#5f5858e4;
-  --bg: #000000;
-
+ 
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -73,12 +60,11 @@ select:focus {
 
 a {
   font-weight: 500;
-  color: #646cff;
+
   text-decoration: inherit;
 }
-a:hover {
-  color: #535bf2;
-}
+
+
 
 body {
 
@@ -98,37 +84,14 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
   cursor: pointer;
   transition: border-color 0.25s;
 }
-button:hover {
-  border-color: #646cff;
-}
+
+
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-    --primary: #394188;
-    --primary-hover: #3d479b;
-    --secondary: #DBDEFF;
-    --error: #f01212;
-    --error-hover: #fb1212;
-    --success: #077707;
-    --gray: #E8E8EB;
-    --bg: #ffffff;
-    --darkGray:#5f5858e4;
-
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
-}

@@ -1,4 +1,3 @@
-
 // import { Button, Stack, TextField, Typography } from '@mui/material'
 // import axios from 'axios';
 // import React from 'react'
@@ -17,20 +16,18 @@
 
 //    }catch(error){
 //     console.log(error);
-   
 
 //    }
- 
 
 //   }
 //   return (
 //    <>
 //       <Stack sx={{ margin:'auto',width:'300px',height:'180px'}}>
-           
+
 //             <Typography variant="h6" sx={{marginBottom:'0.5rem'}}>Forget Password !!</Typography>
-        
+
 //           <form onSubmit={handleSubmit(onsubmit)}>
-            
+
 //             <TextField
 //   {...register('email', {
 //     required: 'This field is required',
@@ -57,13 +54,12 @@
 // import React from 'react'
 // import { useForm } from 'react-hook-form';
 // import { useNavigate } from 'react-router-dom';
-// import { toast } from 'react-toastify'; 
+// import { toast } from 'react-toastify';
 
 // export default function ForgetPass() {
 //   let { register, formState: { errors }, handleSubmit } = useForm();
 //   let navigate = useNavigate();
 
-  
 //   let onsubmit = async (data: any) => {
 //   console.log("Data from form:", data);
 //   try {
@@ -98,15 +94,15 @@
 //             helperText={errors.email?.message as React.ReactNode}
 //           />
 
-//           <Button 
-//             fullWidth 
-//             type="submit" 
-//             variant="contained" 
-//             sx={{ 
-//               color: 'white', 
-//               margin: '1rem 0', 
+//           <Button
+//             fullWidth
+//             type="submit"
+//             variant="contained"
+//             sx={{
+//               color: 'white',
+//               margin: '1rem 0',
 //               backgroundColor: '#394188',
-//               '&:hover': { backgroundColor: '#2e356e' } 
+//               '&:hover': { backgroundColor: '#2e356e' }
 //             }}
 //           >
 //             Send Code
@@ -116,97 +112,120 @@
 //     </>
 //   )
 // }
-import { Button, TextField, Typography, Paper, InputAdornment, Box, CircularProgress } from '@mui/material'
-import axios from 'axios';
-import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify'; 
-import EmailIcon from '@mui/icons-material/Email';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import {
+  Button,
+  TextField,
+  Typography,
+  Paper,
+  InputAdornment,
+  Box,
+  CircularProgress,
+  useTheme,
+} from "@mui/material";
+import axios from "axios";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import EmailIcon from "@mui/icons-material/Email";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 export default function ForgetPass() {
-  let { register, formState: { errors, isSubmitting }, handleSubmit } = useForm();
+  const theme = useTheme();
+  let {
+    register,
+    formState: { errors, isSubmitting },
+    handleSubmit,
+  } = useForm();
   let navigate = useNavigate();
 
   let onsubmit = async (data: any) => {
     // إظهار رسالة تحميل
     const toastId = toast.loading("Sending recovery code to your email...");
-    
+
     try {
-      await axios.post('https://credithourssystemw.premiumasp.net/api/PasswordReset/request-code', data);
-      
-     
-      toast.update(toastId, { 
-        render: "Done! Please check your Gmail inbox ", 
-        type: "success", 
-        isLoading: false, 
-        autoClose: 5000 
+      await axios.post(
+        "https://credithourssystemw.premiumasp.net/api/PasswordReset/request-code",
+        data,
+      );
+
+      toast.update(toastId, {
+        render: "Done! Please check your Gmail inbox ",
+        type: "success",
+        isLoading: false,
+        autoClose: 5000,
       });
 
       setTimeout(() => {
-        navigate('/resetpass');
+        navigate("/resetpass");
       }, 2000);
-
     } catch (error: any) {
       const errorMsg = error.response?.data || "User not found";
-      toast.update(toastId, { 
-        render: typeof errorMsg === 'string' ? errorMsg : "User not found", 
-        type: "error", 
-        isLoading: false, 
-        autoClose: 3000 
+      toast.update(toastId, {
+        render: typeof errorMsg === "string" ? errorMsg : "User not found",
+        type: "error",
+        isLoading: false,
+        autoClose: 3000,
       });
     }
-  }
+  };
 
   return (
-    <Box sx={{ 
-      minHeight: '80vh', 
-      display: 'flex', 
-      alignItems: 'center', 
-      justifyContent: 'center',
-      p: 2 
-    }}>
-      <Paper 
-        elevation={3} 
-        sx={{ 
-          p: 4, 
-          width: '100%', 
-          maxWidth: '400px', 
-          borderRadius: '16px',
-          textAlign: 'center'
+    <Box
+      sx={{
+        minHeight: "80vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        p: 2,
+      }}
+    >
+      <Paper
+        elevation={0}
+        sx={{
+          p: 4,
+          width: "100%",
+          maxWidth: "400px",
+          borderRadius: "16px",
+          textAlign: "center",
+          border: `1px solid ${theme.palette.divider}`,
+          bgcolor: "background.paper",
         }}
       >
-      
-        <Box sx={{ 
-          backgroundColor: '#f0f2ff', 
-          width: '60px', 
-          height: '60px', 
-          borderRadius: '50%', 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
-          margin: '0 auto 1rem',
-          color: '#394188'
-        }}>
+        <Box
+          sx={{
+            backgroundColor: `${theme.palette.primary.main}15`,
+            width: "60px",
+            height: "60px",
+            borderRadius: "50%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            margin: "0 auto 1rem",
+            color: 'primary.main',
+          }}
+        >
           <EmailIcon fontSize="large" />
         </Box>
 
-        <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#394188', mb: 1 }}>
+        <Typography
+          variant="h5"
+          sx={{ fontWeight: "bold", color: 'primary.main', mb: 1 }}
+        >
           Forgot Password?
         </Typography>
-        
-        <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
+
+        <Typography variant="body2" sx={{ color: "text.secondary", mb: 3 }}>
           No worries! Enter your email and we will send you a verification code.
         </Typography>
 
         <form onSubmit={handleSubmit(onsubmit)}>
           <TextField
-            {...register('email', {
-              required: 'Email is required',
+            {...register("email", {
+              required: "Email is required",
               pattern: {
                 value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: "Invalid email address"
-              }
+                message: "Invalid email address",
+              },
             })}
             fullWidth
             type="email"
@@ -217,39 +236,48 @@ export default function ForgetPass() {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <EmailIcon sx={{ color: '#394188' }} />
+                  <EmailIcon sx={{ color: "#394188" }} />
                 </InputAdornment>
               ),
             }}
             sx={{ mb: 2 }}
           />
 
-          <Button 
-            fullWidth 
-            type="submit" 
-            variant="contained" 
+          <Button
+            fullWidth
+            type="submit"
+            variant="contained"
             disabled={isSubmitting}
-            sx={{ 
+            sx={{
               py: 1.5,
-              borderRadius: '8px',
-              backgroundColor: '#394188',
-              fontSize: '16px',
-              textTransform: 'none',
-              '&:hover': { backgroundColor: '#2e356e' } 
+              borderRadius: "8px",
+              bgcolor: 'primary.main',
+              fontSize: "16px",
+              textTransform: "none",
+              '&:hover': { bgcolor: 'primary.dark' }
             }}
           >
-            {isSubmitting ? <CircularProgress size={24} color="inherit" /> : "Send Verification Code"}
+            {isSubmitting ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Send Verification Code"
+            )}
           </Button>
         </form>
 
-        <Button 
+        <Button
           startIcon={<ArrowBackIcon />}
-          onClick={() => navigate('/login')}
-          sx={{ mt: 2, color: '#394188', textTransform: 'none', fontWeight: 500 }}
+          onClick={() => navigate("/login")}
+          sx={{
+            mt: 2,
+            color: 'primary.main',
+            textTransform: "none",
+            fontWeight: 500,
+          }}
         >
           Back to Login
         </Button>
       </Paper>
     </Box>
-  )
+  );
 }

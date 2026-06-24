@@ -27,12 +27,18 @@ const DashboardLayout = ({ sidebar, children }: DashboardLayoutProps) => {
   };
 
   return (
-    <Box sx={{ height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+    <Box
+      sx={{
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+      }}
+    >
       {/* Navbar */}
       <Navebar toggleSidebar={toggleSidebar} />
       <Toolbar />
       {isMobile ? (
-        
         <Box sx={{ flexGrow: 1, overflowY: "auto" }}>
           <Drawer
             anchor="left"
@@ -40,7 +46,7 @@ const DashboardLayout = ({ sidebar, children }: DashboardLayoutProps) => {
             onClose={() => setOpenSidebar(false)}
             PaperProps={{
               sx: {
-                backgroundColor: "#eff2fe", 
+                backgroundColor: "background.paper",
                 width: 250,
                 overflow: "hidden",
                 border: "none",
@@ -65,25 +71,29 @@ const DashboardLayout = ({ sidebar, children }: DashboardLayoutProps) => {
         </Box>
       ) : (
         <Stack direction="row" sx={{ flexGrow: 1, overflow: "hidden" }}>
-          <Box 
-            sx={{ 
-              height: "100%", 
-              backgroundColor: "#eff2fe", 
-              borderRight: "2px solid #eceef1",
-              overflow: "hidden", 
-              flexShrink: 0 
+          <Box
+            sx={{
+              height: "100%",
+              backgroundColor: "background.paper",
+              borderRight: (theme) => `1px solid ${theme.palette.divider}`,
+              overflow: "hidden",
+              flexShrink: 0,
             }}
-          >{sidebar}</Box>
+          >
+            {sidebar}
+          </Box>
 
-          <Box 
-            component="main" 
-            sx={{ 
-              flexGrow: 1, 
-              overflowY: "auto", 
-              backgroundColor: "#f8f9fa", 
-              height: "100%" 
+          <Box
+            component="main"
+            sx={{
+              flexGrow: 1,
+              overflowY: "auto",
+              backgroundColor: "background.default",
+              height: "100%",
             }}
-          >{children}</Box>
+          >
+            {children}
+          </Box>
         </Stack>
       )}
     </Box>

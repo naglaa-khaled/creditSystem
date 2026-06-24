@@ -31,7 +31,7 @@ const DashboardHome = () => {
     totalCourses: 0,
   });
   const [recentStudents, setRecentStudents] = useState<IStudent[]>([]);
-  const [loading, setLoading] = useState(true); // حالة التحميل
+  const [loading, setLoading] = useState(true); 
 
   const location = useLocation();
   const isAdmin = location.pathname.startsWith("/admin");

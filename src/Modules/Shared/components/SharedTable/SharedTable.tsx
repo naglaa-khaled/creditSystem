@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import EditIcon from "@mui/icons-material/Edit";
 import {
   Table,
   TableBody,
@@ -8,23 +9,26 @@ import {
   TableRow,
   Paper,
   Box,
+  Typography,
+  IconButton,
+  Tooltip,
+  useTheme,
 } from "@mui/material";
+
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import VisibilityIcon from "@mui/icons-material/Visibility";
+import OpenInNewRoundedIcon from "@mui/icons-material/OpenInNewRounded";
 import { useNavigate } from "react-router-dom";
-import CustomButton from "../Button/Button";
 import { type Column } from "../../Interfaces";
 
-
-
 interface SharedTableProps<T extends Record<string, any>> {
-  columns: Column<T>[]; 
+  columns: Column<T>[];
   data: T[];
   isAdmin?: boolean;
   showView?: boolean;
   detailsPath?: string;
   idField: keyof T;
   onDelete?: (id: string | number) => void;
+  onEdit?: (item: T) => void;
 }
 
 const SharedTable = <T extends Record<string, any>>({
@@ -35,32 +39,53 @@ const SharedTable = <T extends Record<string, any>>({
   detailsPath,
   idField,
   onDelete,
+  onEdit,
 }: SharedTableProps<T>) => {
   const navigate = useNavigate();
-  const shouldShowActions = isAdmin || showView;
+  const theme = useTheme();
 
+  const shouldShowActions = isAdmin || showView || onEdit;
   return (
     <TableContainer
       component={Paper}
       sx={{
+        borderRadius: 4,
+        overflow: "hidden",
+        border: `1px solid ${theme.palette.divider}`,
         boxShadow: "none",
-        border: "1px solid #e5e7eb",
-        borderRadius: "8px",
       }}
     >
-      <Table>
-        <TableHead sx={{ backgroundColor: "#eff2fe" }}>
+      <Table stickyHeader>
+        <TableHead>
           <TableRow>
             {columns.map((column) => (
               <TableCell
                 key={String(column.id)}
-                sx={{ fontWeight: "bold", color: "#4b5563" }}
+                align={column.align || "left"}
+                sx={{
+                  backgroundColor: theme.palette.grey[50],
+                  color: theme.palette.text.secondary,
+                  fontWeight: 700,
+                  fontSize: "0.9rem",
+                  borderBottom: `2px solid ${theme.palette.divider}`,
+                  py: 2,
+                }}
               >
                 {column.label}
               </TableCell>
             ))}
+
             {shouldShowActions && (
-              <TableCell sx={{ fontWeight: "bold", color: "#4b5563" }}>
+              <TableCell
+                align="center"
+                sx={{
+                  backgroundColor: theme.palette.grey[50],
+                  color: theme.palette.text.secondary,
+                  fontWeight: 700,
+                  fontSize: "0.9rem",
+                  borderBottom: `2px solid ${theme.palette.divider}`,
+                }}
+              >
                 Actions
               </TableCell>
             )}
@@ -68,63 +93,152 @@ const SharedTable = <T extends Record<string, any>>({
         </TableHead>
 
         <TableBody>
-          {data?.map((row) => (
-            <TableRow key={String(row[idField])} hover>
-              {columns.map((column) => (
-                <TableCell key={String(column.id)} sx={{ color: "#374151" }}>
-                  {row[column.id] as any}
-                </TableCell>
-              ))}
+          {data.length > 0 ? (
+            data.map((row) => (
+              <TableRow
+                key={String(row[idField])}
+                hover
+                sx={{
+                  transition: "0.2s",
 
-              {shouldShowActions && (
-                <TableCell>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
-                    
-                    {showView && (
-                      <CustomButton
-                        label="View"
-                        icon={
-                          <VisibilityIcon
-                            sx={{ fontSize: "18px !important" }}
-                          />
-                        }
-                        onClick={() => {
-                          if (detailsPath) {
-                            navigate(
-                              `${detailsPath}/${String(row[idField])}`
-                            );
-                          }
-                        }}
-                        variantType="primary"
-                      />
-                    )}
+                  "&:nth-of-type(even)": {
+                    backgroundColor: theme.palette.action.hover,
+                  },
 
-                    {isAdmin && (
-                      <CustomButton
-                        label="Delete"
-                        icon={
-                          <DeleteOutlineIcon
-                            sx={{ fontSize: "18px !important" }}
-                          />
-                        }
-                        variantType="outline-error"
-                        onClick={() => {
-                          const id = row[idField];
-                          if (
-                            typeof id === "string" ||
-                            typeof id === "number"
-                          ) {
-                            onDelete?.(id);
-                          }
-                        }}
-                      />
-                    )}
+                  "&:hover": {
+                    backgroundColor: theme.palette.action.selected,
+                  },
 
-                  </Box>
-                </TableCell>
-              )}
+                  "& td": {
+                    borderBottom: `1px solid ${theme.palette.divider}`,
+                  },
+                }}
+              >
+                {columns.map((column) => (
+                  <TableCell
+                    key={String(column.id)}
+                    align={column.align || "left"}
+                    sx={{
+                      py: 2.2,
+                      color: theme.palette.text.primary,
+                      fontSize: "0.95rem",
+                    }}
+                  >
+                    {column.render
+                      ? column.render(row)
+                      : (row[column.id] as any)}
+                  </TableCell>
+                ))}
+
+                {shouldShowActions && (
+                  <TableCell align="center">
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        gap: 1,
+                      }}
+                    >
+                      {showView && (
+                        <Tooltip title="View Details">
+                          <IconButton
+                            onClick={() => {
+                              if (detailsPath) {
+                                navigate(
+                                  `${detailsPath}/${String(row[idField])}`,
+                                );
+                              }
+                            }}
+                            sx={{
+                              backgroundColor: theme.palette.primary.light,
+                              "&:hover": {
+                                "&:hover": {
+                                  backgroundColor: theme.palette.primary.main,
+                                  color: "#fff",
+                                },
+                              },
+                            }}
+                          >
+                            <OpenInNewRoundedIcon
+                              sx={{
+                                color: theme.palette.primary.main,
+                                fontSize: 20,
+                              }}
+                            />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                      {onEdit && (
+                        <Tooltip title="Edit">
+                          <IconButton
+                            onClick={() => onEdit(row)} // هنا نقوم بتمرير الصف عند الضغط
+                            sx={{
+                              backgroundColor: theme.palette.success.light,
+                              "&:hover": {
+                                backgroundColor: theme.palette.success.main,
+                                color: "#fff",
+                              },
+                            }}
+                          >
+                            <EditIcon sx={{ color: theme.palette.success.main, fontSize: 20 }} />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+
+                      {isAdmin && (
+                        <Tooltip title="Delete">
+                          <IconButton
+                            onClick={() => {
+                              const id = row[idField];
+
+                              if (
+                                typeof id === "string" ||
+                                typeof id === "number"
+                              ) {
+                                onDelete?.(id);
+                              }
+                            }}
+                            sx={{
+backgroundColor: theme.palette.error.light,
+                              "&:hover": {
+"&:hover": { backgroundColor: theme.palette.error.main, color: "#fff" },                              },
+                            }}
+                          >
+                            <DeleteOutlineIcon
+                              sx={{
+                                color: theme.palette.error.main,
+                                fontSize: 20,
+                              }}
+                            />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                    </Box>
+                  </TableCell>
+                )}
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell
+                colSpan={columns.length + (shouldShowActions ? 1 : 0)}
+                align="center"
+                sx={{
+                  py: 8,
+                }}
+              >
+                <Typography
+                  variant="body1"
+                  sx={{
+                    color: theme.palette.text.disabled,
+                    fontWeight: 500,
+                  }}
+                >
+                  No data available
+                </Typography>
+              </TableCell>
             </TableRow>
-          ))}
+          )}
         </TableBody>
       </Table>
     </TableContainer>

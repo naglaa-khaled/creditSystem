@@ -25,42 +25,38 @@ const CustomButton = ({ label, icon, variantType = "primary", sx, ...props }: Cu
     };
 
     switch (variantType) {
-      case "primary":
+    case "primary":
         return {
           ...baseStyles,
-          backgroundColor: "var(--primary, #1a237e)",
-          color: "#fff",
+          backgroundColor: "primary.main",
+          color: "primary.contrastText",
           "&:hover": {
-            backgroundColor: "var(--primary-hover, #0d1440)",
-            boxShadow: "0px 4px 12px rgba(26, 35, 126, 0.3)",
+            backgroundColor: "primary.dark",
+            boxShadow: (theme) => `0px 4px 12px ${theme.palette.primary.main}40`,
             transform: "translateY(-1px)",
           },
         };
       case "outline-error":
         return {
           ...baseStyles,
-          border: "1px solid var(--error, #d32f2f)",
-          color: "#fff",
-          backgroundColor: "var(--error, #d32f2f)",
-          boxShadow: "none",
-          "&.Mui-focused, &:active": {
-            borderColor: "var(--error, #d32f2f)",
-          },
+          border: (theme) => `1px solid ${theme.palette.error.main}`,
+          backgroundColor: "error.main",
+          color: "error.contrastText",
           "&:hover": {
-            backgroundColor: "var(--error, #d32f2f)",
-            borderColor: "var(--error, #d32f2f)",
-            boxShadow: "0px 4px 12px rgba(211, 47, 47, 0.3)",
+            backgroundColor: "error.dark",
+            borderColor: "error.dark",
+            boxShadow: (theme) => `0px 4px 12px ${theme.palette.error.main}30`,
             transform: "translateY(-1px)",
           },
         };
       case "error":
         return {
           ...baseStyles,
-          backgroundColor: "var(--error, #d32f2f)",
-          color: "#fff",
+          backgroundColor: "error.main",
+          color: "error.contrastText",
           "&:hover": {
-            backgroundColor: "#b71c1c",
-            boxShadow: "0px 4px 12px rgba(211, 47, 47, 0.3)",
+            backgroundColor: "error.dark",
+            boxShadow: (theme) => `0px 4px 12px ${theme.palette.error.main}40`,
             transform: "translateY(-1px)",
           },
         };

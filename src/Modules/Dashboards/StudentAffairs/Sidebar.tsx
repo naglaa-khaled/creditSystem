@@ -15,6 +15,7 @@ function Sidebar() {
         { text: "Instructors", icon: <PersonIcon />, path: "/student-affairs/instructors" },
         { text: "Grades", icon: <GradeIcon />, path: "/student-affairs/grades" },
         { text: "Schedule", icon: <CalendarMonthIcon />, path: "/student-affairs/schedule" },
+        
       ]}
     />
   )

@@ -5,6 +5,7 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  useTheme,
 } from "@mui/material";
 import { useLocation, NavLink } from "react-router-dom";
 
@@ -21,14 +22,15 @@ interface SidebarProps {
 
 const Sidebar = ({ items, onItemClick }: SidebarProps) => {
   const location = useLocation();
+  const theme = useTheme();
 
   return (
     <Box
       sx={{
         width: { xs: 240, sm: 250, md: 260 },
         height: "100vh",
-        backgroundColor:"#eff2fe",
-        color: "var(--primary)",
+        backgroundColor: theme.palette.primary.light,
+        color: "primary.main",
         display: "flex",
         flexDirection: "column",
       }}
@@ -52,17 +54,17 @@ const Sidebar = ({ items, onItemClick }: SidebarProps) => {
                   to={item.path || "#"}
                   onClick={() => {
                     console.log("clicked");
-                    if (onItemClick) onItemClick(); 
+                    if (onItemClick) onItemClick();
                   }}
                   sx={{
                     margin: "8px 12px",
                     borderRadius: "10px",
-                    color: isActive ? "#fff" : "var(--darkGray)",
+                    color: isActive ? "#fff" : theme.palette.text.secondary,
                     backgroundColor: isActive
-                      ? "var(--primary)"
+                      ? theme.palette.primary.main
                       : "transparent",
                     "&:hover": {
-                      backgroundColor: "var(--primary)",
+                      backgroundColor: theme.palette.primary.main,
                       color: "#fff",
                       "& .MuiListItemIcon-root": {
                         color: "#fff",
@@ -73,7 +75,7 @@ const Sidebar = ({ items, onItemClick }: SidebarProps) => {
                   {item.icon && (
                     <ListItemIcon
                       sx={{
-                        color: isActive ? "#fff" : "var(--darkGray)",
+                        color: isActive ? "#fff" : theme.palette.text.secondary,
                       }}
                     >
                       {item.icon}

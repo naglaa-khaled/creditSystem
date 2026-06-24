@@ -48,7 +48,7 @@ export const addStudent = async (studentData: Partial<IStudent>): Promise<IApiRe
 
 export const exportLevelStudents = async (level: string) => {
   try {
-    const res = await axiosInstance.get(`/student-affairs/export-level-sheet-csv`, {
+    const res = await axiosInstance.get(`admin/export-level-sheet-csv`, {
       params: { level }, 
       responseType: 'blob',
     });

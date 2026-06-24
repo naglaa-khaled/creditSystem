@@ -108,7 +108,7 @@
 //     </Stack>
 //   );
 // }
-import { Stack, TextField, Button, Typography, Divider, Link, InputAdornment, IconButton, CircularProgress } from "@mui/material";
+import { Stack, TextField, Button, Typography, Divider, Link, InputAdornment, IconButton, CircularProgress, useTheme } from "@mui/material";
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { Link as RouterLink, useNavigate } from "react-router-dom";
@@ -124,6 +124,7 @@ export default function Login() {
   const { register, formState: { errors, isSubmitting }, handleSubmit } = useForm();
   const { saveLoginData } = useContext(AuthContext);
   const navigate = useNavigate();
+  const theme = useTheme();
   const [showPassword, setShowPassword] = useState(false);
 
   const onsubmit = async (data: any) => {
@@ -157,8 +158,9 @@ export default function Login() {
   };
 
   return (
-    <Stack sx={{ margin: 'auto', p: 4, width: '400px', borderRadius: 4, boxShadow: '0 8px 24px rgba(0,0,0,0.1)', bgcolor: 'white' }}>
-      <Typography variant="h4" sx={{ textAlign: 'center', fontWeight: 'bold', color: '#394188', mb: 1 }}>
+    <Stack sx={{ margin: 'auto', p: 4, width: '400px', borderRadius: 4, boxShadow: '0 8px 24px rgba(0,0,0,0.1)', bgcolor: 'background.paper', // ديناميكي حسب الوضع
+      border: `1px solid ${theme.palette.divider}` }}>
+      <Typography variant="h4" sx={{ textAlign: 'center', fontWeight: 'bold', color: 'text.secondary', mb: 1 }}>
         Login
       </Typography>
       <Typography variant="body2" sx={{ textAlign: 'center', color: 'gray', mb: 4 }}>
@@ -184,7 +186,7 @@ export default function Login() {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <EmailIcon sx={{ color: '#394188' }} />
+                <EmailIcon sx={{ color: 'primary.main' }} />
               </InputAdornment>
             ),
           }}
@@ -206,7 +208,7 @@ export default function Login() {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <LockIcon sx={{ color: '#394188' }} />
+                <LockIcon sx={{ color: 'primary.main' }} />
               </InputAdornment>
             ),
             endAdornment: (
@@ -220,7 +222,7 @@ export default function Login() {
         />
 
         <Link component={RouterLink} to="/forgetpass" underline="hover"
-          sx={{ display: "block", textAlign: "right", mb: 1.5, fontSize: 13, color: '#394188', fontWeight: 500 }}
+          sx={{ display: "block", textAlign: "right", mb: 1.5, fontSize: 13, color: 'primary.main', fontWeight: 500 }}
         >
           Forgot Password?
         </Link>
@@ -231,13 +233,14 @@ export default function Login() {
           variant="contained" 
           disabled={isSubmitting}
           sx={{ 
-            backgroundColor: '#394188', 
+            backgroundColor: 'primary.main', 
             mb: 1, 
             py: 1.5, 
             borderRadius: 2,
             fontSize: '16px',
             textTransform: 'none',
-            '&:hover': { backgroundColor: '#2b3166' }
+            color: 'primary.contrastText',
+            '&:hover': { bgcolor: 'primary.dark' }
           }}
         >
           {isSubmitting ? <CircularProgress size={24} color="inherit" /> : "Login Now"}
@@ -265,8 +268,7 @@ export default function Login() {
        <Button 
          onClick={() => navigate('/register')}
          variant="contained" 
-         sx={{ bgcolor: "#2E7D6B", mb: 2 }}
-       >
+sx={{ bgcolor: "success.main", '&:hover': { bgcolor: "success.dark" } }}       >
          Register Here
       </Button>
     </Stack>

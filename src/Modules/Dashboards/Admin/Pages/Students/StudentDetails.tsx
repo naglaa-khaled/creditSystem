@@ -10,7 +10,10 @@ import {
   type IInfoFieldProps,
 } from "../../../../Shared/Interfaces/index";
 import FormModal from "../../../../Shared/components/Modals/FormModel";
-import { updateStudent,getStudentProfile } from "../../../../../API/AdminData/Students";
+import {
+  updateStudent,
+  getStudentProfile,
+} from "../../../../../API/AdminData/Students";
 import { toast } from "react-toastify";
 
 const StudentDetails = () => {
@@ -78,17 +81,18 @@ const StudentDetails = () => {
 
       console.log("Sending to API (Swagger Specs Only):", apiPayload);
 
-  await updateStudent(id as studentId, apiPayload);
+      await updateStudent(id as studentId, apiPayload);
 
       setStudent((prev) => ({ ...prev, ...updatedData }) as IStudent);
       setEditModalOpen(false);
 
       toast.success("The student details have been successfully updated! ✅");
-
     } catch (error) {
       console.error("Update failed:", error);
-      
-      toast.error("Failed to update student details. Please try again later. ❌");
+
+      toast.error(
+        "Failed to update student details. Please try again later. ❌",
+      );
     }
   };
 
@@ -124,7 +128,10 @@ const StudentDetails = () => {
         onSave={handleSaveEdit}
         title="Edit Student Details"
         fields={editFields}
-        initialData={student}
+        initialData={{
+          ...student,
+          fullName: student?.fullName || student?.nameEn || "",
+        }}
       />
     </>
   );

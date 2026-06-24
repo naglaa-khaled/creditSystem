@@ -13,6 +13,9 @@ import {
   TextField,
 } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
+import WbSunnyIcon from "@mui/icons-material/WbSunny"; // شمس
+import ModeNightIcon from "@mui/icons-material/ModeNight"; // قمر
+import { ColorModeContext } from "../../../../ColorModeContext";
 import { useForm } from "react-hook-form"; // استدعاء useForm
 import DensityMediumIcon from "@mui/icons-material/DensityMedium";
 import LockIcon from "@mui/icons-material/Lock";
@@ -20,7 +23,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import photo from "../../../../assets/images/logoazhar.png";
 import BasicModal from "../Modals/BasicModal";
 import axios from "axios";
-import {getLoginProfile} from "../../../../API/AuthData/Auth";
+import { getLoginProfile } from "../../../../API/AuthData/Auth";
 import { AuthContext } from "../../../../context/AuthContext";
 import { toast } from "react-toastify";
 import type { IUserProfile } from "../../Interfaces";
@@ -31,6 +34,7 @@ interface NavebarProps {
 
 const Navebar = ({ toggleSidebar }: NavebarProps) => {
   const theme = useTheme();
+  const colorMode = useContext(ColorModeContext);
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   // const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -117,8 +121,10 @@ const Navebar = ({ toggleSidebar }: NavebarProps) => {
 
       setOpenChangePassword(false);
       reset();
-    } catch (error) {
-      const errorMsg = error.response?.data || "Failed to change password";
+    } catch (error: unknown) {
+      const errorMsg = axios.isAxiosError(error)
+        ? error.response?.data
+        : "Failed to change password";
       toast.error(typeof errorMsg === "string" ? errorMsg : "Error occurred");
       console.error("Change Password Error:", error);
     }
@@ -126,13 +132,21 @@ const Navebar = ({ toggleSidebar }: NavebarProps) => {
 
   return (
     <>
-      <AppBar position="fixed" elevation={0}>
+      <AppBar
+        position="fixed"
+        elevation={0}
+        sx={{
+          backgroundColor:
+            theme.palette.mode === "dark" ? "#1e293b" : "#ffffff",
+          borderBottom: `1px solid ${theme.palette.divider}`,
+        }}
+      >
         <Toolbar
           sx={{
             display: "flex",
             justifyContent: "space-between",
-            backgroundColor: "var(--bg)",
-            borderBottom: "1px solid var(--gray)",
+            backgroundColor: "transparent",
+            borderBottom: `1px solid ${theme.palette.divider}`,
           }}
         >
           <Box
@@ -146,7 +160,7 @@ const Navebar = ({ toggleSidebar }: NavebarProps) => {
               <IconButton
                 onClick={toggleSidebar}
                 sx={{
-                  color: "var(--primary)",
+                  color: theme.palette.text.primary,
                   "&:focus": { outline: "none" },
                   fontSize: "30px",
                 }}
@@ -165,7 +179,7 @@ const Navebar = ({ toggleSidebar }: NavebarProps) => {
               fontWeight="bold"
               sx={{
                 fontSize: { xs: "16px", sm: "19px", md: "22px", lg: "25px" },
-                color: "var(--primary)",
+                color: theme.palette.text.primary,
               }}
             >
               Al-Azhar University
@@ -175,16 +189,48 @@ const Navebar = ({ toggleSidebar }: NavebarProps) => {
             sx={{
               display: "flex",
               alignItems: "center",
+              justifyContent: "flex-end",
               gap: { xs: 1, md: 3 },
             }}
           >
             <IconButton
+              onClick={colorMode.toggleColorMode}
+              sx={{
+                color: theme.palette.text.primary,
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  backgroundColor: "rgba(0,0,0,0.05)",
+                  
+                },
+              }}
+            >
+              {theme.palette.mode === "dark" ? (
+                <WbSunnyIcon fontSize="medium" />
+              ) : (
+                <ModeNightIcon fontSize="medium" />
+              )}
+            </IconButton>
+            <IconButton
               onClick={handleMenuOpen}
               sx={{ "&:focus": { outline: "none" } }}
             >
-              <Avatar sx={{ color: "var(--primary)" }}>
+              <Avatar
+                sx={{
+                  bgcolor: (theme) => `${theme.palette.primary.main}25`,
+                  color: "primary.main",
+                  fontWeight: 800,
+                  fontSize: "1.2rem",
+                  border: (theme) =>
+                    `1px solid ${theme.palette.primary.main}50`,
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    bgcolor: "primary.main",
+                    color: "#ffffff",
+                  },
+                }}
+              >
                 {profileData?.fullName?.charAt(0).toUpperCase() || ""}
-              </Avatar>{" "}
+              </Avatar>
             </IconButton>
 
             <Menu
@@ -204,8 +250,8 @@ const Navebar = ({ toggleSidebar }: NavebarProps) => {
                   mt: 1.5,
                   minWidth: 200,
                   overflow: "visible",
-                  filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.15))", // ظل احترافي
-                  borderRadius: "12px", // حواف ناعمة
+                  filter: `drop-shadow(0px 2px 8px ${theme.palette.mode === "dark" ? "rgba(0,0,0,0.5)" : "rgba(0,0,0,0.15)"})`,
+                  borderRadius: "12px",
                   "&:before": {
                     content: '""',
                     display: "block",
@@ -225,7 +271,7 @@ const Navebar = ({ toggleSidebar }: NavebarProps) => {
                 <Typography
                   variant="subtitle1"
                   fontWeight="bold"
-                  sx={{ color: "var(--primary)" }}
+                  sx={{ color: theme.palette.text.primary }}
                 >
                   {profileData ? profileData.fullName : "Loading..."}
                 </Typography>
@@ -237,8 +283,12 @@ const Navebar = ({ toggleSidebar }: NavebarProps) => {
                 </Typography>
               </Box>
 
-              {/* الفاصل يفضل أن يكون بسيطاً وبدون ظل خاص به */}
-              <Box sx={{ borderTop: "1px solid var(--gray)", my: 0.5 }} />
+              <Box
+                sx={{
+                  borderTop: "1px solid ${theme.palette.divider}",
+                  my: 0.5,
+                }}
+              />
 
               <MenuItem
                 onClick={() => {
@@ -248,7 +298,11 @@ const Navebar = ({ toggleSidebar }: NavebarProps) => {
                 sx={{ py: 1.2 }}
               >
                 <LockIcon
-                  sx={{ color: "var(--primary)", mr: 2, fontSize: "20px" }}
+                  sx={{
+                    color: theme.palette.primary.main,
+                    mr: 2,
+                    fontSize: "20px",
+                  }}
                 />
                 <Typography variant="body2">Change Password</Typography>
               </MenuItem>
@@ -261,9 +315,16 @@ const Navebar = ({ toggleSidebar }: NavebarProps) => {
                 sx={{ py: 1.2 }}
               >
                 <LogoutIcon
-                  sx={{ color: "var(--error)", mr: 2, fontSize: "20px" }}
+                  sx={{
+                    color: theme.palette.error.main,
+                    mr: 2,
+                    fontSize: "20px",
+                  }}
                 />
-                <Typography variant="body2" sx={{ color: "var(--error)" }}>
+                <Typography
+                  variant="body2"
+                  sx={{ color: theme.palette.error.main }}
+                >
                   Logout
                 </Typography>
               </MenuItem>
@@ -315,9 +376,12 @@ const Navebar = ({ toggleSidebar }: NavebarProps) => {
             <Button onClick={() => setOpenChangePassword(false)}>Cancel</Button>
             <Button
               type="submit"
-              form="change-pass-form" // ربط الزر بالفورم عن طريق الـ ID
+              form="change-pass-form"
               variant="contained"
-              sx={{ color: "#fff", backgroundColor: "var(--primary)" }}
+              sx={{
+                color: theme.palette.background.paper,
+                backgroundColor: theme.palette.primary.main,
+              }}
             >
               Save
             </Button>
@@ -338,7 +402,10 @@ const Navebar = ({ toggleSidebar }: NavebarProps) => {
             <Button
               variant="contained"
               onClick={logout}
-              sx={{ color: "#fff", bgcolor: "var(--error)" }}
+              sx={{
+                color: theme.palette.background.paper,
+                bgcolor: theme.palette.error.main,
+              }}
             >
               Logout
             </Button>
