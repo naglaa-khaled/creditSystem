@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Grid as Grid, Typography } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import { Box, Chip, Grid as Grid, Stack, Typography, useTheme } from "@mui/material";
 import DetailsLayout from "../../../../Shared/components/DetailsLayout/DetailsLayout";
 import {
   dropStudentRegistration,
   getCourseProfile,
   updateCourse,
   updateRegistrationStatus,
+  getAllPrerequisites
 } from "../../../../../API/AdminData/Courses";
 import {
   type studentId,
@@ -14,20 +16,24 @@ import {
   type IFullCourseProfile,
   type ICourse,
   type IEnrolledStudent,
+  type ICoursePrerequisite,
 } from "../../../../Shared/Interfaces/index";
 import FormModal from "../../../../Shared/components/Modals/FormModel";
 import type { FieldValues } from "react-hook-form";
 import { toast } from "react-toastify";
 import ConfirmDeleteModal from "../../../../Shared/components/Modals/DeleteModal";
+import CustomButton from "../../../../Shared/components/Button/Button";
 
 const CourseDetails = () => {
   const { id } = useParams();
+  const theme = useTheme();
   const [profile, setProfile] = useState<IFullCourseProfile | null>(null);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isStatusModalOpen, setStatusModalOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] =
     useState<IEnrolledStudent | null>(null);
+    const [prereqs, setPrereqs] = useState<ICoursePrerequisite[]>([]);
 
   const editCourseFields = [
     {
@@ -165,13 +171,29 @@ const handleSaveStatus = async (formData: FieldValues) => {
       toast.error("An unexpected error occurred.");
     }
   };
-  useEffect(() => {
-    const loadData = async () => {
-      const data = await getCourseProfile(id as studentId);
-      setProfile(data);
-    };
-    loadData();
-  }, [id]);
+useEffect(() => {
+  const loadData = async () => {
+    if (!id) return;
+    
+    try {
+      // جلب البيانات من الـ API
+      const profileData = await getCourseProfile(id as studentId);
+      const allPrereqs = await getAllPrerequisites();
+      
+      setProfile(profileData);
+      
+      // فلترة المتطلبات بناءً على الـ ID الخاص بالكورس الحالي
+      // استخدمنا String للتحويل لضمان تطابق الأنواع
+      const filtered = allPrereqs.filter(p => String(p.courseID) === String(id));
+      setPrereqs(filtered);
+    } catch (error) {
+      console.error("Error loading course data:", error);
+      toast.error("Failed to load course details.");
+    }
+  };
+
+  loadData();
+}, [id]);
   const handleSaveEdit = async (updatedData: FieldValues) => {
     try {
       if (!id) return;
@@ -188,6 +210,7 @@ const handleSaveStatus = async (formData: FieldValues) => {
       toast.error("Failed to update course details.");
     }
   };
+
 
   if (!profile)
     return <Typography sx={{ p: 4 }}>Loading Course Details...</Typography>;
@@ -227,6 +250,33 @@ const handleSaveStatus = async (formData: FieldValues) => {
           <InfoField label="Course Type" value={profile.courseType} />
           <InfoField label="Semester" value={profile.semester} />
         </Grid>
+        <Box sx={{ mt: 4, p: 3, borderRadius: "16px", border: `1px solid ${theme.palette.divider}` }}>
+          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+            <Typography variant="h6" sx={{ fontWeight: "bold" }}>Course Prerequisites</Typography>
+            <CustomButton 
+              label="Add" 
+              icon={<AddIcon />} 
+              variantType="primary" 
+              onClick={() => {/* افتحي الـ Modal الخاص بالإضافة هنا */}} 
+            />
+          </Box>
+          
+          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+            {prereqs.length > 0 ? (
+              prereqs.map((prereq) => (
+                <Chip 
+                  key={prereq.prereqID}
+                  label={prereq.prerequisiteCourseId}
+                  onDelete={() => {/* استدعي دالة الحذف هنا */}}
+                  color="primary"
+                  variant="outlined"
+                />
+              ))
+            ) : (
+              <Typography variant="body2" color="text.secondary">This Course Dont Have Prerequists</Typography>
+            )}
+          </Stack>
+        </Box>
       </DetailsLayout>
       <FormModal
         open={isEditModalOpen}
@@ -256,9 +306,10 @@ const handleSaveStatus = async (formData: FieldValues) => {
             label: "New Status",
             required: true,
             select: true,
-            options: [
-              { value: "registerd", label: "Registerd" },
+           options: [
+              { value: "Registered", label: "Registered" },
               { value: "In Progress", label: "In Progress" },
+              { value: "Waiting", label: "Waiting" },
             ],
           },
         ]}
@@ -287,6 +338,7 @@ const InfoField = ({ label, value, isGpa }: IInfoFieldProps) => (
       {value || "---"}
     </Typography>
   </Grid>
+
 );
 
 export default CourseDetails;

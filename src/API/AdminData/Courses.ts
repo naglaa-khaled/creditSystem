@@ -1,16 +1,17 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import axiosInstance from "../AxiosInstance";
 import {
   type ICourse,
   type IApiResponse,
   type IFullCourseProfile,
   type IAddCourse,
+  type ICoursePrerequisite,
 } from "../../Modules/Shared/Interfaces";
 
 // Courses.ts (API file)
 // Courses.ts (API file)
-export const addCourse = async (courseData: IAddCourse): Promise<IApiResponse & { message?: string }> => {
+export const addCourse = async (
+  courseData: IAddCourse,
+): Promise<IApiResponse & { message?: string }> => {
   try {
     const response = await axiosInstance.post(`Admin/add-course`, null, {
       params: {
@@ -20,7 +21,7 @@ export const addCourse = async (courseData: IAddCourse): Promise<IApiResponse & 
         hours: courseData.hours,
         level: courseData.level,
         semester: courseData.semester,
-        courseType: courseData.courseType
+        courseType: courseData.courseType,
       },
     });
     return { success: response.status === 200 || response.status === 201 };
@@ -29,7 +30,8 @@ export const addCourse = async (courseData: IAddCourse): Promise<IApiResponse & 
 
     let serverMessage = "";
     if (typeof error === "object" && error !== null && "response" in error) {
-      const errData = (error as { response?: { data?: unknown } }).response?.data;
+      const errData = (error as { response?: { data?: unknown } }).response
+        ?.data;
       if (typeof errData === "string") {
         serverMessage = errData;
       } else if (
@@ -57,7 +59,8 @@ export const deleteCourse = async (
 
     let serverMessage = "";
     if (typeof error === "object" && error !== null && "response" in error) {
-      const errData = (error as { response?: { data?: unknown } }).response?.data;
+      const errData = (error as { response?: { data?: unknown } }).response
+        ?.data;
       if (typeof errData === "string") {
         serverMessage = errData;
       } else if (
@@ -73,16 +76,43 @@ export const deleteCourse = async (
     return { success: false, message: serverMessage };
   }
 };
-export const getCourseProfile = async (courseId: string | number): Promise<IFullCourseProfile> => {
+export const getCourseProfile = async (
+  courseId: string | number,
+): Promise<IFullCourseProfile> => {
   try {
     const res = await axiosInstance.get(`admin/course-enrollments/${courseId}`);
-    return res.data; 
+    return res.data;
   } catch (error) {
     console.error(error);
-    throw error; 
+    throw error;
   }
 };
 
+export const getAllPrerequisites = async (): Promise<ICoursePrerequisite[]> => {
+  try {
+    const res = await axiosInstance.get(`Admin/view-all-prerequisites`);
+    return res.data;
+  } catch (error) {
+    console.warn("API Error, using fallback Mock Data:", error);
+    return [
+      {
+        prereqID: 3,
+        courseID: "ENG111",
+        prerequisiteCourseId: "ENG112"
+      },
+      {
+        prereqID: 4,
+        courseID: "ENG111",
+        prerequisiteCourseId: "3"
+      },
+      {
+        prereqID: 1007,
+        courseID: "80",
+        prerequisiteCourseId: "30"
+      }
+    ];
+  }
+};
 export const getCourses = async (
   year?: string,
   semester?: string,
@@ -96,49 +126,29 @@ export const getCourses = async (
     });
     return res.data;
   } catch (error) {
-    return [
-      {
-        courseID: "CSC301",
-        courseNameEn: "Algorithms",
-        creditHours: 4,
-        semester: 2,
-        level: 3,
-        courseType: "Core",
-      },
-      {
-        courseID: "CSC305",
-        courseNameEn: "Database System",
-        creditHours: 3,
-        semester: 3,
-        level: 4,
-        courseType: "Core",
-      },
-      
-     
-      
-      
-    ];
+    console.error("Get Courses Error:", error);
+    return [];
   }
 };
 export const updateCourse = async (
-  courseId: string | number, 
-  updatedData: Partial<ICourse> 
+  courseId: string | number,
+  updatedData: Partial<ICourse>,
 ): Promise<IApiResponse> => {
   try {
     const res = await axiosInstance.put(
-      `Admin/update-course/${courseId}`, 
-      null, 
+      `Admin/update-course/${courseId}`,
+      null,
       {
         params: {
-          id: courseId, 
-          nameAr: updatedData.courseNameAr || "", 
-          nameEn: updatedData.courseNameEn, 
-          hours: Number(updatedData.creditHours), 
-          level: Number(updatedData.level),       
-          semester: Number(updatedData.semester), 
-          courseType: updatedData.courseType || "" 
+          id: courseId,
+          nameAr: updatedData.courseNameAr || "",
+          nameEn: updatedData.courseNameEn,
+          hours: Number(updatedData.creditHours),
+          level: Number(updatedData.level),
+          semester: Number(updatedData.semester),
+          courseType: updatedData.courseType || "",
         },
-      }
+      },
     );
     return { success: res.status === 200 || res.data?.success };
   } catch (error) {
@@ -149,18 +159,24 @@ export const updateCourse = async (
 // إضافة دالة لحذف تسجيل طالب في مادة
 export const dropStudentRegistration = async (
   studentId: number,
-  courseId: string
+  courseId: string,
 ): Promise<IApiResponse & { message?: string }> => {
   try {
-    const response = await axiosInstance.delete(`Admin/drop-student-registration`, {
-      params: { studentId, courseId },
-    });
+    const response = await axiosInstance.delete(
+      `Admin/drop-student-registration`,
+      {
+        params: { studentId, courseId },
+      },
+    );
     return { success: response.status === 200 };
   } catch (error: unknown) {
     console.error("Drop Registration Error:", error);
 
     let serverMessage = "Failed to drop registration";
-    const errData = typeof error === "object" && error !== null ? (error as { response?: { data?: unknown } }).response?.data : undefined;
+    const errData =
+      typeof error === "object" && error !== null
+        ? (error as { response?: { data?: unknown } }).response?.data
+        : undefined;
     if (
       errData &&
       typeof errData === "object" &&
@@ -181,23 +197,24 @@ export const dropStudentRegistration = async (
 export const updateRegistrationStatus = async (
   studentId: number,
   courseId: string,
-  newStatus: string
+  newStatus: string,
 ): Promise<IApiResponse & { message?: string }> => {
   try {
-    const response = await axiosInstance.patch(`Admin/update-registration-status`, null, {
-      params: { studentId, courseId, newStatus },
-    });
+    const response = await axiosInstance.patch(
+      `Admin/update-registration-status`,
+      null,
+      {
+        params: { studentId, courseId, newStatus },
+      },
+    );
     return { success: response.status === 200 };
   } catch (error: unknown) {
     console.error("Update Status Error:", error);
 
     let message = "Failed to update status";
-    if (
-      typeof error === "object" &&
-      error !== null &&
-      "response" in error
-    ) {
-      const errData = (error as { response?: { data?: unknown } }).response?.data;
+    if (typeof error === "object" && error !== null && "response" in error) {
+      const errData = (error as { response?: { data?: unknown } }).response
+        ?.data;
       if (
         errData &&
         typeof errData === "object" &&

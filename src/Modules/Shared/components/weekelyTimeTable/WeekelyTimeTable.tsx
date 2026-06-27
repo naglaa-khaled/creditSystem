@@ -18,7 +18,7 @@ const WeeklyTimetable = ({
   onEdit,
 }: WeeklyTimetableProps) => {
   const showActions = !!onEdit || !!onDelete;
-  const theme = useTheme(); 
+  const theme = useTheme();
 
   return (
     <Box
@@ -108,7 +108,7 @@ const WeeklyTimetable = ({
                 <Typography
                   variant="caption"
                   sx={{
-                    bgcolor: "primary.light",
+                    bgcolor: "info.main",
                     p: "6px 12px",
                     borderRadius: "20px",
                     fontWeight: "600",
@@ -186,7 +186,7 @@ const WeeklyTimetable = ({
                 <Typography
                   variant="body2"
                   sx={{
-                    color:"primary.main",
+                    color: "primary.main",
                     fontWeight: "600",
                     display: "flex",
                     alignItems: "center",
@@ -195,6 +195,19 @@ const WeeklyTimetable = ({
                 >
                   👥 <strong>Capacity:</strong> {lecture.capacity || 0}
                 </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "primary.main",
+                    fontWeight: "600",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                  }}
+                >
+                  📝 <strong>Session-Type:</strong> {lecture["session-type"] ||"---"}
+                </Typography>
+
               </Box>
             </Box>
 

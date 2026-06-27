@@ -71,7 +71,7 @@ const SchedaulPage = () => {
     },
     { name: "room", label: "Room / Hall", required: true },
     {
-      name: "courseLevel",
+      name: "level",
       label: "Level",
       select: true,
       required: true,
@@ -84,13 +84,25 @@ const SchedaulPage = () => {
       ],
     },
     {
-      name: "courseSemester",
+      name: "semester",
       label: "Semester",
       select: true,
       required: true,
       options: [
         { value: "1", label: "Semester 1" },
         { value: "2", label: "Semester 2" },
+      ],
+    },
+    { name: "capacity", label: "Capacity", type: "number", required: true },
+    {
+      name: "sessionType",
+      label: "Session Type",
+      select: true,
+      required: true,
+      options: [
+        { value: "Lecture", label: "Lecture" },
+        { value: "Section", label: "Section" },
+        { value: "Lab", label: "Lab" },
       ],
     },
   ];
@@ -115,6 +127,7 @@ const SchedaulPage = () => {
     loadDataFromApi();
   }, []);
   const handleOpenEditModal = (lecture: ISchedule) => {
+    console.log("البيانات الكاملة القادمة من الـ API:", lecture);
     setScheduleToEdit(lecture);
     setIsEditModalOpen(true);
   };
@@ -126,24 +139,17 @@ const SchedaulPage = () => {
 
   const handleConfirmDelete = async () => {
     if (selectedSchedualeId) {
+      console.log(
+        "Attempting to delete schedule with ID:",
+        selectedSchedualeId,
+      );
       try {
-        const targetSchedule = allSchedual.find(
-          (s) =>
-            s.id === selectedSchedualeId || s.courseID === selectedSchedualeId,
-        );
+        await deleteSchedule(selectedSchedualeId);
 
-        const targetId = targetSchedule?.courseID || selectedSchedualeId;
-
-        await deleteSchedule(targetId);
         toast.success("Schedule deleted successfully!");
 
         setAllSchedual((prev) =>
-          prev.filter((schedual) => {
-            return (
-              schedual.id !== selectedSchedualeId &&
-              schedual.courseID !== targetId
-            );
-          }),
+          prev.filter((item) => item.id !== selectedSchedualeId),
         );
 
         setDeleteModalOpen(false);
@@ -156,6 +162,7 @@ const SchedaulPage = () => {
   };
   // add Schedual handler
   const handleSaveSchedual = async (data: FieldValues) => {
+    console.log("Submitting new schedule data:", data);
     try {
       await addSchedule(data);
       setIsAddModalOpen(false);
@@ -168,10 +175,11 @@ const SchedaulPage = () => {
   };
   const handleUpdateSchedule = async (data: FieldValues) => {
     if (scheduleToEdit) {
+      console.log("Updating schedule ID:", scheduleToEdit.id);
+      console.log("Updated values:", data);
       try {
-        const targetId = scheduleToEdit.courseID || scheduleToEdit.id;
+        await updateSchedule(scheduleToEdit.id, data);
 
-        await updateSchedule(targetId, data);
         setIsEditModalOpen(false);
         setScheduleToEdit(null);
         loadDataFromApi();
@@ -273,7 +281,7 @@ const SchedaulPage = () => {
             }}
           >
             <CircularProgress size={50} />
-            <Typography variant="h6" sx={{ color: "var(--primary)" }}>
+            <Typography variant="h6" sx={{ color: "primary.main" }}>
               Loading Schedual...
             </Typography>
           </Box>
@@ -315,14 +323,17 @@ const SchedaulPage = () => {
               gridColumn: "1/-1",
               textAlign: "center",
               py: 10,
-              border: "1px dashed #ccc",
+              border: (theme) => `1px dashed ${theme.palette.divider}`,
               borderRadius: "16px",
-              backgroundColor: "#f9f9f9",
+              backgroundColor: (theme) =>
+                theme.palette.mode === "light"
+                  ? "rgba(0, 0, 0, 0.02)"
+                  : "rgba(255, 255, 255, 0.03)",
             }}
           >
             <Typography
               variant="h6"
-              sx={{ color: "var(--primary)", opacity: 0.7 }}
+              sx={{ color: "primary.main", opacity: 0.7 }}
             >
               {searchTerm
                 ? `No Schedual found matching "${searchTerm}"`

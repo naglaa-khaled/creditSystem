@@ -49,7 +49,6 @@ export const getDesignTokens = (mode: 'light' | 'dark') => ({
     fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
   },
   components: {
-    // تنسيق تلقائي للبطاقات
     MuiPaper: {
       styleOverrides: {
         root: {
@@ -57,7 +56,6 @@ export const getDesignTokens = (mode: 'light' | 'dark') => ({
         },
       },
     },
-    // تنسيق تلقائي للأزرار (حتى لا تضطري لتكرار الـ sx في كل مكان)
     MuiButton: {
       styleOverrides: {
         root: {
@@ -67,7 +65,6 @@ export const getDesignTokens = (mode: 'light' | 'dark') => ({
         },
       },
     },
-    // تنسيق الحقول النصية (Inputs)
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
@@ -84,7 +81,6 @@ export const getDesignTokens = (mode: 'light' | 'dark') => ({
         },
       },
     },
-    // تنسيق الجداول إذا استخدمتها
     MuiTableCell: {
       styleOverrides: {
         head: {

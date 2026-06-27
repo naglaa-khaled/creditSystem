@@ -75,3 +75,63 @@ export const updateStudent = async (studentId: studentId, studentData: Partial<I
     throw error;
   }
 };
+export const updateStudentMaxHours = async (studentId: studentId, hours: number): Promise<IApiResponse> => {
+  try {
+    const res = await axiosInstance.patch(`Admin/update-student-max-hours/${studentId}`, null, {
+      params: {
+        hours: hours
+      }
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Error updating student max hours:", error);
+    throw error;
+  }
+};
+export const changeStudentStatus = async (studentId: studentId, newStatus: string): Promise<IApiResponse> => {
+  try {
+    const res = await axiosInstance.patch(`Admin/change-student-status/${studentId}`, null, {
+      params: { newStatus }
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Error changing student status:", error);
+    throw error;
+  }
+};
+export const updateRegistrationStatus = async (
+  studentId: number,
+  courseId: string,
+  newStatus: string
+): Promise<IApiResponse & { message?: string }> => {
+  try {
+    const response = await axiosInstance.patch(`Admin/update-registration-status`, null, {
+      params: { studentId, courseId, newStatus },
+    });
+    return { success: response.status === 200 };
+  } catch (error: unknown) {
+    console.error("Update Status Error:", error);
+
+    let message = "Failed to update status";
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "response" in error
+    ) {
+      const errData = (error as { response?: { data?: unknown } }).response?.data;
+      if (
+        errData &&
+        typeof errData === "object" &&
+        "message" in errData &&
+        typeof (errData as { message?: unknown }).message === "string"
+      ) {
+        message = (errData as { message: string }).message;
+      }
+    }
+
+    return {
+      success: false,
+      message,
+    };
+  }
+};

@@ -25,6 +25,7 @@ export interface IStudent {
   gpa?: string | number;
   completedHours?: string | number;
   academicYear?: string;
+  status?: string;
 }
 export interface IFullStudentProfile {
   student: IStudent;
@@ -59,6 +60,11 @@ export interface ICourse {
   semester?: number;
   level?: number;
   courseType?: string;
+}
+export interface ICoursePrerequisite {
+  prereqID: number;
+  courseID: string;
+  prerequisiteCourseId: string;
 }
 export interface IAddCourse {
   courseId: string;
@@ -145,6 +151,7 @@ export interface ISchedule {
   id: string | number;
   level: number;
   semester: number;
+  "session-type": string;
 }
 export interface IGrades {
   studentID: string | number;

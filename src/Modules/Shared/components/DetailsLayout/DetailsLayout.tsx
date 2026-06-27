@@ -102,6 +102,7 @@ const DetailsLayout = <T extends Record<string, unknown>>({
           </Grid>
         </Grid>
       </Paper>
+      
 
       <Typography
         variant="h6"
