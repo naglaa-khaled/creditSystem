@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import WbSunnyIcon from "@mui/icons-material/WbSunny"; // شمس
-import ModeNightIcon from "@mui/icons-material/ModeNight"; // قمر
+import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined"; // قمر
 import { ColorModeContext } from "../../../../ColorModeContext";
 import { useForm } from "react-hook-form"; // استدعاء useForm
 import DensityMediumIcon from "@mui/icons-material/DensityMedium";
@@ -173,13 +173,17 @@ const Navebar = ({ toggleSidebar }: NavebarProps) => {
               component="img"
               src={photo}
               alt="Logo"
-              sx={{ width: 42, height: 42 }}
+              sx={{
+                width: { xs: 42, md: 45 },
+                height: { xs: 42, md: 45 },
+              }}
             />
             <Typography
               fontWeight="bold"
               sx={{
-                fontSize: { xs: "16px", sm: "19px", md: "22px", lg: "25px" },
+                fontSize: { xs: "16px", sm: "25px" },
                 color: theme.palette.text.primary,
+                lineHeight: 2,
               }}
             >
               Al-Azhar University
@@ -200,14 +204,13 @@ const Navebar = ({ toggleSidebar }: NavebarProps) => {
                 transition: "all 0.3s ease",
                 "&:hover": {
                   backgroundColor: "rgba(0,0,0,0.05)",
-                  
                 },
               }}
             >
               {theme.palette.mode === "dark" ? (
                 <WbSunnyIcon fontSize="medium" />
               ) : (
-                <ModeNightIcon fontSize="medium" />
+                <DarkModeOutlinedIcon fontSize="medium" />
               )}
             </IconButton>
             <IconButton

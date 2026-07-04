@@ -1,87 +1,41 @@
-// import {jwtDecode} from 'jwt-decode';
-
-
-// import { createContext, useEffect, useState, type PropsWithChildren } from "react";
-
-// export const AuthContext = createContext(null);
-
-// export default function AuthContextProvider(props: PropsWithChildren) {
-//     const [loginData, setloginData] = useState(null);
-
-//     const saveLoginData = () => {
-//         let encodedToken = localStorage.getItem("accessToken");
-//         if (encodedToken) {
-//             let decodedToken = jwtDecode(encodedToken);
-//             console.log(decodedToken);
-//             setloginData(decodedToken);
-//         }
-//     };
-//     useEffect(()=>{
-//         if(localStorage.getItem('accessToken'))
-//             saveLoginData()
-    
-
-//     },[]);
-//     const logout = () => {
-//     localStorage.removeItem("accessToken"); 
-//     setloginData(null);
-//     window.location.href = "/login"; 
-// };
-
-   
-
-//     return (
-//         <AuthContext.Provider value={{ saveLoginData , loginData,logout }}>
-//             {props.children}
-//         </AuthContext.Provider>
-//     );
-// }
 import { jwtDecode } from 'jwt-decode';
-import { createContext, useEffect, useState, type PropsWithChildren } from "react";
-import { toast } from 'react-toastify';
+import { createContext,  useState, useCallback, type PropsWithChildren } from "react";
 
-// تعريف الـ Context مع قيم افتراضية عشان TypeScript ميزعلش
+// تعريف الـ Context
 export const AuthContext = createContext<any>(null);
 
 export default function AuthContextProvider(props: PropsWithChildren) {
-    const [loginData, setloginData] = useState(null);
-
-    const saveLoginData = () => {
+    const [loginData, setloginData] = useState<any>(() => {
         const encodedToken = localStorage.getItem("accessToken");
-        
-        // 1. التأكد إن فيه توكن فعلاً
-        // 2. التأكد إن التوكن فيه 3 أجزاء (Header.Payload.Signature) عشان jwtDecode ميعملش Crash
-        if (encodedToken && encodedToken.split('.').length === 3) {
-            try {
-                const decodedToken = jwtDecode(encodedToken);
-                console.log("Decoded Success:", decodedToken);
-                setloginData(decodedToken);
-            } catch (error) {
-                // لو التوكن بايظ أو منتهي الصلاحية
-                console.error("Invalid Token Format:", error);
-                logout(); 
-            }
-        } else {
-            // لو التوكن مش موجود أو مش JWT سليم
-            setloginData(null);
-        }
-    };
+        if (!encodedToken) return null;
 
-    useEffect(() => {
-        // بننادي الدالة وهي جواها الـ check بتاعها
-        saveLoginData();
+        try {
+            return jwtDecode(encodedToken);
+        } catch {
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("userRole");
+            return null;
+        }
+    });
+
+    const logout = useCallback(() => {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("userRole"); // حذف الدور عند تسجيل الخروج
+        setloginData(null);
+        window.location.href = "/login";
     }, []);
 
-    const logout = () => {
-        localStorage.removeItem("accessToken"); 
-        setloginData(null);
-        // الأفضل نستخدم navigate لو متاح، بس window.location شغالة برضه
-        toast.success("Logged out successfully!");
-
-    setTimeout(() => {
-        window.location.href = "/login"; 
-    }, 1000);
-    };
+    const saveLoginData = useCallback(() => {
+        const encodedToken = localStorage.getItem("accessToken");
+        if (encodedToken) {
+            try {
+                const decodedToken = jwtDecode(encodedToken);
+                setloginData(decodedToken);
+            } catch (error) {
+                logout();
+            }
+        }
+    }, [logout]);
 
     return (
         <AuthContext.Provider value={{ saveLoginData, loginData, logout }}>

@@ -205,7 +205,7 @@ const WeeklyTimetable = ({
                     gap: 1,
                   }}
                 >
-                  📝 <strong>Session-Type:</strong> {lecture["session-type"] ||"---"}
+                  📝 <strong>Session-Type:</strong> {lecture.sessionType ||"---"}
                 </Typography>
 
               </Box>

@@ -1,18 +1,26 @@
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"; // الأيقونة الأنسب للمظهر الهابط
 import DownloadIcon from "@mui/icons-material/Download";
+import UploadIcon from "@mui/icons-material/Upload";
 import { Box, IconButton, Button, Typography } from "@mui/material";
 import { type ReactNode } from "react";
-
+import PublishIcon from "@mui/icons-material/Publish"; // أو CheckCircleIcon
+import Tooltip from "@mui/material/Tooltip";
+import CircularProgress from "@mui/material/CircularProgress";
 interface ISemesterCardProps {
   level: string;
   semester: string;
-  count: number;
+  count: number | undefined;
   isActive: boolean;
   onClick: () => void;
   onExport?: (e: React.MouseEvent) => void;
+  onImport?: (e: React.MouseEvent) => void;
+  onPublish?: (e: React.MouseEvent) => void;
+  isPublished?: boolean;
   icon: ReactNode;
   exportLabel?: string;
   text: string;
+  importLabel?: string;
+  loading?: boolean;
 }
 
 const getCardColors = (level: string) => {
@@ -72,9 +80,14 @@ export const SemesterCard = ({
   isActive,
   onClick,
   onExport,
+  importLabel = "Import",
+  onImport, // استقبال الدالة
+  onPublish, // استقبال الدالة
+  isPublished,
   text,
   icon,
   exportLabel = "Download Data",
+  loading,
 }: ISemesterCardProps) => {
   const colors = getCardColors(level);
 
@@ -152,21 +165,27 @@ export const SemesterCard = ({
           </Box>
         </Box>
 
-        <Box
-          sx={{
-            backgroundColor: colors.bg,
-            color: colors.text,
-            px: 1.5,
-            py: 0.75,
-            borderRadius: "8px",
-            fontSize: "0.8rem",
-            fontWeight: "700",
-            textTransform: "uppercase",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {count} {text}
-        </Box>
+        {isActive && (
+          <Box
+            sx={{
+              backgroundColor: colors.bg,
+              color: colors.text,
+              px: 1.5,
+              py: 0.75,
+              borderRadius: "8px",
+              minWidth: 70,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            {loading ? (
+              <CircularProgress size={16} color="inherit" />
+            ) : count !== undefined ? (
+              `${count} ${text}`
+            ) : null}
+          </Box>
+        )}
       </Box>
 
       <Box sx={{ height: "1px", bgcolor: "divider", mx: 2.5 }} />
@@ -206,21 +225,61 @@ export const SemesterCard = ({
             {exportLabel}
           </Button>
         )}
+        {onImport && (
+          <Button
+            variant="text"
+            startIcon={<UploadIcon sx={{ fontSize: "18px !important" }} />}
+            onClick={(e) => {
+              e.stopPropagation();
+              onImport(e);
+            }}
+            sx={{
+              color: "primary.main",
+              "&:hover": { backgroundColor: "primary.light" },
+              fontSize: "0.85rem",
+              fontWeight: 600,
+              textTransform: "uppercase",
+              p: "4px 8px",
+              borderRadius: "6px",
+            }}
+          >
+            {importLabel}
+          </Button>
+        )}
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          {onPublish && (
+            <Tooltip title="publish grades" arrow>
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onPublish(e);
+                }}
+                sx={{
+                  color: isPublished ? "success.main" : "text.secondary",
+                  "&:hover": {
+                    color: "success.main",
+                    bgcolor: "rgba(76, 175, 80, 0.1)",
+                  },
+                }}
+              >
+                <PublishIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          )}
 
-        <IconButton
-          size="small"
-          disableRipple
-          sx={{
-            color: isActive ? "primary.main" : "text.disabled",
-            transition: "transform 0.3s ease",
-            transform: isActive ? "rotate(180deg)" : "rotate(0deg)",
-            "&:hover": {
-              bgcolor: onExport ? "transparent" : "rgba(0, 0, 0, 0.04)",
-            },
-          }}
-        >
-          <KeyboardArrowDownIcon />
-        </IconButton>
+          <IconButton
+            size="small"
+            disableRipple
+            sx={{
+              color: isActive ? "primary.main" : "text.disabled",
+              transition: "transform 0.3s ease",
+              transform: isActive ? "rotate(180deg)" : "rotate(0deg)",
+            }}
+          >
+            <KeyboardArrowDownIcon />
+          </IconButton>
+        </Box>
       </Box>
     </Box>
   );

@@ -1,4 +1,3 @@
-
 // import { Stack, TextField, Button, Typography, Divider, Link } from "@mui/material";
 // import { useForm } from 'react-hook-form';
 // import axios from 'axios';
@@ -10,19 +9,17 @@
 // export default function Login() {
 //   // استخدام useForm للتحقق من المدخلات
 //   let { register, formState: { errors }, handleSubmit } = useForm();
-  
+
 //   // استدعاء دالة حفظ البيانات من الـ Context
 //   let { saveLoginData } = useContext(AuthContext);
 //   let navigate = useNavigate();
 
-
 // let onsubmit = async (data: any) => {
 //   try {
 //     let response = await axios.post('https://credithourssystemw.premiumasp.net/api/Auth/login', data);
-    
+
 //     console.log("Full Response:", response.data); // شوفي الشكل هنا في الكونسول
 
-    
 //     const resData = response.data;
 //     const token = resData.token || resData.accessToken || resData.data?.token;
 //     const userRole = resData.role || resData.data?.role;
@@ -33,7 +30,6 @@
 
 //       console.log("User Role detected:", userRole);
 
-      
 //       if (userRole === "Admin") {
 //         navigate('/admin', { replace: true });
 //       } else if (userRole === "instructor") {
@@ -84,11 +80,10 @@
 //           Forgot Password?
 //         </Link>
 
-      
-//         <Button 
-//           type="submit" 
-//           fullWidth 
-//           variant="contained" 
+//         <Button
+//           type="submit"
+//           fullWidth
+//           variant="contained"
 //           sx={{ backgroundColor: '#394188', marginBottom: '1rem', py: 1.5 }}
 //         >
 //           Login
@@ -97,10 +92,9 @@
 //         <Divider sx={{ my: 2 }}>Are You Student?</Divider>
 //       </form>
 
-      
-//       <Button 
+//       <Button
 //         onClick={() => navigate('/register')}
-//         variant="contained" 
+//         variant="contained"
 //         sx={{ bgcolor: "#2E7D6B", mb: 2 }}
 //       >
 //         Register Here
@@ -108,20 +102,35 @@
 //     </Stack>
 //   );
 // }
-import { Stack, TextField, Button, Typography, Divider, Link, InputAdornment, IconButton, CircularProgress, useTheme } from "@mui/material";
-import { useForm } from 'react-hook-form';
-import axios from 'axios';
+import {
+  Stack,
+  TextField,
+  Button,
+  Typography,
+  Divider,
+  Link,
+  InputAdornment,
+  IconButton,
+  CircularProgress,
+  useTheme,
+} from "@mui/material";
+import { useForm } from "react-hook-form";
+import axios from "axios";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../../../context/AuthContext";
 import { toast } from "react-toastify";
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import EmailIcon from '@mui/icons-material/Email';
-import LockIcon from '@mui/icons-material/Lock';
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import EmailIcon from "@mui/icons-material/Email";
+import LockIcon from "@mui/icons-material/Lock";
 
 export default function Login() {
-  const { register, formState: { errors, isSubmitting }, handleSubmit } = useForm();
+  const {
+    register,
+    formState: { errors, isSubmitting },
+    handleSubmit,
+  } = useForm();
   const { saveLoginData } = useContext(AuthContext);
   const navigate = useNavigate();
   const theme = useTheme();
@@ -130,52 +139,86 @@ export default function Login() {
   const onsubmit = async (data: any) => {
     // إظهار رسالة تحميل فوراً
     const toastId = toast.loading("Verifying your credentials... Please wait.");
-    
+
     try {
-      const response = await axios.post('https://credithourssystemw.premiumasp.net/api/Auth/login', data);
+      const response = await axios.post(
+        "https://credithourssystemw.premiumasp.net/api/Auth/login",
+        data,
+      );
       const resData = response.data;
       const token = resData.token || resData.accessToken;
       const userRole = resData.role ? resData.role.toLowerCase() : "";
-
+      console.log("Checking role data:", resData);
       if (token) {
-        localStorage.setItem('accessToken', token);
-        saveLoginData();
+        localStorage.setItem("accessToken", token);
+        localStorage.setItem("userRole", userRole); // استخدمي المتغير الصحيح هنا        saveLoginData();
 
-       
-        toast.update(toastId, { render: `Welcome back, ${resData.name || 'User'}!`, type: "success", isLoading: false, autoClose: 2000 });
+        toast.update(toastId, {
+          render: `Welcome back, ${resData.name || "User"}!`,
+          type: "success",
+          isLoading: false,
+          autoClose: 2000,
+        });
 
         setTimeout(() => {
-          if (userRole === "admin") navigate('/admin', { replace: true });
-          else if (userRole === "instructor") navigate('/doctors/dashboarddoc', { replace: true });
-          else if (userRole === "studentaffairs") navigate('/student-affairs', { replace: true });
-          else navigate('/', { replace: true });
+          if (userRole === "admin") navigate("/admin", { replace: true });
+          else if (userRole === "instructor")
+            navigate("/doctors/dashboarddoc", { replace: true });
+          else if (userRole === "studentaffairs")
+            navigate("/student-affairs", { replace: true });
+          else navigate("/", { replace: true });
         }, 1000);
       }
     } catch (error: any) {
-      toast.update(toastId, { render: "Login failed! Please check your email or password.", type: "error", isLoading: false, autoClose: 3000 });
+      toast.update(toastId, {
+        render: "Login failed! Please check your email or password.",
+        type: "error",
+        isLoading: false,
+        autoClose: 3000,
+      });
       console.log("Login Error:", error);
     }
   };
 
   return (
-    <Stack sx={{ margin: 'auto', p: 4, borderRadius: 4,width: {  sm: '400px' }, boxShadow: '0 8px 24px rgba(0,0,0,0.1)', bgcolor: 'background.paper', // ديناميكي حسب الوضع
-      border: `1px solid ${theme.palette.divider}` }}>
-      <Typography variant="h4" sx={{ textAlign: 'center', fontWeight: 'bold', color: 'text.secondary', mb: 1 }}>
+    <Stack
+      sx={{
+        margin: "auto",
+        p: 4,
+        borderRadius: 4,
+        width: { sm: "400px" },
+        boxShadow: "0 8px 24px rgba(0,0,0,0.1)",
+        bgcolor: "background.paper", // ديناميكي حسب الوضع
+        border: `1px solid ${theme.palette.divider}`,
+      }}
+    >
+      <Typography
+        variant="h4"
+        sx={{
+          textAlign: "center",
+          fontWeight: "bold",
+          color: "text.secondary",
+          mb: 1,
+        }}
+      >
         Login
       </Typography>
-      <Typography variant="body2" sx={{ textAlign: 'center', color: 'gray', mb: 4 }}>
+      <Typography
+        variant="body2"
+        sx={{ textAlign: "center", color: "gray", mb: 4 }}
+      >
         Access to your Account
       </Typography>
 
       <form onSubmit={handleSubmit(onsubmit)}>
         {/* البريد الإلكتروني */}
         <TextField
-          {...register('email', { 
-            required: 'Email is required',
+          {...register("email", {
+            required: "Email is required",
             pattern: {
               value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-              message: "Invalid email address (e.g., example@mail.com)"
-            }
+              message: "Invalid email address (e.g., example@mail.com)",
+            },
           })}
           fullWidth
           label="Email Address"
@@ -186,17 +229,19 @@ export default function Login() {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <EmailIcon sx={{ color: 'primary.main' }} />
+                <EmailIcon sx={{ color: "primary.main" }} />
               </InputAdornment>
             ),
           }}
         />
 
-       
         <TextField
-          {...register('password', { 
-            required: 'Password is required',
-            minLength: { value: 6, message: 'Password must be at least 6 characters' }
+          {...register("password", {
+            required: "Password is required",
+            minLength: {
+              value: 6,
+              message: "Password must be at least 6 characters",
+            },
           })}
           fullWidth
           type={showPassword ? "text" : "password"}
@@ -208,12 +253,15 @@ export default function Login() {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <LockIcon sx={{ color: 'primary.main' }} />
+                <LockIcon sx={{ color: "primary.main" }} />
               </InputAdornment>
             ),
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                <IconButton
+                  onClick={() => setShowPassword(!showPassword)}
+                  edge="end"
+                >
                   {showPassword ? <VisibilityOff /> : <Visibility />}
                 </IconButton>
               </InputAdornment>
@@ -221,29 +269,43 @@ export default function Login() {
           }}
         />
 
-        <Link component={RouterLink} to="/forgetpass" underline="hover"
-          sx={{ display: "block", textAlign: "right", mb: 1.5, fontSize: 13, color: 'primary.main', fontWeight: 500 }}
+        <Link
+          component={RouterLink}
+          to="/forgetpass"
+          underline="hover"
+          sx={{
+            display: "block",
+            textAlign: "right",
+            mb: 1.5,
+            fontSize: 13,
+            color: "primary.main",
+            fontWeight: 500,
+          }}
         >
           Forgot Password?
         </Link>
 
-        <Button 
-          type="submit" 
-          fullWidth 
-          variant="contained" 
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
           disabled={isSubmitting}
-          sx={{ 
-            backgroundColor: 'primary.main', 
-            mb: 1, 
-            py: 1.5, 
+          sx={{
+            backgroundColor: "primary.main",
+            mb: 1,
+            py: 1.5,
             borderRadius: 2,
-            fontSize: '16px',
-            textTransform: 'none',
-            color: 'primary.contrastText',
-            '&:hover': { bgcolor: 'primary.dark' }
+            fontSize: "16px",
+            textTransform: "none",
+            color: "primary.contrastText",
+            "&:hover": { bgcolor: "primary.dark" },
           }}
         >
-          {isSubmitting ? <CircularProgress size={24} color="inherit" /> : "Login Now"}
+          {isSubmitting ? (
+            <CircularProgress size={24} color="inherit" />
+          ) : (
+            "Login Now"
+          )}
         </Button>
 
         <Divider sx={{ my: 2 }}>Are You Student?</Divider>
@@ -264,12 +326,13 @@ export default function Login() {
       >
         Create New Account
       </Button> */}
-      
-       <Button 
-         onClick={() => navigate('/register')}
-         variant="contained" 
-sx={{ bgcolor: "success.main", '&:hover': { bgcolor: "success.dark" } }}       >
-         Register Here
+
+      <Button
+        onClick={() => navigate("/register")}
+        variant="contained"
+        sx={{ bgcolor: "success.main", "&:hover": { bgcolor: "success.dark" } }}
+      >
+        Register Here
       </Button>
     </Stack>
   );

@@ -8,7 +8,7 @@ import { type IApiResponse, type ISchedule } from "../../Modules/Shared/Interfac
 
 export const getSchedules = async (courseLevel?: string, courseSemester?: string): Promise<ISchedule[]> => {
   try {
-    const res = await axiosInstance.get(`student-affairs/view-schedules`, {
+    const res = await axiosInstance.get(`student-affairs/all-course-offerings`, {
         params: { 
         level: courseLevel || undefined, 
         semester: courseSemester || undefined 
@@ -18,16 +18,7 @@ export const getSchedules = async (courseLevel?: string, courseSemester?: string
     return res.data; 
   } catch (error) {
     return [
-    {
-        "courseName": "التصميم الرقمي والمنطقي ١",
-        "courseID": "ENG 141",
-        "day": "Monday",
-        "startTime": "08:00:00",
-        "endTime": "10:00:00",
-        "room": "Room 404",
-        "courseLevel": 1,
-        "courseSemester": 1
-    }
+
 ]
   }
 };

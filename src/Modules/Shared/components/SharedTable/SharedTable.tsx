@@ -10,8 +10,7 @@ import {
   Paper,
   Box,
   Typography,
-  IconButton,
-  Tooltip,
+
   useTheme,
 } from "@mui/material";
 
@@ -19,6 +18,7 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import OpenInNewRoundedIcon from "@mui/icons-material/OpenInNewRounded";
 import { useNavigate } from "react-router-dom";
 import { type Column } from "../../Interfaces";
+import CustomButton from "../Button/Button";
 
 interface SharedTableProps<T extends Record<string, any>> {
   columns: Column<T>[];
@@ -53,7 +53,7 @@ const SharedTable = <T extends Record<string, any>>({
       component={Paper}
       sx={{
         borderRadius: 4,
-        overflowX: "auto",
+        overflow: "auto",
         border: `1px solid ${theme.palette.divider}`,
         boxShadow: "none",
       }}
@@ -143,94 +143,41 @@ const SharedTable = <T extends Record<string, any>>({
                       }}
                     >
                       {showView && (
-                        <Tooltip title="View Details">
-                          <IconButton
-                            onClick={() => {
-                              if (detailsPath) {
-                                navigate(
-                                  `${detailsPath}/${String(row[idField])}`,
-                                );
-                              }
-                            }}
-                            sx={{
-                              backgroundColor: theme.palette.primary.light,
-                              "&:hover": {
-                                "&:hover": {
-                                  backgroundColor: theme.palette.primary.main,
-                                  color: "#fff",
-                                },
-                              },
-                            }}
-                          >
-                            <OpenInNewRoundedIcon
-                              sx={{
-                                color: theme.palette.primary.main,
-                                fontSize: 20,
-                              }}
-                            />
-                          </IconButton>
-                        </Tooltip>
+                        <CustomButton
+                          label="View"
+                          variantType="primary"
+                          icon={<OpenInNewRoundedIcon sx={{ fontSize: 16 }} />}
+                          onClick={() => detailsPath && navigate(`${detailsPath}/${String(row[idField])}`)}
+                        />
                       )}
                       {onEdit && (
-                        <Tooltip title="Edit">
-                          <IconButton
-                            onClick={() => onEdit(row)} // هنا نقوم بتمرير الصف عند الضغط
-                            sx={{
-                              backgroundColor: theme.palette.success.light,
-                              "&:hover": {
-                                backgroundColor: theme.palette.success.main,
-                                color: "#fff",
-                              },
-                            }}
-                          >
-                            <EditIcon
-                              sx={{
-                                color: theme.palette.success.main,
-                                fontSize: 20,
-                              }}
-                            />
-                          </IconButton>
-                        </Tooltip>
+                        <CustomButton
+                          label="Edit"
+                          variantType="primary"
+                          sx={{ backgroundColor: "success.main", "&:hover": { backgroundColor: "success.dark" } }}
+                          icon={<EditIcon sx={{ fontSize: 16 }} />}
+                          onClick={() => onEdit(row)}
+                        />
                       )}
                       {onEditStatus && (
-                        <Tooltip title="Update Status">
-                          <IconButton onClick={() => onEditStatus(row)}>
-                            <EditIcon />
-                          </IconButton>
-                        </Tooltip>
+                        <CustomButton
+                          label="Status"
+                          variantType="secondary" // أضف تنسيقاً لهذا النوع في CustomButton إذا أردت
+                          icon={<EditIcon sx={{ fontSize: 16 }} />}
+                          onClick={() => onEditStatus(row)}
+                        />
                       )}
 
                       {isAdmin && (
-                        <Tooltip title="Delete">
-                          <IconButton
-                            onClick={() => {
-                              const id = row[idField];
-
-                              if (
-                                typeof id === "string" ||
-                                typeof id === "number"
-                              ) {
-                                onDelete?.(id);
-                              }
-                            }}
-                            sx={{
-                              backgroundColor: theme.palette.error.light,
-                              "&:hover": {
-                                "&:hover": {
-                                  backgroundColor: theme.palette.error.main,
-                                  color: "#fff",
-                                },
-                              },
-                            }}
-                          >
-                            <DeleteOutlineIcon
-                              sx={{
-                                color: theme.palette.error.main,
-                                fontSize: 20,
-                              }}
-                            />
-                          </IconButton>
-                        </Tooltip>
+                        <CustomButton
+                          label="Delete"
+                          variantType="error"
+                          icon={<DeleteOutlineIcon sx={{ fontSize: 16 }} />}
+                          onClick={() => {
+                            const id = row[idField];
+                            if (typeof id === "string" || typeof id === "number") onDelete?.(id);
+                          }}
+                        />
                       )}
                     </Box>
                   </TableCell>

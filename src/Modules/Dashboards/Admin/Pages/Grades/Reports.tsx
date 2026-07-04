@@ -8,20 +8,24 @@ import FormModal, {
 import CustomButton from "../../../../Shared/components/Button/Button";
 import { SemesterCard } from "../../../../Shared/components/CourseCard/CourseCard";
 import GradeIcon from "@mui/icons-material/Grade";
+
 import {
   getGrades,
   exportCourseGrades,
   getCourseGrades,
   getStudentGrades,
-} from "../../../../../API/SyudentAffairsData/Grades";
-
-import { type Column, type IGradeRow } from "../../../../Shared/Interfaces";
+  publishSemesterResults,
+  importGrades,
+} from "../../../../../API/AdminData/Grades";
+import { type Column, type IGradeRow, type IPublishFormData } from "../../../../Shared/Interfaces";
 
 const Reports = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   // States
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [searchedData, setSearchedData] = useState<IGradeRow[]>([]);
@@ -40,6 +44,7 @@ const Reports = () => {
     semester: string;
   } | null>(null);
 
+
   const cardOptions = [
     { level: "1", semester: "1" },
     { level: "1", semester: "2" },
@@ -52,48 +57,39 @@ const Reports = () => {
     { level: "5", semester: "1" },
     { level: "5", semester: "2" },
   ];
-  const getGradeColor = (
-    value: string | number
-  ): "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning" => {
-    const valueString = String(value).trim();
-    if (!valueString) return "default";
-
-    if (/^[A-F]$/i.test(valueString)) {
-      switch (valueString.toUpperCase()) {
-        case "A":
-          return "success";
-        case "B":
-          return "primary";
-        case "C":
-          return "info";
-        case "D":
-          return "warning";
-        case "F":
-          return "error";
-      }
-    }
-
-    const numeric = parseFloat(valueString);
-    if (Number.isNaN(numeric)) return "default";
-
-    if (numeric <= 4.5) {
-      if (numeric >= 3.5) return "success";
-      if (numeric >= 2.5) return "primary";
-      if (numeric >= 2.0) return "info";
-      if (numeric >= 1.0) return "warning";
-      return "error";
-    }
-
-    if (numeric >= 85) return "success";
-    if (numeric >= 65) return "info";
-    if (numeric >= 50) return "warning";
-    return "error";
-  };
   const exportFields: FieldConfig[] = [
-  { name: "courseID", label: "Course ID", required: true },
-  { name: "academicYear", label: "Academic Year", required: true, select: true, options: [{ value: "2026", label: "2026" }] },
-  { name: "semester", label: "Semester", required: true , select: true, options: [{ value: "1", label: "1" }, { value: "2", label: "2" }] },
-];
+    { name: "courseID", label: "Course ID", required: true },
+    {
+      name: "academicYear",
+      label: "Academic Year",
+      required: true,
+      select: true,
+      options: [{ value: "2026", label: "2026" }],
+    },
+    {
+      name: "semester",
+      label: "Semester",
+      required: true,
+      select: true,
+      options: [
+        { value: "1", label: "1" },
+        { value: "2", label: "2" },
+      ],
+    },
+  ];
+  // إضافة دالة الـ Publish
+const handlePublish = async (data: IPublishFormData) => {
+  const res = await publishSemesterResults(
+    data.academicYear,
+    data.semester,
+    data.level
+  );
+  if (res.success) {
+    toast.success("Grades published successfully!");
+  } else {
+    toast.error(res.message || "Failed to publish");
+  }
+}
 
   const searchFields: FieldConfig[] = [
     { name: "searchValue", label: "Enter ID", required: true },
@@ -161,7 +157,10 @@ const Reports = () => {
           studentID: (item.studentID as string | undefined) || data.searchValue,
 
           // هنا التعديل: سنحاول البحث عن الاسم في عدة أماكن، وإذا لم نجد شيئاً، سنظهر الـ ID فقط
-studentName: item.studentFullName || item.studentName || `Student ID: ${data.searchValue}`,
+          studentName:
+            item.studentFullName ||
+            item.studentName ||
+            `Student ID: ${data.searchValue}`,
           courseID: item.courseID || "-",
           courseName: item.courseName || "-",
           courseLevel: item.level || "-",
@@ -182,6 +181,43 @@ studentName: item.studentFullName || item.studentName || `Student ID: ${data.sea
     } finally {
       setSearchLoading(false);
     }
+  };
+   const getGradeColor = (
+    value: string | number
+  ): "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning" => {
+    const valueString = String(value).trim();
+    if (!valueString) return "default";
+
+    if (/^[A-F]$/i.test(valueString)) {
+      switch (valueString.toUpperCase()) {
+        case "A":
+          return "success";
+        case "B":
+          return "primary";
+        case "C":
+          return "info";
+        case "D":
+          return "warning";
+        case "F":
+          return "error";
+      }
+    }
+
+    const numeric = parseFloat(valueString);
+    if (Number.isNaN(numeric)) return "default";
+
+    if (numeric <= 4.5) {
+      if (numeric >= 3.5) return "success";
+      if (numeric >= 2.5) return "primary";
+      if (numeric >= 2.0) return "info";
+      if (numeric >= 1.0) return "warning";
+      return "error";
+    }
+
+    if (numeric >= 85) return "success";
+    if (numeric >= 65) return "info";
+    if (numeric >= 50) return "warning";
+    return "error";
   };
 
   const handleCardClick = async (level: string, semester: string) => {
@@ -217,6 +253,7 @@ studentName: item.studentFullName || item.studentName || `Student ID: ${data.sea
       setLoadingCount(false);
     }
   };
+
 
 const SchedaulTable: Column<IGradeRow>[] = [
   { id: "studentID", label: "Student ID" },
@@ -270,8 +307,6 @@ const SchedaulTable: Column<IGradeRow>[] = [
     )
   },];
 
-
-
   const filteredCards = cardOptions;
 
   return (
@@ -299,6 +334,17 @@ const SchedaulTable: Column<IGradeRow>[] = [
           label="Export Course Grades"
           variantType="secondary"
           onClick={() => setIsExportModalOpen(true)}
+        />
+
+        <CustomButton
+          label="Import Grades"
+          variantType="secondary"
+          onClick={() => setIsImportModalOpen(true)}
+        />
+        <CustomButton
+          label="Publish Grades"
+          variantType="primary"
+          onClick={() => setIsPublishModalOpen(true)}
         />
       </Box>
 
@@ -365,7 +411,6 @@ const SchedaulTable: Column<IGradeRow>[] = [
                 selectedGroup?.semester === semester
               }
               onClick={() => handleCardClick(level, semester)}
-              
             />
           ))}
         </Box>
@@ -418,6 +463,43 @@ const SchedaulTable: Column<IGradeRow>[] = [
           )}
         </Box>
       )}
+      {/* موديل الاستيراد (Import) */}
+{/* موديل الاستيراد */}
+<FormModal
+  open={isImportModalOpen}
+  title="Import Grades"
+  buttonLabel="Upload"
+  onClose={() => setIsImportModalOpen(false)}
+  fields={[
+    { name: "courseId", label: "Course ID", required: true },
+    { name: "level", label: "Level", required: true, select: true, options: [{ value: "1", label: "1" }, { value: "2", label: "2" }, { value: "3", label: "3" }, { value: "4", label: "4" }, { value: "5", label: "5" }] },
+    { name: "academicYear", label: "Academic Year", required: true, select: true, options: [{ value: "2026", label: "2026" }] },
+    { name: "semester", label: "Semester", required: true, select: true, options: [{ value: "1", label: "1" }, { value: "2", label: "2" }] },
+    { name: "file", label: "Select File", type: "file", required: true }
+  ]}
+  onSave={async (data) => {
+    await importGrades(data.file, data.courseId, data.level, data.academicYear, data.semester);
+    toast.success("Imported successfully");
+    setIsImportModalOpen(false);
+  }}
+/>
+
+{/* موديل النشر */}
+<FormModal
+  open={isPublishModalOpen}
+  title="Publish Semester Results"
+  buttonLabel="Publish"
+  onClose={() => setIsPublishModalOpen(false)}
+  fields={[
+    { name: "level", label: "Level", required: true, select: true, options: [{ value: "1", label: "1" }, { value: "2", label: "2" }, { value: "3", label: "3" }, { value: "4", label: "4" }, { value: "5", label: "5" }] },
+    { name: "semester", label: "Semester", required: true, select: true, options: [{ value: "1", label: "1" }, { value: "2", label: "2" }] },
+    { name: "academicYear", label: "Academic Year", required: true, select: true, options: [{ value: "2026", label: "2026" }] },
+  ]}
+  onSave={async (data) => {
+    await handlePublish(data as IPublishFormData);
+    setIsPublishModalOpen(false);
+  }}
+/>
 
       <FormModal
         open={isModalOpen}
@@ -441,23 +523,27 @@ const SchedaulTable: Column<IGradeRow>[] = [
         }}
       />
       <FormModal
-  open={isExportModalOpen}
-  title="Export Course Grades"
-  buttonLabel="Export"
-  fields={exportFields}
-  onClose={() => setIsExportModalOpen(false)}
-  onSave={async (data) => {
-    try {
-      // استدعاء دالة التصدير من الـ API
-      await exportCourseGrades(data.courseID, data.semester, data.academicYear);
-      toast.success("Export started successfully");
-      setIsExportModalOpen(false);
-    } catch (error) {
-      console.log(error);
-      toast.error("Export failed");
-    }
-  }}
-/>
+        open={isExportModalOpen}
+        title="Export Course Grades"
+        buttonLabel="Export"
+        fields={exportFields}
+        onClose={() => setIsExportModalOpen(false)}
+        onSave={async (data) => {
+          try {
+            // استدعاء دالة التصدير من الـ API
+            await exportCourseGrades(
+              data.courseID,
+              data.semester,
+              data.academicYear,
+            );
+            toast.success("Export started successfully");
+            setIsExportModalOpen(false);
+          } catch (error) {
+            console.log(error);
+            toast.error("Export failed");
+          }
+        }}
+      />
     </div>
   );
 };

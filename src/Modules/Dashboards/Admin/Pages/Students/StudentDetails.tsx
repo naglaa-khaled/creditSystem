@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { type FieldValues } from "react-hook-form";
-import { Box, Grid as Grid, Typography } from "@mui/material";
+import { Box, Grid, Typography, Chip } from "@mui/material";
 import DetailsLayout from "../../../../Shared/components/DetailsLayout/DetailsLayout";
 import {
   type ICourse,
@@ -31,7 +31,8 @@ const StudentDetails = () => {
   const [status, setStatus] = useState<string>(student?.status || "");
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [isCourseStatusModalOpen, setIsCourseStatusModalOpen] = useState(false);
-  const [selectedRegistration, setSelectedRegistration] = useState<ICourse | null>(null);
+  const [selectedRegistration, setSelectedRegistration] =
+    useState<ICourse | null>(null);
   const editFields = [
     { name: "fullName", label: "Full Name", required: true },
     { name: "email", label: "Email", type: "email", required: true },
@@ -78,7 +79,16 @@ const StudentDetails = () => {
     loadData();
   }, [id]);
   if (!student)
-    return <Typography sx={{ p: 4 }}>Loading Student Details...</Typography>;
+    return (
+      <Typography
+        sx={{
+          p: 4,
+          color: "text.primary",
+        }}
+      >
+        Loading Student Details...
+      </Typography>
+    );
   const hasCourses = courses && courses.length > 0;
   const handleSaveEdit = async (updatedData: FieldValues) => {
     try {
@@ -103,6 +113,7 @@ const StudentDetails = () => {
       toast.error(
         "Failed to update student details. Please try again later. ❌",
       );
+      setEditModalOpen(false); // Close the modal even if there's an error
     }
   };
   const handleUpdateMaxHours = async (data: FieldValues) => {
@@ -116,6 +127,7 @@ const StudentDetails = () => {
     } catch (error) {
       console.error("Update failed:", error);
       toast.error("Failed to update max hours. ❌");
+      setIsMaxHoursModalOpen(false); // Close the modal even if there's an error
     }
   };
   const handleUpdateStatus = async (data: FieldValues) => {
@@ -127,30 +139,34 @@ const StudentDetails = () => {
     } catch (error) {
       console.error("Update failed:", error);
       toast.error("Failed to update status. ❌");
+      setIsStatusModalOpen(false); // Close the modal even if there's an error
     }
   };
-const handleUpdateCourseStatus = async (data: FieldValues) => {
-  if (!selectedRegistration) return; 
+  const handleUpdateCourseStatus = async (data: FieldValues) => {
+    if (!selectedRegistration) return;
 
-  try {
-    await updateRegistrationStatus(
-      Number(id), 
-      selectedRegistration.courseID, 
-      data.newStatus
-    );
-    
-    setCourses(prev => prev.map(c => 
-      c.courseID === selectedRegistration.courseID 
-        ? {...c, status: data.newStatus} 
-        : c
-    ));
-    
-    setIsCourseStatusModalOpen(false);
-    toast.success("Course status updated successfully! ✅");
-  } catch {
-    toast.error("Failed to update course status. ❌");
-  }
-};
+    try {
+      await updateRegistrationStatus(
+        Number(id),
+        selectedRegistration.courseID,
+        data.newStatus,
+      );
+
+      setCourses((prev) =>
+        prev.map((c) =>
+          c.courseID === selectedRegistration.courseID
+            ? { ...c, status: data.newStatus }
+            : c,
+        ),
+      );
+
+      setIsCourseStatusModalOpen(false);
+      toast.success("Course status updated successfully! ✅");
+    } catch {
+      toast.error("Failed to update course status. ❌");
+      setIsCourseStatusModalOpen(false); // Close the modal even if there's an error
+    }
+  };
 
   return (
     <>
@@ -165,7 +181,29 @@ const handleUpdateCourseStatus = async (data: FieldValues) => {
           { id: "courseID", label: "Course ID" },
           { id: "courseName", label: "Course Name" },
           { id: "creditsHours", label: "Credits" },
-          { id: "status", label: "Status" },
+          {
+            id: "status",
+            label: "Status",
+            render: (row: ICourse) => (
+              <Chip
+                label={row.status}
+                color={
+                  row.status === "Registered"
+                    ? "primary"
+                    : row.status === "Waiting"
+                      ? "warning"
+                      : row.status === "In Progress"
+                        ? "secondary"
+                        : "default"
+                }
+                size="small"
+                sx={{
+                  fontWeight: 700,
+                  borderRadius: "8px",
+                }}
+              />
+            ),
+          },
           {
             id: "actions",
             label: "Actions",
@@ -189,10 +227,15 @@ const handleUpdateCourseStatus = async (data: FieldValues) => {
           <InfoField label="Academic Year" value={student?.year} />
           <InfoField label="Semester" value={student?.semester} />
           <InfoField label="Completed Hours" value={student?.completedHours} />
+          <InfoField
+            label="MaxAllowed Hours"
+            value={student?.maxAllowedHours}
+          />
+
           <Grid size={{ xs: 6, md: 4 }}>
             <Typography
               variant="caption"
-              color="text.secondary"
+              color="text.primary"
               sx={{ display: "block", mb: 0.5 }}
             >
               Max Hours
@@ -210,15 +253,27 @@ const handleUpdateCourseStatus = async (data: FieldValues) => {
           <Grid size={{ xs: 6, md: 4 }}>
             <Typography
               variant="caption"
-              color="text.secondary"
+              color="text.primary"
               sx={{ display: "block", mb: 0.5 }}
             >
               Student Status
             </Typography>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                {status || "Active"}
-              </Typography>
+              <Chip
+                label={status || "Active"}
+                color={
+                  (status || "Active") === "Active"
+                    ? "success"
+                    : (status || "Active") === "Suspended"
+                      ? "warning"
+                      : "info"
+                }
+                size="small"
+                sx={{
+                  fontWeight: 700,
+                  borderRadius: "8px",
+                }}
+              />
               <EditIcon
                 sx={{ fontSize: 16, cursor: "pointer", color: "primary.main" }}
                 onClick={() => setIsStatusModalOpen(true)}
@@ -301,7 +356,7 @@ const InfoField = ({ label, value, isGpa }: IInfoFieldProps) => (
   <Grid size={{ xs: 6, md: 4 }}>
     <Typography
       variant="caption"
-      color="text.secondary"
+      color="text.primary"
       sx={{ display: "block", mb: 0.5 }}
     >
       {label}
@@ -310,7 +365,7 @@ const InfoField = ({ label, value, isGpa }: IInfoFieldProps) => (
       variant="body2"
       sx={{
         fontWeight: 600,
-        color: isGpa ? "#38a169" : "#1a202c",
+        color: isGpa ? "success.main" : "text.primary",
       }}
     >
       {value !== undefined && value !== null && value !== "" ? value : "---"}

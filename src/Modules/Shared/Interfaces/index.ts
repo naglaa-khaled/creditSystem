@@ -5,6 +5,37 @@ export interface Column<T> {
   align?: "left" | "center" | "right";
   render?: (row: T) => React.ReactNode;
 }
+  export interface IPublishFormData {
+  level: string;
+  semester: string;
+  academicYear: string;
+}
+export interface IImportFormData {
+  courseId: string;
+  level: string;
+  academicYear: string;
+  semester: string;
+  file: File; // التأكد أن الملف من نوع File
+}
+
+export interface IPublishFormData {
+  level: string;
+  semester: string;
+  academicYear: string;
+}
+
+export interface ISearchFormData {
+  searchValue: string;
+  academicYear: string;
+  semester: string;
+  level: string;
+}
+
+export interface IExportFormData {
+  courseID: string;
+  academicYear: string;
+  semester: string;
+}
 // --- Student Related Interfaces ---
 export type studentId = number | string;
 export type CourseId = string | number;
@@ -12,6 +43,22 @@ export interface IUserProfile {
   fullName: string;
   email: string;
   role: string;
+}
+// في ملف الواجهات
+export interface IStudentData {
+  studentID: number;
+  studentName: string;
+  email: string;
+  status: string;
+  registrationDate: string;
+}
+
+export interface IStudentInOffering {
+  courseName: string;
+  instructorName: string;
+  semester: number;
+  year: number;
+  students: IStudentData[]; // هنا استخدمنا النوع الذي عرفناه للتو
 }
 
 export interface IStudent {
@@ -26,6 +73,7 @@ export interface IStudent {
   completedHours?: string | number;
   academicYear?: string;
   status?: string;
+  maxAllowedHours:number
 }
 export interface IFullStudentProfile {
   student: IStudent;
@@ -35,7 +83,11 @@ export interface IEnrolledStudent {
   studentID: string | number;
   studentName: string;
   status: string;
+  email:string;
+  registrationDate:string;
+  
 }
+export type CourseCategoryType = "UR" | "ENG" | "ISE" | "VIS" | "NLP" | "CNS" | "ROB";
 export interface IFullCourseProfile {
   courseID: string;
   courseName: string;
@@ -44,6 +96,7 @@ export interface IFullCourseProfile {
   level: string;
   semester: string;
   courseType: string;
+  courseCategory:CourseCategoryType;
   students: {
     studentID: string | number;
     studentName: string;
@@ -62,9 +115,11 @@ export interface ICourse {
   courseType?: string;
 }
 export interface ICoursePrerequisite {
-  prereqID: number;
+  prereqID: string;
   courseID: string;
-  prerequisiteCourseId: string;
+  courseName: string;
+  prerequisiteCourseID: string;
+  prerequisiteCourseName:string
 }
 export interface IAddCourse {
   courseId: string;
@@ -75,6 +130,7 @@ export interface IAddCourse {
   semester: number;
   courseType?: string;
   status?: string;
+  CourseCategory?: CourseCategoryType;
 }
 
 // --- API Responses ---
@@ -111,8 +167,8 @@ export interface Column<T> {
 export interface IDetailsLayoutProps<T> {
   title?: string;
   isAdmin: boolean;
-  tableTitle: string;
-  tableData: T[];
+  tableTitle?: string;
+  tableData?: T[];
   PageName: string;
   tableColumns: Column<T>[];
   onEdit?: () => void;
@@ -139,7 +195,7 @@ export interface IInstructor {
 // Schedual
 export interface ISchedule {
   courseName: string;
-  courseID: string;
+  courseID: string | number;
   day: string;
   startTime: string;
   endTime: string;
@@ -151,19 +207,59 @@ export interface ISchedule {
   id: string | number;
   level: number;
   semester: number;
-  "session-type": string;
+  sessionType: string;
+  instructorID:number
 }
-export interface IGrades {
-  studentID: string | number;
+export interface ICourseReviewed {
+  courseCode: string;
+  courseName: string;
+  category: string;
+  hours: number;
+  numericGrade: number | null;
+  percentage: number | null;
+  letterGrade: string | null;
+  gradePoints: number | null;
+}
+
+export interface IPreviewStudent {
+  studentID: number;
   studentName: string;
+  academicYear: number;
+  semester: number;
+  level: string;
+  semesterHours: number;
+  gpa: number;
+  cgpa: number;
+  gpau: number;
+  cgpau: number;
+  totalGradePoints: number;
+  totalPercentage: number;
+  overallLetter: string;
+  coursesReviewed: ICourseReviewed[];
+}
+
+export interface IPreviewResponse {
+  success: boolean;
+  message: string;
+  data: IPreviewStudent[];
+}
+export interface IGradeRow {
+  studentID: number;
+  studentName: string;
+
   courseID: string;
   courseName: string;
+
   courseLevel: number;
   courseSemester: number;
+
+  category: string;
+  hours: number;
+
+  numericGrade: number | string;
+  percentage: number | string;
   letterGrade: string;
-  numericGrade: number;
-  midterm: number;
-  final: number;
+  gradePoints: number | string;
 }
 
 export interface ICardStats {

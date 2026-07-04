@@ -60,6 +60,16 @@ const UsersPage = () => {
         { value: "student-affairs", label: "Student Affairs" },
       ],
     },
+    {
+      name: "isActive",
+      label: "Active Status",
+      select: true,
+      required: true,
+      options: [
+        { value: "active", label: "Active" },
+        { value: "inactive", label: "InActive" },
+      ],
+    },
   ];
   const loadDataFromApi = async () => {
     setIsLoading(true);
@@ -102,6 +112,8 @@ const UsersPage = () => {
         toast.error(
           "لا يمكن حذف هذا المستخدم نظراً لارتباطه بعمليات أخرى داخل النظام.",
         );
+        setDeleteModalOpen(false);
+        
 
         setDeleteModalOpen(false);
         setSelectedUserId(null);
@@ -109,17 +121,27 @@ const UsersPage = () => {
     }
   };
 
-
 const handleSaveUser = async (data: FieldValues) => {
   try {
     if (selectedUser) {
-      await updateUser(selectedUser.userID, data);
+      // نقوم بتجهيز الـ finalData مباشرة مع تحديد الخصائص التي نحتاجها
+      const finalData = {
+        fullName: data.fullName,
+        email: data.email,
+        role: data.role,
+        password: data.password || "KEEP_EXISTING_PASSWORD", // إذا كان فارغاً نرسل القيمة الرمزية
+        isActive: data.isActive === "active" // تحويل مباشر لـ boolean
+      };
+
+      await updateUser(selectedUser.userID, finalData);
       toast.success("User updated successfully");
     } else {
-      await addUser(data);
+      // عند الإضافة، نحول الـ isActive أيضاً
+      const newData = { ...data, isActive: data.isActive === "active" };
+      await addUser(newData);
       toast.success("User added successfully");
     }
-    
+
     setIsAddModalOpen(false);
     setIsEditModalOpen(false);
     setSelectedUser(null);
@@ -127,13 +149,22 @@ const handleSaveUser = async (data: FieldValues) => {
   } catch (error) {
     console.error("Save failed:", error);
     toast.error("An error occurred while saving.");
+    setIsAddModalOpen(false);
+    setIsEditModalOpen(false);
+    setSelectedUser(null);
   }
 };
 
   const filteredData = useMemo(() => {
-    return allUsers.filter((user) => {
-      const fullName = user?.fullName || "";
-      return fullName.toLowerCase().includes(searchTerm.toLowerCase());
+    if (!allUsers) return [];
+
+    return allUsers.filter((student) => {
+      const searchLower = searchTerm.toLowerCase();
+
+      const name = (student?.fullName || student?.fullName || "").toLowerCase();
+      const id = (student?.userID || "").toString().toLowerCase();
+
+      return name.includes(searchLower) || id.includes(searchLower);
     });
   }, [allUsers, searchTerm]);
 
@@ -183,7 +214,7 @@ const handleSaveUser = async (data: FieldValues) => {
 
   return (
     <div style={{ padding: isMobile ? "10px" : "20px" }}>
-      <h2 style={{ marginBottom: "20px", color: "var(--primary)" }}>
+      <h2 style={{ marginBottom: "20px", color: "primary.main" }}>
         Users Management
       </h2>
 
@@ -197,7 +228,10 @@ const handleSaveUser = async (data: FieldValues) => {
         }}
       >
         <Box sx={{ flex: 1 }}>
-          <FilterBar onSearch={(value: string) => setSearchTerm(value)} />
+          <FilterBar
+            onSearch={(value: string) => setSearchTerm(value)}
+            placeholder="Search by User name or ID..."
+          />
         </Box>
         <CustomButton
           label="Add User"
@@ -219,7 +253,7 @@ const handleSaveUser = async (data: FieldValues) => {
           }}
         >
           <CircularProgress size={50} />
-          <Typography variant="h6" sx={{ color: "var(--primary)" }}>
+          <Typography variant="h6" sx={{ color: "primary.main" }}>
             Loading Users...
           </Typography>
         </Box>
@@ -231,20 +265,20 @@ const handleSaveUser = async (data: FieldValues) => {
           detailsPath="/admin/Users/details"
           isAdmin={true}
           onDelete={handleOpenDeleteModal}
-          onEdit={handleOpenEditModal} 
-          showView={false} 
+          onEdit={handleOpenEditModal}
+          showView={false}
         />
       ) : (
         <Box
           sx={{
             textAlign: "center",
             py: 10,
-            border: "1px dashed #ccc",
+            border: `1px dashed ${theme.palette.divider}`,
             borderRadius: "8px",
-            backgroundColor: "#f9f9f9",
+            backgroundColor: "background.paper",
           }}
         >
-          <Typography variant="h6" color="var(--primary)">
+          <Typography variant="h6" color="primary.main">
             {searchTerm
               ? `No Users found matching "${searchTerm}"`
               : "No Users available."}
@@ -275,7 +309,14 @@ const handleSaveUser = async (data: FieldValues) => {
         onSave={handleSaveUser}
         title="Edit User"
         fields={userFields}
-        initialData={selectedUser || {}} 
+        initialData={
+          selectedUser
+            ? {
+                ...selectedUser,
+                isActive: selectedUser.isActive ? "active" : "inactive",
+              }
+            : {}
+        }
       />
     </div>
   );

@@ -3,9 +3,16 @@ import SharedTable from "../../../../Shared/components/SharedTable/SharedTable";
 import { FilterBar } from "../../../../Shared/components/FilterBar/FilterBar";
 import { getCourses } from "../../../../../API/SyudentAffairsData/Courses";
 import { type ICourse, type Column } from "../../../../Shared/Interfaces/index";
-import { Box, CircularProgress, Typography, useMediaQuery, useTheme } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import { SemesterCard } from "../../../../Shared/components/CourseCard/CourseCard";
 import SchoolIcon from "@mui/icons-material/School";
+import CustomButton from "../../../../Shared/components/Button/Button";
 const CoursePage = () => {
   const theme = useTheme();
 
@@ -41,8 +48,13 @@ const CoursePage = () => {
 
   const filteredData = useMemo(() => {
     return allCourses.filter((course) => {
-      const name = course.courseNameEn || "";
-      return name.toLowerCase().includes(searchTerm.toLowerCase());
+      const searchLower = searchTerm.toLowerCase();
+
+      return (
+        course.courseName?.toLowerCase().includes(searchLower) ||
+        course.courseNameAr?.toLowerCase().includes(searchLower) ||
+        course.courseID?.toString().toLowerCase().includes(searchLower)
+      );
     });
   }, [allCourses, searchTerm]);
   const groupedCourses = useMemo(() => {
@@ -57,8 +69,16 @@ const CoursePage = () => {
     return groups;
   }, [filteredData]);
 
-  const handleApiFilterChange = (type: "year" | "semester", value: string) => {
-    const updatedFilters = { ...activeApiFilters, [type]: value };
+  const handleApiFilterChange = (
+    type: "year" | "semester" | "academicYear",
+    value: string,
+  ) => {
+    if (type === "academicYear") return;
+
+    const updatedFilters = {
+      ...activeApiFilters,
+      [type]: value,
+    };
     setActiveApiFilters(updatedFilters);
     loadDataFromApi(updatedFilters.year, updatedFilters.semester);
   };
@@ -78,9 +98,12 @@ const CoursePage = () => {
 
   return (
     <div style={{ padding: "20px" }}>
-      <h2 style={{ marginBottom: "20px", color: "var(--primary)" }}>
-        Courses Management
-      </h2>
+      <Typography
+        variant="h5"
+        sx={{ mb: 3, color: "primary.main", fontWeight: 600 }}
+      >
+        Grade Management
+      </Typography>
       <Box
         sx={{
           display: "flex",
@@ -93,8 +116,11 @@ const CoursePage = () => {
         <Box sx={{ flex: 1 }}>
           <FilterBar
             onSearch={(value: string) => setSearchTerm(value)}
+            showYear
+            showSemester
+            showAcademicYear={false}
             onFilterChange={handleApiFilterChange}
-            
+            placeholder="Search by course name or ID..."
           />
         </Box>
       </Box>
@@ -110,7 +136,6 @@ const CoursePage = () => {
           mb: 5,
         }}
       >
-    
         {isLoading ? (
           <Box
             sx={{
@@ -123,9 +148,9 @@ const CoursePage = () => {
             }}
           >
             <CircularProgress size={50} />
-          <Typography variant="h6" sx={{ color: "var(--primary)" }}>
-            Loading Courses...
-          </Typography>
+            <Typography variant="h6" sx={{ color: "primary.main" }}>
+              Loading Courses...
+            </Typography>
           </Box>
         ) : Object.keys(groupedCourses).length > 0 ? (
           Object.keys(groupedCourses)
@@ -146,8 +171,8 @@ const CoursePage = () => {
 
               return (
                 <SemesterCard
-                text="Courses"
-                icon={<SchoolIcon />}
+                  text="Courses"
+                  icon={<SchoolIcon />}
                   key={key}
                   level={level}
                   semester={semester}
@@ -160,28 +185,34 @@ const CoursePage = () => {
               );
             })
         ) : (
-          <Box sx={{
-            gridColumn: "1/-1",
-            textAlign: "center",
-            py: 10,
-            border: "1px dashed #ccc",
-            borderRadius: "16px",
-            backgroundColor: "#f9f9f9"
-          }}>
-            <Typography variant="h6" sx={{ color: "var(--primary)", opacity: 0.7 }}>
-              {searchTerm 
-                ? `No courses found matching "${searchTerm}"` 
+          <Box
+            sx={{
+              gridColumn: "1/-1",
+              textAlign: "center",
+              py: 10,
+              borderRadius: "16px",
+              border: "1px dashed",
+              borderColor: "divider",
+              backgroundColor: "background.paper",
+            }}
+          >
+            <Typography
+              variant="h6"
+              sx={{ color: "primary.main", opacity: 0.7 }}
+            >
+              {searchTerm
+                ? `No courses found matching "${searchTerm}"`
                 : "No courses available for the selected filters."}
             </Typography>
           </Box>
         )}
       </Box>
-      {selectedGroup &&Object.keys(groupedCourses).length > 0 && (
+      {selectedGroup && Object.keys(groupedCourses).length > 0 && (
         <Box
           sx={{
             mt: 4,
             p: 3,
-            bgcolor: "#fff",
+            bgcolor: "background.paper",
             borderRadius: "16px",
             boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
             animation: "fadeIn 0.4s ease-out",
@@ -195,21 +226,15 @@ const CoursePage = () => {
               mb: 3,
             }}
           >
-            <h3 style={{ margin: 0, color: "var(--primary)" }}>
+            <h3 style={{ margin: 0, color: "primary.main" }}>
               Courses - Level {selectedGroup.level} / Semester{" "}
               {selectedGroup.semester}
             </h3>
-            <button
+            <CustomButton
+              label="Close"
+              variantType="secondary"
               onClick={() => setSelectedGroup(null)}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                color: "#666",
-              }}
-            >
-              Close [x]
-            </button>
+            />
           </Box>
 
           <SharedTable

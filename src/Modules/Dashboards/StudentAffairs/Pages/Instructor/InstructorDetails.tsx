@@ -21,8 +21,16 @@ const InstructorDetails = () => {
   }, [id]);
 
   if (!instructor)
-    return <Typography sx={{ p: 4 }}>Loading Instructor Details...</Typography>;
-
+    return (
+      <Typography
+        sx={{
+          p: 4,
+          color: "text.primary",
+        }}
+      >
+        Loading Instructor Details...
+      </Typography>
+    );
   return (
     <>
       <DetailsLayout
@@ -65,7 +73,13 @@ const InfoField = ({
     >
       {label}
     </Typography>
-    <Typography variant="body2" sx={{ fontWeight: 600, color: "#1a202c" }}>
+    <Typography
+      variant="body2"
+      sx={{
+        fontWeight: 600,
+        color: "text.primary",
+      }}
+    >
       {value || "---"}
     </Typography>
   </Grid>

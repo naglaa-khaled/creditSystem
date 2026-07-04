@@ -22,7 +22,6 @@ const InstructorDetails = () => {
   const editInstructorFields = [
     { name: "fullName", label: "Full Name", required: true },
     { name: "email", label: "Email Address", type: "email", required: true },
-    { name: "instructorID", label: "Instructor ID", required: true },
   ];
 
   useEffect(() => {
@@ -33,57 +32,68 @@ const InstructorDetails = () => {
     loadData();
   }, [id]);
 
-const handleSaveEdit = async (updatedData: FieldValues) => {
-  try {
-    if (!id) return;
+  const handleSaveEdit = async (updatedData: FieldValues) => {
+    try {
+      if (!id) return;
 
-    const response = await updateInstructor(id, updatedData as IInstructor);
+      const response = await updateInstructor(id, updatedData as IInstructor);
 
-    if (response && response.success) {
-      setInstructor((prev) => (prev ? { ...prev, ...updatedData } : null));
-      setEditModalOpen(false);
-      
-      toast.success("Instructor details updated successfully!");
-    } else {
-      if (response && response.message) {
-        toast.error(response.message, { rtl: true });
+      if (response && response.success) {
+        setInstructor((prev) => (prev ? { ...prev, ...updatedData } : null));
+        setEditModalOpen(false);
+
+        toast.success("Instructor details updated successfully!");
       } else {
-        toast.error("Failed to update instructor details.");
+        if (response && response.message) {
+          toast.error(response.message, { rtl: true });
+        } else {
+          toast.error("Failed to update instructor details.");
+        }
+      }
+    } catch (error: unknown) {
+      console.error("Update failed:", error);
+
+      type ErrorWithResponse = {
+        response?: {
+          data?:
+            | {
+                message?: string;
+              }
+            | string;
+        };
+      };
+
+      const responseData =
+        typeof error === "object" && error !== null
+          ? (error as ErrorWithResponse).response?.data
+          : undefined;
+
+      const serverMessage =
+        typeof responseData === "string"
+          ? responseData
+          : typeof responseData === "object" && responseData !== null
+            ? responseData.message
+            : undefined;
+
+      if (typeof serverMessage === "string" && serverMessage) {
+        toast.error(serverMessage, { rtl: true });
+      } else {
+        toast.error("An unexpected error occurred while updating.");
       }
     }
-  } catch (error: unknown) {
-    console.error("Update failed:", error);
-
-    type ErrorWithResponse = {
-      response?: {
-        data?: {
-          message?: string;
-        } | string;
-      };
-    };
-
-    const responseData =
-      typeof error === "object" && error !== null
-        ? (error as ErrorWithResponse).response?.data
-        : undefined;
-
-    const serverMessage =
-      typeof responseData === "string"
-        ? responseData
-        : typeof responseData === "object" && responseData !== null
-        ? responseData.message
-        : undefined;
-
-    if (typeof serverMessage === "string" && serverMessage) {
-      toast.error(serverMessage, { rtl: true });
-    } else {
-      toast.error("An unexpected error occurred while updating.");
-    }
-  }
-};
+  };
 
   if (!instructor)
-    return <Typography sx={{ p: 4 }}>Loading Instructor Details...</Typography>;
+    return (
+      <Typography
+        sx={{
+          p: 4,
+          color: "text.primary",
+        }}
+      >
+        Loading Instructor Details...
+      </Typography>
+    );
 
   return (
     <>
@@ -136,10 +146,8 @@ const InfoField = ({
     >
       {label}
     </Typography>
-    <Typography variant="body2" sx={{ fontWeight: 600, color: "#1a202c" }}>
-      {value !== undefined && value !== null && value !== ""
-        ? value
-        : "---"}
+    <Typography variant="body2" sx={{ fontWeight: 600, color: "text.primary" }}>
+      {value !== undefined && value !== null && value !== "" ? value : "---"}
     </Typography>
   </Grid>
 );

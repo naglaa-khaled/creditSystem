@@ -34,6 +34,7 @@ const SchedaulPage = () => {
     year: "",
     semester: "",
   });
+  const [courseOfferings, setCourseOfferings] = useState<ISchedule[]>([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [scheduleToEdit, setScheduleToEdit] = useState<ISchedule | null>(null);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -43,18 +44,19 @@ const SchedaulPage = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const SchedualField = [
     { name: "courseID", label: "Course ID", required: true },
-    { name: "instructorId", label: "Instructor ID", required: true },
+    { name: "instructorID", label: "Instructor ID", required: true },
     {
       name: "day",
       label: "Day",
       select: true,
       required: true,
       options: [
-        { value: "Sunday", label: "Sunday" },
-        { value: "Monday", label: "Monday" },
-        { value: "Tuesday", label: "Tuesday" },
+        { value: "Saturday", label: "Saturday" },
+        { value: "sunday", label: "Sunday" },
+        { value: "monday", label: "Monday" },
+        { value: "tuesday", label: "Tuesday" },
         { value: "Wednesday", label: "Wednesday" },
-        { value: "Thursday", label: "Thursday" },
+        { value: "thursday", label: "Thursday" },
       ],
     },
     {
@@ -116,6 +118,7 @@ const SchedaulPage = () => {
     try {
       const data = await getSchedules(year, semester);
       setAllSchedual(data);
+      setCourseOfferings(data);
     } catch (error) {
       console.error("Failed to load Scheduals:", error);
     } finally {
@@ -127,8 +130,13 @@ const SchedaulPage = () => {
     loadDataFromApi();
   }, []);
   const handleOpenEditModal = (lecture: ISchedule) => {
-    console.log("البيانات الكاملة القادمة من الـ API:", lecture);
-    setScheduleToEdit(lecture);
+    const course = courseOfferings.find((c) => c.courseID === lecture.courseID);
+
+    setScheduleToEdit({
+      ...lecture,
+      courseName: course?.courseName ?? "",
+    });
+
     setIsEditModalOpen(true);
   };
 
@@ -157,47 +165,76 @@ const SchedaulPage = () => {
       } catch (error) {
         console.error("Delete failed", error);
         toast.error("Failed to delete schedule.");
+        setDeleteModalOpen(false);
       }
     }
   };
   // add Schedual handler
   const handleSaveSchedual = async (data: FieldValues) => {
-    console.log("Submitting new schedule data:", data);
     try {
-      await addSchedule(data);
+      const payload = {
+        courseID: data.courseID,
+        instructorID: Number(data.instructorID),
+        semester: Number(data.semester),
+        year: Number(data.year),
+        capacity: Number(data.capacity),
+        day: data.day,
+        sessionType: data.sessionType,
+        startTime: `${data.startTime}:00`,
+        endTime: `${data.endTime}:00`,
+        room: data.room,
+      };
+      console.log(payload);
+      await addSchedule(payload);
       setIsAddModalOpen(false);
       loadDataFromApi();
       toast.success("New schedule added successfully!");
     } catch (error) {
       console.error("Add failed", error);
       toast.error("Failed to add schedule.");
+      setIsAddModalOpen(false);
     }
   };
-  const handleUpdateSchedule = async (data: FieldValues) => {
-    if (scheduleToEdit) {
-      console.log("Updating schedule ID:", scheduleToEdit.id);
-      console.log("Updated values:", data);
-      try {
-        await updateSchedule(scheduleToEdit.id, data);
+const handleUpdateSchedule = async (data: FieldValues) => {
+  if (!scheduleToEdit) return;
 
-        setIsEditModalOpen(false);
-        setScheduleToEdit(null);
-        loadDataFromApi();
-        toast.success("Schedule updated successfully!");
-      } catch (error) {
-        console.error("Update failed", error);
-        toast.error("Failed to update schedule.");
-      }
-    }
+  const payload = {
+    courseID: data.courseID,
+    instructorID: Number(data.instructorID),
+    semester: Number(data.semester),
+  year: Number(data.level), // السيرفر عايز year
+    capacity: Number(data.capacity),
+    day: data.day,
+    sessionType: data.sessionType,
+    startTime: data.startTime,
+    endTime: data.endTime,
+    room: data.room,
   };
+
+  console.log("Payload:", payload);
+
+  try {
+    await updateSchedule(scheduleToEdit.id, payload);
+
+    toast.success("Schedule updated successfully!");
+    setIsEditModalOpen(false);
+    setScheduleToEdit(null);
+    loadDataFromApi();
+  } catch (error) {
+    console.error(error);
+    toast.error("Failed to update schedule.");
+  }
+};
   const filteredData = useMemo(() => {
-    return allSchedual.filter((schedaul) =>
-      (schedaul.courseName || "")
-        .toLowerCase()
-        .includes((searchTerm || "").toLowerCase()),
-    );
-  }, [allSchedual, searchTerm]);
+    return allSchedual.filter((schedual) => {
+      const searchLower = searchTerm.toLowerCase();
 
+      return (
+        schedual.courseName?.toLowerCase().includes(searchLower) ||
+        schedual.courseID?.toString().toLowerCase().includes(searchLower)
+      );
+    });
+  }, [allSchedual, searchTerm]);
   const groupedSchedaul = useMemo(() => {
     const groups: Record<string, ISchedule[]> = {};
 
@@ -222,15 +259,23 @@ const SchedaulPage = () => {
     }
   }, [groupedSchedaul, selectedGroup]);
 
-  const handleApiFilterChange = (type: "year" | "semester", value: string) => {
-    const updatedFilters = { ...activeApiFilters, [type]: value };
+  const handleApiFilterChange = (
+    type: "year" | "semester" | "academicYear",
+    value: string,
+  ) => {
+    if (type === "academicYear") return;
+
+    const updatedFilters = {
+      ...activeApiFilters,
+      [type]: value,
+    };
     setActiveApiFilters(updatedFilters);
     loadDataFromApi(updatedFilters.year, updatedFilters.semester);
   };
 
   return (
     <div style={{ padding: isMobile ? "10px" : "20px" }}>
-      <h2 style={{ marginBottom: "20px", color: "var(--primary)" }}>
+      <h2 style={{ marginBottom: "20px", color: "primary.main" }}>
         Schedual Management
       </h2>
 
@@ -247,6 +292,7 @@ const SchedaulPage = () => {
           <FilterBar
             onSearch={(value: string) => setSearchTerm(value)}
             onFilterChange={handleApiFilterChange}
+            placeholder="Search by course name or ID..."
           />
         </Box>
         <CustomButton

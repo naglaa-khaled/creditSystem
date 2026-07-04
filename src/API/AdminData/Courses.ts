@@ -5,7 +5,28 @@ import {
   type IFullCourseProfile,
   type IAddCourse,
   type ICoursePrerequisite,
+  type IStudentData,
+  type ISchedule,
 } from "../../Modules/Shared/Interfaces";
+import { AxiosError } from "axios";
+
+interface ErrorResponse {
+  message?: string;
+}
+
+const getErrorMessage = (error: unknown, defaultMessage = ""): string => {
+  if (error instanceof AxiosError) {
+    const data = error.response?.data as ErrorResponse | string | undefined;
+
+    if (typeof data === "string") {
+      return data;
+    }
+
+    return data?.message ?? defaultMessage;
+  }
+
+  return defaultMessage;
+};
 
 // Courses.ts (API file)
 // Courses.ts (API file)
@@ -88,29 +109,22 @@ export const getCourseProfile = async (
   }
 };
 
-export const getAllPrerequisites = async (): Promise<ICoursePrerequisite[]> => {
+export const getPrerequisitesByCourseId = async (
+  courseId: string,
+): Promise<ICoursePrerequisite[]> => {
   try {
-    const res = await axiosInstance.get(`Admin/view-all-prerequisites`);
-    return res.data;
+    const res = await axiosInstance.get(`Admin/view-prerequisites/${courseId}`);
+
+    return res.data.data || [];
   } catch (error) {
-    console.warn("API Error, using fallback Mock Data:", error);
-    return [
-      {
-        prereqID: 3,
-        courseID: "ENG111",
-        prerequisiteCourseId: "ENG112"
-      },
-      {
-        prereqID: 4,
-        courseID: "ENG111",
-        prerequisiteCourseId: "3"
-      },
-      {
-        prereqID: 1007,
-        courseID: "80",
-        prerequisiteCourseId: "30"
-      }
-    ];
+    const axiosError = error as AxiosError;
+
+    if (axiosError.response?.status === 404) {
+      console.warn(`No prerequisites found for course: ${courseId}`);
+      return [];
+    }
+    console.error("Failed to fetch prerequisites:", error);
+    throw error;
   }
 };
 export const getCourses = async (
@@ -147,6 +161,8 @@ export const updateCourse = async (
           level: Number(updatedData.level),
           semester: Number(updatedData.semester),
           courseType: updatedData.courseType || "",
+          CourseCategory:
+            updatedData.CourseCategory ?? updatedData.courseCategory ?? "",
         },
       },
     );
@@ -156,47 +172,126 @@ export const updateCourse = async (
     return { success: false };
   }
 };
-// إضافة دالة لحذف تسجيل طالب في مادة
-export const dropStudentRegistration = async (
-  studentId: number,
-  courseId: string,
+// في ملف API الخاص بك
+export const getOfferingsByCourse = async (
+  courseID: string,
+): Promise<ISchedule[]> => {
+  try {
+    const res = await axiosInstance.get(
+      `Admin/course-offerings-by-course/${courseID}`,
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching course offerings:", error);
+    return [];
+  }
+};
+export const setupCourseOfferingAndSchedule = async (
+  scheduleData: Partial<ISchedule>,
 ): Promise<IApiResponse & { message?: string }> => {
   try {
-    const response = await axiosInstance.delete(
-      `Admin/drop-student-registration`,
-      {
-        params: { studentId, courseId },
-      },
+    const response = await axiosInstance.post(
+      `Admin/setup-course-offering-and-schedule`,
+      scheduleData,
     );
-    return { success: response.status === 200 };
+    return { success: response.status === 200 || response.status === 201 };
   } catch (error: unknown) {
-    console.error("Drop Registration Error:", error);
+    console.error("Error setting up course schedule:", error);
 
-    let serverMessage = "Failed to drop registration";
-    const errData =
-      typeof error === "object" && error !== null
-        ? (error as { response?: { data?: unknown } }).response?.data
-        : undefined;
-    if (
-      errData &&
-      typeof errData === "object" &&
-      "message" in errData &&
-      typeof (errData as { message?: unknown }).message === "string"
-    ) {
-      serverMessage = (errData as { message: string }).message;
+    let serverMessage = "Failed to setup course offering";
+    if (typeof error === "object" && error !== null && "response" in error) {
+      const errData = (error as { response?: { data?: unknown } }).response
+        ?.data;
+      if (typeof errData === "string") {
+        serverMessage = errData;
+      } else if (
+        errData &&
+        typeof errData === "object" &&
+        "message" in errData &&
+        typeof errData.message === "string"
+      ) {
+        serverMessage = errData.message;
+      }
     }
-
-    return {
-      success: false,
-      message: serverMessage,
-    };
+    return { success: false, message: serverMessage };
   }
 };
 
-// إضافة دالة لتحديث حالة تسجيل طالب
-export const updateRegistrationStatus = async (
+export const getStudentsInOffering = async (
+  offeringId: number,
+): Promise<IStudentData[]> => {
+  try {
+    const res = await axiosInstance.get(
+      `Admin/get-students-in-offering/${offeringId}`,
+    );
+    const studentsList = res.data.students || [];
+    return studentsList;
+  } catch (error) {
+    console.error("Error fetching students in offering:", error);
+    return [];
+  }
+};
+
+export const getStudentsByOfferingId = async (
+  offeringId: number,
+): Promise<IStudentData[]> => {
+  // داتا وهمية للطلاب
+  if (offeringId === 101)
+    return [
+      {
+        studentID: 3,
+        studentName: "Mona Saeed",
+        email: "mona@gmail.com",
+        status: "Registered",
+        registrationDate: "9:5:0",
+      },
+      {
+        studentID: 16,
+        studentName: "Maryam Emad",
+        email: "maryam@gmail.com",
+        status: "Registered",
+        registrationDate: "9",
+      },
+    ];
+  return [];
+};
+
+export const adminManualRegistration = async (
   studentId: number,
-  courseId: string,
+  offeringId: number,
+): Promise<IApiResponse & { message?: string }> => {
+  try {
+    const response = await axiosInstance.post(
+      `Admin/admin-manual-registration`,
+      null,
+      {
+        params: { studentId, offeringId },
+      },
+    );
+    return { success: response.status === 200 || response.status === 201 };
+  } catch (error: unknown) {
+    let serverMessage = "Failed to register";
+    if (typeof error === "object" && error !== null && "response" in error) {
+      const errData = (error as { response?: { data?: unknown } }).response
+        ?.data;
+      if (typeof errData === "string") {
+        serverMessage = errData;
+      } else if (
+        errData &&
+        typeof errData === "object" &&
+        "message" in errData &&
+        typeof errData.message === "string"
+      ) {
+        serverMessage = errData.message;
+      }
+    }
+    return { success: false, message: serverMessage };
+  }
+};
+
+export const updateRegistrationStatus = async (
+  studentId: number | string,
+  offeringId: number,
   newStatus: string,
 ): Promise<IApiResponse & { message?: string }> => {
   try {
@@ -204,30 +299,127 @@ export const updateRegistrationStatus = async (
       `Admin/update-registration-status`,
       null,
       {
-        params: { studentId, courseId, newStatus },
+        params: { studentId, offeringId, newStatus },
       },
     );
     return { success: response.status === 200 };
   } catch (error: unknown) {
-    console.error("Update Status Error:", error);
-
-    let message = "Failed to update status";
+    let serverMessage = "Failed to update status";
     if (typeof error === "object" && error !== null && "response" in error) {
       const errData = (error as { response?: { data?: unknown } }).response
         ?.data;
-      if (
+      if (typeof errData === "string") {
+        serverMessage = errData;
+      } else if (
         errData &&
         typeof errData === "object" &&
         "message" in errData &&
-        typeof (errData as { message?: unknown }).message === "string"
+        typeof errData.message === "string"
       ) {
-        message = (errData as { message: string }).message;
+        serverMessage = errData.message;
       }
     }
+    return { success: false, message: serverMessage };
+  }
+};
+
+export const dropStudentRegistration = async (
+  studentId: number,
+  offeringId: number,
+): Promise<IApiResponse & { message?: string }> => {
+  try {
+    const response = await axiosInstance.delete(
+      `Admin/drop-student-registration`,
+      {
+        params: { studentId, offeringId },
+      },
+    );
+    return { success: response.status === 200 };
+  } catch (error: unknown) {
+    let serverMessage = "Failed to drop";
+    if (typeof error === "object" && error !== null && "response" in error) {
+      const errData = (error as { response?: { data?: unknown } }).response
+        ?.data;
+      if (typeof errData === "string") {
+        serverMessage = errData;
+      } else if (
+        errData &&
+        typeof errData === "object" &&
+        "message" in errData &&
+        typeof errData.message === "string"
+      ) {
+        serverMessage = errData.message;
+      }
+    }
+    return { success: false, message: serverMessage };
+  }
+};
+export const deleteOffering = async (
+  offeringId: number,
+): Promise<IApiResponse & { message?: string }> => {
+  try {
+    const response = await axiosInstance.delete(
+      `Admin/delete-offering/${offeringId}`,
+    );
+    return { success: response.status === 200 };
+  } catch (error: unknown) {
+    return {
+      success: false,
+      message: getErrorMessage(error, "Failed to delete offering"), // استخدام الدالة الموحدة
+    };
+  }
+};
+export const addPrerequist = async (
+  courseId: string,
+  prerequisiteCourseID: string,
+): Promise<IApiResponse> => {
+  try {
+    const response = await axiosInstance.post(
+      "Admin/set-course-prerequisite",
+      null,
+      {
+        params: {
+          courseId,
+          PrerequisiteCourseID: prerequisiteCourseID,
+        },
+      },
+    );
+
+    return {
+      success: response.status === 200 || response.status === 201,
+      message: response.data?.message,
+    };
+  } catch (error: unknown) {
+    console.error("Add Prerequisite Error:", error);
 
     return {
       success: false,
-      message,
+      message: getErrorMessage(error),
+    };
+  }
+};
+// في ملف API/AdminData/Courses.ts
+
+export const removePrerequisite = async (
+  courseId: string,
+  prerequisiteCourseID: string // إضافة المعامل الثاني
+): Promise<IApiResponse> => {
+  try {
+    // تعديل المسار ليتطابق مع الـ Swagger: /api/Admin/remove-prerequisite/{courseId}/{PrerequisiteCourseID}
+    const response = await axiosInstance.delete<ErrorResponse>(
+      `Admin/remove-prerequisite/${courseId}/${prerequisiteCourseID}`,
+    );
+
+    return {
+      success: response.status === 200,
+      message: response.data?.message,
+    };
+  } catch (error: unknown) {
+    console.error("Remove Prerequisite Error:", error);
+
+    return {
+      success: false,
+      message: getErrorMessage(error),
     };
   }
 };

@@ -31,6 +31,7 @@ interface DynamicFormModalProps {
   title: string;
   fields: FieldConfig[];
   initialData?: any;
+  buttonLabel?: string;
 }
 
 const FormModal = ({
@@ -40,6 +41,7 @@ const FormModal = ({
   title,
   fields,
   initialData,
+  buttonLabel,
 }: DynamicFormModalProps) => {
   const {
     control,
@@ -103,7 +105,7 @@ const FormModal = ({
                 <TextField
                   inputProps={{
                     ...(field.disabled ? { readOnly: true } : {}),
-                    ...(field as any).inputProps, 
+                    ...(field as any).inputProps,
                   }}
                   fullWidth
                   label={field.label}
@@ -128,8 +130,15 @@ const FormModal = ({
                   }}
                   error={!!errors[field.name]}
                   helperText={errors[field.name]?.message as string}
-                  value={value ?? ""}
-                  onChange={onChange}
+                  value={field.type === "file" ? undefined : (value ?? "")}
+                  onChange={(e) => {
+                    if (field.type === "file") {
+                      const input = e.target as HTMLInputElement;
+                      onChange(input.files?.[0] ?? null);
+                    } else {
+                      onChange(e.target.value);
+                    }
+                  }}
                   disabled={field.disabled}
                   InputProps={{
                     ...(field.disabled ? { readOnly: true } : {}),
@@ -175,7 +184,7 @@ const FormModal = ({
             variantType="primary"
           />
           <CustomButton
-            label={initialData ? "Save Changes" : "Add Item"}
+            label={buttonLabel ?? (initialData ? "Save Changes" : "Add Item")}
             variantType="primary"
             onClick={handleSubmit(onSubmit)}
           />

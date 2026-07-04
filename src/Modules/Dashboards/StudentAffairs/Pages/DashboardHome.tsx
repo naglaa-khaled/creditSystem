@@ -31,7 +31,7 @@ const DashboardHome = () => {
     totalCourses: 0,
   });
   const [recentStudents, setRecentStudents] = useState<IStudent[]>([]);
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
 
   const location = useLocation();
   const isAdmin = location.pathname.startsWith("/admin");
@@ -40,28 +40,28 @@ const DashboardHome = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-      const statsData = await getDashboardStats();
-      const studentsData = await getRecentStudent();
+        const statsData = await getDashboardStats();
+        const studentsData = await getRecentStudent();
 
-      setStats(statsData);
-      setRecentStudents(Array.isArray(studentsData) ? studentsData : []);
-    } catch (error) {
-      console.error("Error fetching dashboard data:", error);
-    } finally {
-      setLoading(false); 
-    }
-  };
-  fetchData();
-}, []);
+        setStats(statsData);
+        setRecentStudents(Array.isArray(studentsData) ? studentsData : []);
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   return (
-    <Box sx={{ p: 3, backgroundColor: "#f9fafb", minHeight: "100vh" }}>
+    <Box sx={{ p: 3, backgroundColor: "background.default", minHeight: "100vh" }}>
       <Typography
         variant="h5"
         sx={{
           fontWeight: "bold",
           mb: 2,
-          color: "var(--primary)",
+          color: "primary.main",
           fontSize: "1.8rem",
         }}
       >
@@ -74,7 +74,7 @@ const DashboardHome = () => {
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <SharedCard
-            icon={<SchoolIcon sx={{ fontSize: 40, color: "var(--primary)" }} />}
+            icon={<SchoolIcon sx={{ fontSize: 40, color: "primary.main" }} />}
             title="Total Students"
             value={stats.totalStudents}
             loading={loading}
@@ -82,7 +82,7 @@ const DashboardHome = () => {
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <SharedCard
-            icon={<PersonIcon sx={{ fontSize: 40, color: "var(--primary)" }} />}
+            icon={<PersonIcon sx={{ fontSize: 40, color: "primary.main" }} />}
             title="Total Professors"
             value={stats.totalInstructors}
             loading={loading}
@@ -90,9 +90,7 @@ const DashboardHome = () => {
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <SharedCard
-            icon={
-              <MenuBookIcon sx={{ fontSize: 40, color: "var(--primary)" }} />
-            }
+            icon={<MenuBookIcon sx={{ fontSize: 40, color: "primary.main" }} />}
             title="Total Courses"
             value={stats.totalCourses}
             loading={loading}
@@ -114,42 +112,64 @@ const DashboardHome = () => {
               Recent Students
             </Typography>
             <List>
-  {loading
-    ? // لو بيحمل، اعرض 5 سطور وهمية (Skeleton)
-      [1, 2, 3, 4, 5].map((item) => (
-        <Box key={item}>
-          <ListItem sx={{ px: 0, py: 1.5 }}>
-            <Skeleton variant="circular" width={40} height={40} sx={{ mr: 2 }} />
-            <ListItemText
-              primary={<Skeleton variant="text" width="40%" height={25} />}
-              secondary={<Skeleton variant="text" width="60%" height={20} />}
-            />
-          </ListItem>
-          {item < 5 && <Divider />}
-        </Box>
-      ))
-    : // لو خلص تحميل، اعرض الداتا الحقيقية
-      recentStudents.map((student, index) => {
-        const displayName = student.nameEn || student.fullName || "N/A";
-        return (
-          <Box key={student.studentID}>
-            <ListItem sx={{ px: 0, py: 1.5 }}>
-              <Avatar sx={{ bgcolor: "#EEF2FF", color: "#5D5FEF", mr: 2, fontWeight: "bold" }}>
-                {displayName[0]?.toUpperCase()}
-              </Avatar>
-              <ListItemText
-                primary={<Typography sx={{ fontWeight: "600" }}>{displayName}</Typography>}
-                secondary={`${student.email} | Year ${student.year}`}
-              />
-              <Typography variant="caption" color="text.secondary">
-                Semester: {student.semester}
-              </Typography>
-            </ListItem>
-            {index < recentStudents.length - 1 && <Divider />}
-          </Box>
-        );
-      })}
-</List>
+              {loading
+                ? // لو بيحمل، اعرض 5 سطور وهمية (Skeleton)
+                  [1, 2, 3, 4, 5].map((item) => (
+                    <Box key={item}>
+                      <ListItem sx={{ px: 0, py: 1.5 }}>
+                        <Skeleton
+                          variant="circular"
+                          width={40}
+                          height={40}
+                          sx={{ mr: 2 }}
+                        />
+                        <ListItemText
+                          primary={
+                            <Skeleton variant="text" width="40%" height={25} />
+                          }
+                          secondary={
+                            <Skeleton variant="text" width="60%" height={20} />
+                          }
+                        />
+                      </ListItem>
+                      {item < 5 && <Divider />}
+                    </Box>
+                  ))
+                : // لو خلص تحميل، اعرض الداتا الحقيقية
+                  recentStudents.map((student, index) => {
+                    const displayName =
+                      student.nameEn || student.fullName || "N/A";
+                    return (
+                      <Box key={student.studentID}>
+                        <ListItem sx={{ px: 0, py: 1.5 }}>
+                          <Avatar
+                            sx={{
+                              border: "1px solid #ffffff",
+                              bgcolor: "primary.light",
+                              color: "primary.main",
+                              mr: 2,
+                              fontWeight: "bold",
+                            }}
+                          >
+                            {displayName[0]?.toUpperCase()}
+                          </Avatar>
+                          <ListItemText
+                            primary={
+                              <Typography sx={{ fontWeight: "600" }}>
+                                {displayName}
+                              </Typography>
+                            }
+                            secondary={`${student.email} | Year ${student.year}`}
+                          />
+                          <Typography variant="caption" color="text.secondary">
+                            Semester: {student.semester}
+                          </Typography>
+                        </ListItem>
+                        {index < recentStudents.length - 1 && <Divider />}
+                      </Box>
+                    );
+                  })}
+            </List>
             <Button
               component={Link}
               to={`${basePath}/students`}
@@ -157,7 +177,7 @@ const DashboardHome = () => {
               variant="contained"
               sx={{
                 mt: 2,
-                backgroundColor: "#5D5FEF",
+                backgroundColor: "primary.main",
                 textTransform: "none",
                 borderRadius: 2,
               }}
@@ -188,8 +208,7 @@ const DashboardHome = () => {
                 variant="contained"
                 startIcon={<PersonIcon />}
                 sx={{
-                  backgroundColor: "#eef2ff",
-                  color: "#3730a3",
+                  backgroundColor: "primary.main",
                   boxShadow: "none",
                   textTransform: "none",
                   justifyContent: "flex-start",
@@ -205,8 +224,7 @@ const DashboardHome = () => {
                 variant="contained"
                 startIcon={<SchoolIcon />}
                 sx={{
-                  backgroundColor: "#eef2ff",
-                  color: "#3730a3",
+                  backgroundColor: "primary.main",
                   boxShadow: "none",
                   textTransform: "none",
                   justifyContent: "flex-start",
@@ -222,8 +240,7 @@ const DashboardHome = () => {
                 variant="contained"
                 startIcon={<MenuBookIcon />}
                 sx={{
-                  backgroundColor: "#eef2ff",
-                  color: "#3730a3",
+                  backgroundColor: "primary.main",
                   boxShadow: "none",
                   textTransform: "none",
                   justifyContent: "flex-start",

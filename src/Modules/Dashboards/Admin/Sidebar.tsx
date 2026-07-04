@@ -6,6 +6,7 @@ import GradeIcon from "@mui/icons-material/Grade";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import MenuBook from "@mui/icons-material/MenuBook";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 function Sidebar() {
   return (
@@ -31,6 +32,7 @@ function Sidebar() {
           icon: <CalendarMonthIcon />,
           path: "/admin/schedule",
         },
+        { text: "System Settings", icon: <SettingsIcon />, path: "/admin/system-settings" },
       ]}
     />
   );

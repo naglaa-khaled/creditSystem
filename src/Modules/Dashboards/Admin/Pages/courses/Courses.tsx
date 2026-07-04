@@ -168,9 +168,23 @@ const CoursePage = () => {
   };
 
   const filteredData = useMemo(() => {
-    return allCourses.filter((course) =>
-      course.courseNameEn.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
+    return allCourses.filter((course) => {
+      const searchLower = searchTerm.toLowerCase();
+      console.log(
+        "Searching in:",
+        course.courseNameEn,
+        course.courseID,
+        "For:",
+        searchLower,
+      );
+
+      // هنا نتحقق من تطابق نص البحث مع أي من الحقول المطلوبة
+      return (
+        course.courseNameEn?.toLowerCase().includes(searchLower) ||
+        course.courseNameAr?.toLowerCase().includes(searchLower) || // إضافة البحث بالاسم العربي
+        course.courseID?.toString().toLowerCase().includes(searchLower) // البحث بالكود
+      );
+    });
   }, [allCourses, searchTerm]);
 
   const groupedCourses = useMemo(() => {
@@ -185,8 +199,16 @@ const CoursePage = () => {
     return groups;
   }, [filteredData]);
 
-  const handleApiFilterChange = (type: "year" | "semester", value: string) => {
-    const updatedFilters = { ...activeApiFilters, [type]: value };
+  const handleApiFilterChange = (
+    type: "year" | "semester" | "academicYear",
+    value: string,
+  ) => {
+    if (type === "academicYear") return;
+
+    const updatedFilters = {
+      ...activeApiFilters,
+      [type]: value,
+    };
     setActiveApiFilters(updatedFilters);
     loadDataFromApi(updatedFilters.year, updatedFilters.semester);
   };
@@ -222,8 +244,10 @@ const CoursePage = () => {
           <FilterBar
             onSearch={(value: string) => setSearchTerm(value)}
             onFilterChange={handleApiFilterChange}
+            placeholder="Search by Course name or ID..."
           />
         </Box>
+
         <CustomButton
           label="Add Course"
           icon={<AddIcon />}
@@ -298,8 +322,8 @@ const CoursePage = () => {
               gridColumn: "1/-1",
               textAlign: "center",
               py: 10,
-              border: "1px dashed",
-              borderColor: "divider", 
+              border: "1px dashbordered",
+              borderColor: "divider",
               borderRadius: "16px",
               backgroundColor: "background.default",
             }}
@@ -339,17 +363,11 @@ const CoursePage = () => {
               Courses - Level {selectedGroup.level} / Semester{" "}
               {selectedGroup.semester}
             </h3>
-            <button
+            <CustomButton
+              label="Close"
+              variantType="secondary"
               onClick={() => setSelectedGroup(null)}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                color: theme.palette.text.secondary,
-              }}
-            >
-              Close
-            </button>
+            />
           </Box>
 
           <SharedTable

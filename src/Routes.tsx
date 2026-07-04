@@ -24,11 +24,9 @@ import AInstructorDetails from "./Modules/Dashboards/Admin/Pages/Instructor/Inst
 import Instructor from "./Modules/Dashboards/StudentAffairs/Pages/Instructor/Instructors";
 import InstructorDetails from "./Modules/Dashboards/StudentAffairs/Pages/Instructor/InstructorDetails";
 import Schedual from "./Modules/Dashboards/Admin/Pages/Scheduals/Schedual";
-import SchedualDetails from "./Modules/Dashboards/Admin/Pages/Scheduals/SchedualDetails";
 import SchedualPage from "./Modules/Dashboards/StudentAffairs/Pages/Schedual/Schedual";
 import GradesPage from "./Modules/Dashboards/StudentAffairs/Pages/Grades/Grades";
 import DoctorDashboard from "./Modules/Dashboards/Doctors/DoctorDashboard";
-import Docgrades from "./Modules/Dashboards/Doctors/Pages/Docgrades";
 import Docourses from "./Modules/Dashboards/Doctors/Pages/Docourses";
 import Schedule from "./Modules/Dashboards/Doctors/Pages/Schedule";
 import Dashborarddoc from "./Modules/Dashboards/Doctors/Pages/Dashborarddoc";
@@ -36,6 +34,8 @@ import DoCourseStudents from "./Modules/Dashboards/Doctors/Pages/DoCourseStudent
 import Grads from "./Modules/Dashboards/Doctors/Pages/Grads";
 import ProtectedRoute from "./Modules/AuthModule/components/Protectedroute/ProtectedRoute";
 import NotFound from "./Modules/AuthModule/components/NotFound/NotFound";
+import Reports from "./Modules/Dashboards/Admin/Pages/Grades/Reports";
+import SystemSettings from "./Modules/Dashboards/Admin/systemsetting/SystemSettings";
 
 export const routes = createBrowserRouter([
   {
@@ -53,7 +53,11 @@ export const routes = createBrowserRouter([
   },
   {
     path: "/student-affairs",
-    element: <ProtectedRoute><StudentAffairsDashboard /></ProtectedRoute>,
+    element: (
+      <ProtectedRoute>
+        <StudentAffairsDashboard />
+      </ProtectedRoute>
+    ),
     children: [
       { index: true, element: <DashboardHome /> },
       { path: "students", element: <StudentsPage /> },
@@ -68,7 +72,11 @@ export const routes = createBrowserRouter([
   },
   {
     path: "/admin",
-    element: <ProtectedRoute><AdminDashboard /></ProtectedRoute>,
+    element: (
+      <ProtectedRoute>
+        <AdminDashboard />
+      </ProtectedRoute>
+    ),
     children: [
       { index: true, element: <DashboardHome /> },
       { path: "users", element: <UsersPage /> },
@@ -79,21 +87,31 @@ export const routes = createBrowserRouter([
       { path: "instructors", element: <Instructors /> },
       { path: "instructors/details/:id", element: <AInstructorDetails /> },
       { path: "schedule", element: <Schedual /> },
-      { path: "schedule/details/:id", element: <SchedualDetails /> },
+      { path: "grades", element: <Reports /> },
+      { path: "system-settings", element: <SystemSettings /> },
+
+      
     ],
   },
   {
     path: "/doctors",
-    element: <ProtectedRoute><DoctorDashboard /></ProtectedRoute>,
+    element: (
+      <ProtectedRoute>
+        <DoctorDashboard />
+      </ProtectedRoute>
+    ),
     errorElement: <NotFound />,
     children: [
       { index: true, element: <Dashborarddoc /> },
       { path: "dashboarddoc", element: <Dashborarddoc /> },
-      { path: "docgrads", element: <Docgrades /> },
       { path: "courses", element: <Docourses /> },
       { path: "schedule", element: <Schedule /> },
       { path: "docourse/:courseId", element: <DoCourseStudents /> },
       { path: "grads", element: <Grads /> },
     ],
+  },
+  {
+    path: "*",
+    element: <NotFound />,
   },
 ]);

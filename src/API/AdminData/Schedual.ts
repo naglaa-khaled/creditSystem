@@ -36,10 +36,9 @@ export const deleteSchedule = async (
 export const addSchedule = async (
   scheduleData: Partial<ISchedule>,
 ): Promise<IApiResponse> => {
-
   const res = await axiosInstance.post<IApiResponse>(
-    `Admin/setup-course-offering-and-schedule`,
-    scheduleData,
+    "Admin/setup-course-offering-and-schedule",
+    scheduleData,   // ✅
   );
 
   return res.data;

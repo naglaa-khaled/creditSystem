@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import SharedTable from "../../../../Shared/components/SharedTable/SharedTable";
 import { FilterBar } from "../../../../Shared/components/FilterBar/FilterBar";
 import FormModal from "../../../../Shared/components/Modals/FormModel";
@@ -8,6 +8,7 @@ import {
   addStudent,
   deleteStudent,
   exportLevelStudents,
+  importLevelStudents,
 } from "../../../../../API/AdminData/Students";
 import CustomButton from "../../../../Shared/components/Button/Button";
 import {
@@ -18,10 +19,11 @@ import {
   useTheme,
 } from "@mui/material";
 import ConfirmDeleteModal from "../../../../Shared/components/Modals/DeleteModal";
-import AddIcon from "@mui/icons-material/Add";
 import { type FieldValues } from "react-hook-form";
 import { type IStudent, type Column } from "../../../../Shared/Interfaces";
 import { SemesterCard } from "../../../../Shared/components/CourseCard/CourseCard";
+import { AxiosError } from "axios";
+import { toast } from "react-toastify";
 
 const StudentsPage = () => {
   const theme = useTheme();
@@ -40,6 +42,10 @@ const StudentsPage = () => {
     string | number | null
   >(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [importContext, setImportContext] = useState<{
+    level: number;
+    semester: number;
+  } | null>(null);
   const studentFields = [
     { name: "fullName", label: "Full Name", required: true },
     { name: "studentID", label: "Student ID", required: true },
@@ -78,7 +84,7 @@ const StudentsPage = () => {
       const data = await getStudents(year, semester);
       setAllStudents(data);
     } catch (error) {
-      console.error("Failed to load Grades:", error);
+      console.error("Failed to load Students:", error);
     } finally {
       setIsLoading(false);
     }
@@ -92,22 +98,40 @@ const StudentsPage = () => {
     setSelectedStudentId(id);
     setDeleteModalOpen(true);
   };
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  //delete student handler
-  const handleConfirmDelete = async () => {
-    if (selectedStudentId) {
-      try {
-        await deleteStudent(selectedStudentId);
-        setAllStudents((prev) =>
-          prev.filter((student) => student.studentID !== selectedStudentId),
-        );
-        setDeleteModalOpen(false);
-        setSelectedStudentId(null);
-      } catch (error) {
-        console.error("Delete failed", error);
-      }
+  // 2. تحديث دالة الـ import
+  const handleImport = async (file: File, level: number, semester: number) => {
+    try {
+      await importLevelStudents(file, level, semester);
+      toast.success("Imported successfully");
+    } catch (error: unknown) {
+      // هنا ستظهر رسالة السيرفر التي التقطناها في الـ catch أعلاه
+      const errorMessage = error instanceof Error ? error.message : "Import failed";
+      toast.error(errorMessage);
+      console.log(error); 
     }
   };
+
+  //delete student handler
+const handleConfirmDelete = async () => {
+  if (selectedStudentId) {
+    try {
+      await deleteStudent(selectedStudentId); // سيتم تنفيذ الـ API الآن
+      setAllStudents((prev) =>
+        prev.filter((student) => student.studentID !== selectedStudentId),
+      );
+      toast.success("Student deleted successfully"); // رسالة تأكيد للمستخدم
+      setDeleteModalOpen(false);
+      setSelectedStudentId(null);
+    } catch (error) {
+      toast.error("Failed to delete student");
+      console.error("Delete failed", error);
+      setDeleteModalOpen(false);
+      setSelectedStudentId(null);
+    }
+  }
+};
   //add student handler
   const handleSaveStudent = async (data: FieldValues) => {
     try {
@@ -123,9 +147,12 @@ const StudentsPage = () => {
     if (!allStudents) return [];
 
     return allStudents.filter((student) => {
-      const name = student?.nameEn || student?.fullName || "";
+      const searchLower = searchTerm.toLowerCase();
 
-      return name.toLowerCase().includes(searchTerm.toLowerCase());
+      const name = (student?.nameEn || student?.fullName || "").toLowerCase();
+      const id = (student?.studentID || "").toString().toLowerCase();
+
+      return name.includes(searchLower) || id.includes(searchLower);
     });
   }, [allStudents, searchTerm]);
   const groupedSchedaul = useMemo(() => {
@@ -145,8 +172,16 @@ const StudentsPage = () => {
     return groups;
   }, [filteredData]);
 
-  const handleApiFilterChange = (type: "year" | "semester", value: string) => {
-    const updatedFilters = { ...activeApiFilters, [type]: value };
+  const handleApiFilterChange = (
+    type: "year" | "semester" | "academicYear",
+    value: string,
+  ) => {
+    if (type === "academicYear") return;
+
+    const updatedFilters = {
+      ...activeApiFilters,
+      [type]: value,
+    };
     setActiveApiFilters(updatedFilters);
     loadDataFromApi(updatedFilters.year, updatedFilters.semester);
   };
@@ -167,7 +202,7 @@ const StudentsPage = () => {
 
   return (
     <div style={{ padding: isMobile ? "10px" : "20px" }}>
-      <h2 style={{ marginBottom: "20px", color: "var(--primary)" }}>
+      <h2 style={{ marginBottom: "20px", color: "primary.main" }}>
         Students Management
       </h2>
 
@@ -184,14 +219,10 @@ const StudentsPage = () => {
           <FilterBar
             onSearch={(value: string) => setSearchTerm(value)}
             onFilterChange={handleApiFilterChange}
+            placeholder="Search by student name or ID..."
           />
         </Box>
-        <CustomButton
-          label="Add Student"
-          icon={<AddIcon />}
-          variantType="primary"
-          onClick={() => setIsAddModalOpen(true)}
-        />
+
       </Box>
 
       <Box
@@ -218,7 +249,7 @@ const StudentsPage = () => {
             }}
           >
             <CircularProgress size={50} />
-            <Typography variant="h6" sx={{ color: "var(--primary)" }}>
+            <Typography variant="h6" sx={{ color: "primary.main" }}>
               Loading Students Grid...
             </Typography>
           </Box>
@@ -248,11 +279,28 @@ const StudentsPage = () => {
                   onClick={() =>
                     setSelectedGroup(isActive ? null : { level, semester })
                   }
+                  importLabel="Import Students Data"
+                  onImport={() => {
+                    setImportContext({ level: Number(level), semester: Number(semester) }); // (1) حفظنا البيانات
+                    fileInputRef.current?.click(); 
+                  }}
                   onExport={async () => {
+                    const semesterNumber = Number(semester);
+                    const levelNumber = Number(level);
                     try {
-                      await exportLevelStudents(`level ${level}`);
-                    } catch (error) {
-                      console.error("Export failed", error);
+                      await exportLevelStudents(levelNumber, semesterNumber);
+                    } catch (error: unknown) {
+                      if (error instanceof AxiosError) {
+                        console.error(
+                          "Export failed:",
+                          error.response?.status,
+                          error.response?.data,
+                        );
+                      } else if (error instanceof Error) {
+                        console.error("Export failed:", error.message);
+                        toast.error("Failed to export Student Data");
+                        
+                      }
                     }
                   }}
                 />
@@ -264,14 +312,14 @@ const StudentsPage = () => {
               gridColumn: "1/-1",
               textAlign: "center",
               py: 10,
-              border: "1px dashed #ccc",
+              border: `1px dashed ${theme.palette.divider}`,
               borderRadius: "16px",
-              backgroundColor: "#f9f9f9",
+              backgroundColor: "background.paper",
             }}
           >
             <Typography
               variant="h6"
-              sx={{ color: "var(--primary)", opacity: 0.7 }}
+              sx={{ color: "primary.main", opacity: 0.7 }}
             >
               {searchTerm
                 ? `No Students found matching "${searchTerm}"`
@@ -286,7 +334,7 @@ const StudentsPage = () => {
           sx={{
             mt: 4,
             p: 3,
-            bgcolor: "#fff",
+            bgcolor: "background.paper",
             borderRadius: "16px",
             boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
             animation: "fadeIn 0.4s ease-out",
@@ -300,21 +348,15 @@ const StudentsPage = () => {
               mb: 3,
             }}
           >
-            <h3 style={{ margin: 0, color: "var(--primary)" }}>
+            <h3 style={{ margin: 0, color: "primary.main" }}>
               Students List - Level {selectedGroup.level} / Semester{" "}
               {selectedGroup.semester}
             </h3>
-            <button
+            <CustomButton
+              label="Close"
+              variantType="secondary"
               onClick={() => setSelectedGroup(null)}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                color: "#666",
-              }}
-            >
-              Close [x]
-            </button>
+            />
           </Box>
 
           <SharedTable
@@ -344,6 +386,17 @@ const StudentsPage = () => {
         onSave={handleSaveStudent}
         title="Add New Student"
         fields={studentFields}
+      />
+      <input
+        type="file"
+        ref={fileInputRef}
+        style={{ display: "none" }}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file && importContext) {
+            handleImport(file, importContext.level, importContext.semester);
+          }
+        }}
       />
     </div>
   );

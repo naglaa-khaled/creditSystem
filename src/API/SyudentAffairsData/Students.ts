@@ -1,7 +1,7 @@
 import axiosInstance from "../AxiosInstance"; 
 import { AxiosError } from "axios";
 import { type IStudent, type IApiResponse , type studentId , type IFullStudentProfile} from "../../Modules/Shared/Interfaces";
-
+ 
 export const getStudents = async (year?: string, semester?: string): Promise<IStudent[]> => {
   try {
     const res = await axiosInstance.get(`student-affairs/view-students-filtered`,{
@@ -46,10 +46,13 @@ export const addStudent = async (studentData: Partial<IStudent>): Promise<IApiRe
   return { success: true }; 
 };
 
-export const exportLevelStudents = async (level: string) => {
+export const exportLevelStudents = async (level: number, semester: number) => {
   try {
-    const res = await axiosInstance.get(`/student-affairs/export-level-sheet-csv`, {
-      params: { level }, 
+    const res = await axiosInstance.get(`student-affairs/export-level-sheet-csv`, {
+       params: { 
+        level: Number(level),      
+        semester: Number(semester) 
+      }, 
       responseType: 'blob',
     });
 
@@ -60,8 +63,12 @@ export const exportLevelStudents = async (level: string) => {
     document.body.appendChild(link);
     link.click();
     link.remove();
-  } catch (error) {
-    console.error("Error exporting level students:", error);
+  } catch (error: unknown) { // استخدمي unknown بدلاً من any
+    if (error instanceof AxiosError) { // التحقق مما إذا كان الخطأ من axios
+      console.error("Error exporting:", error.response?.status, error.response?.data);
+    } else {
+      console.error("Unexpected error:", error);
+    }
     throw error;
   }
 };

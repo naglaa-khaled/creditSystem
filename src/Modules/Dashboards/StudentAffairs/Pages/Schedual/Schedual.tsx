@@ -47,17 +47,22 @@ const SchedaulPage = () => {
   }, []);
 
   const filteredData = useMemo(() => {
-    return allSchedual.filter((schedaul) =>
-      schedaul.courseName.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
+    return allSchedual.filter((schedual) => {
+      const searchLower = searchTerm.toLowerCase();
+
+      return (
+        schedual.courseName?.toLowerCase().includes(searchLower) ||
+        schedual.courseID?.toString().toLowerCase().includes(searchLower)
+      );
+    });
   }, [allSchedual, searchTerm]);
 
   const groupedSchedaul = useMemo(() => {
     const groups: Record<string, ISchedule[]> = {};
 
     filteredData.forEach((schedual) => {
-      const level = schedual.courseLevel;
-      const semester = schedual.courseSemester;
+      const level = schedual.level;
+      const semester = schedual.semester;
 
       const key = `${level}-${semester}`;
       if (!groups[key]) groups[key] = [];
@@ -76,17 +81,28 @@ const SchedaulPage = () => {
     }
   }, [groupedSchedaul, selectedGroup]);
 
-  const handleApiFilterChange = (type: "year" | "semester", value: string) => {
-    const updatedFilters = { ...activeApiFilters, [type]: value };
+  const handleApiFilterChange = (
+    type: "year" | "semester" | "academicYear",
+    value: string,
+  ) => {
+    if (type === "academicYear") return;
+
+    const updatedFilters = {
+      ...activeApiFilters,
+      [type]: value,
+    };
     setActiveApiFilters(updatedFilters);
     loadDataFromApi(updatedFilters.year, updatedFilters.semester);
   };
 
   return (
     <div style={{ padding: isMobile ? "10px" : "20px" }}>
-      <h2 style={{ marginBottom: "20px", color: "primary.main"  }}>
-        Schedual Management
-      </h2>
+      <Typography
+        variant="h5"
+        sx={{ mb: 3, color: "primary.main", fontWeight: 600 }}
+      >
+        Schedule Management
+      </Typography>
 
       <Box
         sx={{
@@ -101,6 +117,10 @@ const SchedaulPage = () => {
           <FilterBar
             onSearch={(value: string) => setSearchTerm(value)}
             onFilterChange={handleApiFilterChange}
+            placeholder="Search by course name or ID..."
+            showYear
+            showSemester
+            showAcademicYear={false}
           />
         </Box>
       </Box>
@@ -129,7 +149,7 @@ const SchedaulPage = () => {
             }}
           >
             <CircularProgress size={50} />
-            <Typography variant="h6" sx={{ color: "primary.main"  }}>
+            <Typography variant="h6" sx={{ color: "primary.main" }}>
               Loading Schedual...
             </Typography>
           </Box>
@@ -171,7 +191,7 @@ const SchedaulPage = () => {
               gridColumn: "1/-1",
               textAlign: "center",
               py: 10,
-               border: (theme) => `1px dashed ${theme.palette.divider}`,
+              border: (theme) => `1px dashed ${theme.palette.divider}`,
               borderRadius: "16px",
               backgroundColor: (theme) =>
                 theme.palette.mode === "light"
@@ -181,7 +201,7 @@ const SchedaulPage = () => {
           >
             <Typography
               variant="h6"
-              sx={{ color: "primary.main" , opacity: 0.7 }}
+              sx={{ color: "primary.main", opacity: 0.7 }}
             >
               {searchTerm
                 ? `No Schedual found matching "${searchTerm}"`

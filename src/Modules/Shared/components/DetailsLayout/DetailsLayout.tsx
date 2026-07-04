@@ -102,52 +102,34 @@ const DetailsLayout = <T extends Record<string, unknown>>({
           </Grid>
         </Grid>
       </Paper>
-      
 
-      <Typography
-        variant="h6"
-        sx={{ mb: 2, fontWeight: 600, color: "text.primary" }}
-      >
-        {tableTitle}
-      </Typography>
+{tableTitle && (
+  <>
+    <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: "text.primary" }}>
+      {tableTitle}
+    </Typography>
 
-      {hasData ? (
-        <Box
-          sx={{
-            borderRadius: "12px",
-            border: `1px solid ${theme.palette.divider}`,
-            overflow: "hidden",
-          }}
-        >
-          <SharedTable
-            columns={tableColumns}
-            data={tableData}
-            idField={tableColumns[0]?.id || "id"}
-            isAdmin={showTableActions}
-            showView={false}
-            onDelete={onDeleteStudent} 
-            onEditStatus={onUpdateStatus}
-          />
-        </Box>
-      ) : (
-        <Paper
-          sx={{
-            p: 4,
-            textAlign: "center",
-            borderRadius: "12px",
-            border: `1px dashed ${theme.palette.divider}`,
-            bgcolor: "background.default",
-          }}
-        >
-          <Typography
-            sx={{ color: "text.secondary", fontWeight: "bold" }}
-            variant="h5"
-          >
-            {" "}
-            {noDataMessage}
-          </Typography>
-        </Paper>
-      )}
+    {hasData ? (
+      <Box sx={{ borderRadius: "12px", border: `1px solid ${theme.palette.divider}`, overflow: "hidden" }}>
+        <SharedTable
+          columns={tableColumns}
+          data={tableData}
+          idField={tableColumns[0]?.id || "id"}
+          isAdmin={showTableActions}
+          showView={false}
+          onDelete={onDeleteStudent} 
+          onEditStatus={onUpdateStatus}
+        />
+      </Box>
+    ) : (
+      <Paper sx={{ p: 4, textAlign: "center", borderRadius: "12px", border: `1px dashed ${theme.palette.divider}`, bgcolor: "background.default" }}>
+        <Typography sx={{ color: "primary.main", fontWeight: "bold" }} variant="h5">
+          {noDataMessage}
+        </Typography>
+      </Paper>
+    )}
+  </>
+)}
     </Box>
   );
 };

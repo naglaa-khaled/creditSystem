@@ -18,6 +18,9 @@ import {
 } from "../../../../Shared/Interfaces/index";
 import { SemesterCard } from "../../../../Shared/components/CourseCard/CourseCard";
 import GroupsIcon from "@mui/icons-material/Groups";
+import CustomButton from "../../../../Shared/components/Button/Button";
+import { AxiosError } from "axios";
+import { toast } from "react-toastify";
 const StudentPage = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -50,37 +53,46 @@ const StudentPage = () => {
     loadDataFromApi();
   }, []);
 
-const filteredData = useMemo(() => {
-  if (!allStudents) return [];
+  const filteredData = useMemo(() => {
+    if (!allStudents) return [];
 
-  return allStudents.filter((student) => {
-    const name = student?.nameEn || student?.fullName || "";
-    
-    return name.toLowerCase().includes(searchTerm.toLowerCase());
-  });
-}, [allStudents, searchTerm]);
-console.log(filteredData);
+    return allStudents.filter((student) => {
+      const searchLower = searchTerm.toLowerCase();
+
+      const name = (student?.nameEn || student?.fullName || "").toLowerCase();
+      const id = (student?.studentID || "").toString().toLowerCase();
+
+      return name.includes(searchLower) || id.includes(searchLower);
+    });
+  }, [allStudents, searchTerm]);
 
   const groupedSchedaul = useMemo(() => {
     const groups: Record<string, IStudent[]> = {};
 
     filteredData?.forEach((student) => {
-     const sYear =  student.year; 
-    const sSemester = student.semester;
+      const sYear = student.year;
+      const sSemester = student.semester;
 
-    if (student && sYear && sSemester) {
-      const key = `${sYear}-${sSemester}`;
-      if (!groups[key]) groups[key] = [];
-      groups[key].push(student);
-    }
+      if (student && sYear && sSemester) {
+        const key = `${sYear}-${sSemester}`;
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(student);
+      }
     });
 
     return groups;
   }, [filteredData]);
 
-  const handleApiFilterChange = (type: "year" | "semester", value: string) => {
-    console.log(type, value);
-    const updatedFilters = { ...activeApiFilters, [type]: value };
+  const handleApiFilterChange = (
+    type: "year" | "semester" | "academicYear",
+    value: string,
+  ) => {
+    if (type === "academicYear") return;
+
+    const updatedFilters = {
+      ...activeApiFilters,
+      [type]: value,
+    };
     setActiveApiFilters(updatedFilters);
     loadDataFromApi(updatedFilters.year, updatedFilters.semester);
   };
@@ -94,16 +106,19 @@ console.log(filteredData);
     { id: "fullName", label: "Name" },
     { id: "studentID", label: "ID" },
     { id: "email", label: "Email" },
-{ id: "year", label: "Year" },
+    { id: "year", label: "Year" },
     { id: "gpa", label: "GPA" },
     { id: "semester", label: "Semester" },
   ];
 
   return (
     <div style={{ padding: isMobile ? "10px" : "20px" }}>
-      <h2 style={{ marginBottom: "20px", color: "var(--primary)" }}>
+      <Typography
+        variant="h5"
+        sx={{ mb: 3, color: "primary.main", fontWeight: 600 }}
+      >
         Students Management
-      </h2>
+      </Typography>
 
       <Box
         sx={{
@@ -118,6 +133,10 @@ console.log(filteredData);
           <FilterBar
             onSearch={(value: string) => setSearchTerm(value)}
             onFilterChange={handleApiFilterChange}
+            showYear
+            showSemester
+            showAcademicYear={false}
+            placeholder="Search by student name or ID..."
           />
         </Box>
       </Box>
@@ -146,7 +165,7 @@ console.log(filteredData);
             }}
           >
             <CircularProgress size={50} />
-            <Typography variant="h6" sx={{ color: "var(--primary)" }}>
+            <Typography variant="h6" sx={{ color: "primary.main" }}>
               Loading Students...
             </Typography>
           </Box>
@@ -181,10 +200,22 @@ console.log(filteredData);
                     setSelectedGroup(isActive ? null : { level, semester })
                   }
                   onExport={async () => {
+                    const semesterNumber = parseInt(semester, 10);
+                    const levelNumber = parseInt(level, 10);
                     try {
-                      await exportLevelStudents(`level ${level}`);
-                    } catch (error) {
-                      console.error("Export failed", error);
+                      await exportLevelStudents(levelNumber, semesterNumber);
+                    } catch (error: unknown) {
+                      // التحقق من نوع الخطأ بدلاً من any
+                      if (error instanceof AxiosError) {
+                        console.error(
+                          "Export failed:",
+                          error.response?.status,
+                          error.response?.data,
+                        );
+                      } else if (error instanceof Error) {
+                        console.error("Export failed:", error.message);
+                        toast.error("Failed to export Student Data");
+                      }
                     }
                   }}
                 />
@@ -196,14 +227,15 @@ console.log(filteredData);
               gridColumn: "1/-1",
               textAlign: "center",
               py: 10,
-              border: "1px dashed #ccc",
               borderRadius: "16px",
-              backgroundColor: "#f9f9f9",
+              border: "1px dashed",
+              borderColor: "divider",
+              backgroundColor: "background.paper",
             }}
           >
             <Typography
               variant="h6"
-              sx={{ color: "var(--primary)", opacity: 0.7 }}
+              sx={{ color: "primary.main", opacity: 0.7 }}
             >
               {searchTerm
                 ? `No Students found matching "${searchTerm}"`
@@ -218,7 +250,7 @@ console.log(filteredData);
           sx={{
             mt: 4,
             p: 3,
-            bgcolor: "#fff",
+            bgcolor: "background.paper",
             borderRadius: "16px",
             boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
             animation: "fadeIn 0.4s ease-out",
@@ -232,21 +264,15 @@ console.log(filteredData);
               mb: 3,
             }}
           >
-            <h3 style={{ margin: 0, color: "var(--primary)" }}>
+            <h3 style={{ margin: 0, color: "primary.main" }}>
               Students - Level {selectedGroup.level} / Semester{" "}
               {selectedGroup.semester}
             </h3>
-            <button
+            <CustomButton
+              label="Close"
+              variantType="secondary"
               onClick={() => setSelectedGroup(null)}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                color: "#666",
-              }}
-            >
-              Close [x]
-            </button>
+            />
           </Box>
 
           <SharedTable

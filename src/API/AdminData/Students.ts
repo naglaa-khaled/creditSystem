@@ -37,19 +37,26 @@ export const getStudentProfile = async (studentId: studentId): Promise<IFullStud
 
 
 export const deleteStudent = async (studentId: studentId): Promise<IApiResponse> => {
-  console.log("Deleting student:", studentId);
-  return { success: true }; 
+  try {
+    const res = await axiosInstance.delete(`Admin/delete-student-safely/${studentId}`);
+    
+    return res.data;
+  } catch (error) {
+    console.error("Delete student failed:", error);
+    throw error;
+  }
 };
-
 export const addStudent = async (studentData: Partial<IStudent>): Promise<IApiResponse> => {
   console.log("Adding student data:", studentData);
   return { success: true }; 
 };
-
-export const exportLevelStudents = async (level: string) => {
+export const exportLevelStudents = async (level: number, semester: number) => {
   try {
     const res = await axiosInstance.get(`admin/export-level-sheet-csv`, {
-      params: { level }, 
+      params: { 
+       level: Number(level),      
+        semester: Number(semester)
+      }, 
       responseType: 'blob',
     });
 
@@ -60,11 +67,54 @@ export const exportLevelStudents = async (level: string) => {
     document.body.appendChild(link);
     link.click();
     link.remove();
-  } catch (error) {
-    console.error("Error exporting level students:", error);
+  } catch (error: unknown) {
+    if (error instanceof AxiosError && error.response) {
+      // محاولة استخراج الرسالة من السيرفر
+      const serverMessage = error.response.data?.message || error.response.data;
+      
+      // إذا وجدت رسالة، قم بعرضها (يمكنك استخدام toast هنا)
+      console.error("Server Error:", serverMessage);
+      
+      // إعادة رمي الخطأ ليتمكن المكون (Component) من استلام الرسالة
+      throw new Error(typeof serverMessage === 'string' ? serverMessage : "Export failed");
+    }
     throw error;
   }
 };
+export const importLevelStudents = async (
+  file: File, 
+  level: number, 
+  semester: number, 
+) => {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await axiosInstance.post(`Admin/import-full-sheet-csv`, formData, {
+      params: { 
+        level: `"${level}"`,      // كما هو الحال في الـ Export
+        semester: Number(semester),
+      },
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return res.data;
+ } catch (error: unknown) {
+    if (error instanceof AxiosError && error.response) {
+      // 1. استخراج رسالة السيرفر أولاً إذا كانت موجودة
+      const serverMessage = error.response.data?.message || error.response.data;
+      
+      console.error("Server Error:", serverMessage);
+      
+      throw new Error(typeof serverMessage === 'string' ? serverMessage : "Failed to import file");
+    }
+    throw new Error("Network error or server unreachable");
+  }
+};
+
+
 
 export const updateStudent = async (studentId: studentId, studentData: Partial<IStudent>): Promise<IApiResponse> => {
   try {
