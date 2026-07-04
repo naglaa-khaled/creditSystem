@@ -6,9 +6,7 @@ import {
   useTheme,
   useMediaQuery,
   Toolbar,
-  IconButton,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 import Navebar from "../Navebar/Navebar";
 
 interface DashboardLayoutProps {
@@ -29,7 +27,7 @@ const DashboardLayout = ({ sidebar, children }: DashboardLayoutProps) => {
   return (
     <Box
       sx={{
-        height: "100vh",
+        height: "115vh",
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
@@ -54,15 +52,7 @@ const DashboardLayout = ({ sidebar, children }: DashboardLayoutProps) => {
             }}
           >
             <Box sx={{ width: 250, height: "100%", p: 0,backgroundColor: "primary.light" }}>
-              <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-                <IconButton
-                  onClick={() => setOpenSidebar(false)}
-                  sx={{ height: "100%" }}
-                >
-                  <CloseIcon />
-                </IconButton>
-              </Box>
-
+              
               <Box onClick={() => setOpenSidebar(false)}>{sidebar}</Box>
             </Box>
           </Drawer>

@@ -30,7 +30,7 @@ function App() {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <ToastContainer
-          position="bottom-center"
+          position="top-center"
           autoClose={3000}
           hideProgressBar={false}
           newestOnTop={false}
