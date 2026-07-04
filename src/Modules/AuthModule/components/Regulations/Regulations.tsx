@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTheme } from "@mui/material";
 import { Box, Container, Typography, Paper, Button, Divider, IconButton, Grid } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import LanguageIcon from "@mui/icons-material/Language";
@@ -84,6 +85,7 @@ const translations = {
 
 export default function Regulations() {
   const navigate = useNavigate();
+  const theme = useTheme();
   const [lang, setLang] = useState<"en" | "ar">("en"); 
 
   const t = translations[lang];
@@ -99,7 +101,7 @@ export default function Regulations() {
         minHeight: "100vh",
         py: { xs: 3, sm: 6 }, 
         px: { xs: 1, sm: 0 },
-        backgroundColor: "#f4f6f9",
+backgroundColor: theme.palette.background.default,
         direction: isRtl ? "rtl" : "ltr",
       }}
     >
@@ -114,13 +116,13 @@ export default function Regulations() {
             sx={{
               borderRadius: 2,
               textTransform: "none",
-              borderColor: "#1e3a8a",
-              color: "#1e3a8a",
+              borderColor: theme.palette.primary.main,
+              color: theme.palette.primary.main,
               fontWeight: "bold",
               fontSize: { xs: "0.85rem", sm: "1rem" }, 
               "&:hover": {
-                borderColor: "#3b82f6",
-                backgroundColor: "rgba(59, 130, 246, 0.04)",
+                borderColor: theme.palette.primary.dark,
+                backgroundColor: theme.palette.action.hover,
               },
             }}
           >
@@ -133,8 +135,8 @@ export default function Regulations() {
           sx={{
             p: { xs: 2.5, sm: 5 }, 
             borderRadius: { xs: 3, sm: 4 },
-            background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
-            borderTop: "6px solid #1e3a8a", 
+           background: theme.palette.background.paper, // استخدام لون الورقة من الثيم
+            borderTop: `6px solid ${theme.palette.primary.main}`, 
           }}
         >
       
@@ -153,7 +155,7 @@ export default function Regulations() {
                 variant="h4" 
                 fontWeight="800" 
                 sx={{ 
-                  color: "#0f172a", 
+                  color: theme.palette.primary.main, 
                   mb: 0.5,
                   fontSize: { xs: "1.75rem", sm: "2.125rem" } 
                 }}
@@ -164,7 +166,7 @@ export default function Regulations() {
                 variant="h6" 
                 fontWeight="600" 
                 sx={{ 
-                  color: "#2563eb", 
+                  color: theme.palette.info.main, 
                   mb: 0.5,
                   fontSize: { xs: "1rem", sm: "1.25rem" }
                 }}
@@ -177,12 +179,12 @@ export default function Regulations() {
             <Typography 
               variant="caption" 
               sx={{ 
-                backgroundColor: "#e2e8f0", 
+                backgroundColor: theme.palette.secondary.light, 
                 px: 1.5, 
                 py: 0.5, 
                 borderRadius: 1.5, 
                 fontWeight: 600, 
-                color: "#475569",
+                color: theme.palette.text.secondary,
                 alignSelf: { xs: "flex-start", sm: "auto" }   
               }}
             >
@@ -197,14 +199,14 @@ export default function Regulations() {
             
           <Grid size={12}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1.5 }}>
-                <IconButton sx={{ backgroundColor: "#eff6ff", color: "#2563eb" }} disableRipple>
+                <IconButton sx={{ backgroundColor: theme.palette.info.light, color: theme.palette.info.main }} disableRipple>
                   <MenuBookIcon />
                 </IconButton>
-                <Typography variant="h6" fontWeight="bold" sx={{ color: "#1e293b", fontSize: { xs: "1.05rem", sm: "1.25rem" } }}>
+                <Typography variant="h6" fontWeight="bold" sx={{ color: theme.palette.text.primary, fontSize: { xs: "1.05rem", sm: "1.25rem" } }}>
                   {t.sec1Title}
                 </Typography>
               </Box>
-              <Box component="ul" sx={{ pr: isRtl ? 2 : 0, pl: !isRtl ? 2 : 0, m: 0, "& li": { mb: 1, color: "#334155", lineHeight: 1.6, fontSize: { xs: "0.9rem", sm: "1rem" } } }}>
+              <Box component="ul" sx={{ pr: isRtl ? 2 : 0, pl: !isRtl ? 2 : 0, m: 0, "& li": { mb: 1, color: theme.palette.text.secondary, lineHeight: 1.6, fontSize: { xs: "0.9rem", sm: "1rem" } } }}>
                 {t.sec1Points.map((point, index) => (
                   <li key={index}>{point}</li>
                 ))}
@@ -214,14 +216,14 @@ export default function Regulations() {
        
            <Grid size={12}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1.5 }}>
-                <IconButton sx={{ backgroundColor: "#fef3c7", color: "#d97706" }} disableRipple>
+                <IconButton sx={{ backgroundColor: theme.palette.warning.light, color: theme.palette.warning.dark }} disableRipple>
                   <AccountBalanceWalletIcon />
                 </IconButton>
-                <Typography variant="h6" fontWeight="bold" sx={{ color: "#1e293b", fontSize: { xs: "1.05rem", sm: "1.25rem" } }}>
+                <Typography variant="h6" fontWeight="bold" sx={{ color: theme.palette.text.primary, fontSize: { xs: "1.05rem", sm: "1.25rem" } }}>
                   {t.sec2Title}
                 </Typography>
               </Box>
-              <Box component="ul" sx={{ pr: isRtl ? 2 : 0, pl: !isRtl ? 2 : 0, m: 0, "& li": { mb: 1, color: "#334155", lineHeight: 1.6, fontSize: { xs: "0.9rem", sm: "1rem" } } }}>
+              <Box component="ul" sx={{ pr: isRtl ? 2 : 0, pl: !isRtl ? 2 : 0, m: 0, "& li": { mb: 1, color: theme.palette.text.secondary, lineHeight: 1.6, fontSize: { xs: "0.9rem", sm: "1rem" } } }}>
                 {t.sec2Points.map((point, index) => (
                   <li key={index}>{point}</li>
                 ))}
@@ -231,14 +233,14 @@ export default function Regulations() {
         
    <Grid size={12}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1.5 }}>
-                <IconButton sx={{ backgroundColor: "#e0f2fe", color: "#0369a1" }} disableRipple>
+                <IconButton sx={{ backgroundColor: theme.palette.info.light, color: theme.palette.info.main }} disableRipple>
                   <SchoolIcon />
                 </IconButton>
-                <Typography variant="h6" fontWeight="bold" sx={{ color: "#1e293b", fontSize: { xs: "1.05rem", sm: "1.25rem" } }}>
+                <Typography variant="h6" fontWeight="bold" sx={{ color: theme.palette.text.primary, fontSize: { xs: "1.05rem", sm: "1.25rem" } }}>
                   {t.sec3Title}
                 </Typography>
               </Box>
-              <Box component="ul" sx={{ pr: isRtl ? 2 : 0, pl: !isRtl ? 2 : 0, m: 0, "& li": { mb: 1, color: "#334155", lineHeight: 1.6, fontSize: { xs: "0.9rem", sm: "1rem" } } }}>
+              <Box component="ul" sx={{ pr: isRtl ? 2 : 0, pl: !isRtl ? 2 : 0, m: 0, "& li": { mb: 1, color: theme.palette.text.secondary, lineHeight: 1.6, fontSize: { xs: "0.9rem", sm: "1rem" } } }}>
                 {t.sec3Points.map((point, index) => (
                   <li key={index}>{point}</li>
                 ))}
@@ -247,14 +249,14 @@ export default function Regulations() {
 
      <Grid size={12}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1.5 }}>
-                <IconButton sx={{ backgroundColor: "#f0fdf4", color: "#16a34a" }} disableRipple>
+                <IconButton sx={{ backgroundColor: theme.palette.success.light, color: theme.palette.success.main }} disableRipple>
                   <AssignmentTurnedInIcon />
                 </IconButton>
-                <Typography variant="h6" fontWeight="bold" sx={{ color: "#1e293b", fontSize: { xs: "1.05rem", sm: "1.25rem" } }}>
+                <Typography variant="h6" fontWeight="bold" sx={{ color: theme.palette.text.primary, fontSize: { xs: "1.05rem", sm: "1.25rem" } }}>
                   {t.sec4Title}
                 </Typography>
               </Box>
-              <Box component="ul" sx={{ pr: isRtl ? 2 : 0, pl: !isRtl ? 2 : 0, m: 0, "& li": { mb: 1, color: "#334155", lineHeight: 1.6, fontSize: { xs: "0.9rem", sm: "1rem" } } }}>
+              <Box component="ul" sx={{ pr: isRtl ? 2 : 0, pl: !isRtl ? 2 : 0, m: 0, "& li": { mb: 1, color: theme.palette.text.secondary, lineHeight: 1.6, fontSize: { xs: "0.9rem", sm: "1rem" } } }}>
                 {t.sec4Points.map((point, index) => (
                   <li key={index}>{point}</li>
                 ))}
@@ -264,14 +266,14 @@ export default function Regulations() {
           
             <Grid size={12}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1.5 }}>
-                <IconButton sx={{ backgroundColor: "#faf5ff", color: "#7c3aed" }} disableRipple>
+                <IconButton sx={{ backgroundColor: theme.palette.primary.light, color: theme.palette.primary.main}} disableRipple>
                   <EmojiEventsIcon />
                 </IconButton>
-                <Typography variant="h6" fontWeight="bold" sx={{ color: "#1e293b", fontSize: { xs: "1.05rem", sm: "1.25rem" } }}>
+                <Typography variant="h6" fontWeight="bold" sx={{ color: theme.palette.text.primary, fontSize: { xs: "1.05rem", sm: "1.25rem" } }}>
                   {t.sec5Title}
                 </Typography>
               </Box>
-              <Box component="ul" sx={{ pr: isRtl ? 2 : 0, pl: !isRtl ? 2 : 0, m: 0, "& li": { mb: 1, color: "#334155", lineHeight: 1.6, fontSize: { xs: "0.9rem", sm: "1rem" } } }}>
+              <Box component="ul" sx={{ pr: isRtl ? 2 : 0, pl: !isRtl ? 2 : 0, m: 0, "& li": { mb: 1, color: theme.palette.text.secondary, lineHeight: 1.6, fontSize: { xs: "0.9rem", sm: "1rem" } } }}>
                 {t.sec5Points.map((point, index) => (
                   <li key={index}>{point}</li>
                 ))}
@@ -292,11 +294,11 @@ export default function Regulations() {
                 px: 4,
                 py: 1.2,
                 width: { xs: "100%", sm: "auto" }, // يأخذ عرض الشاشة كاملاً على الموبايل لسهولة الضغط
-                backgroundColor: "#1e3a8a",
+                backgroundColor: theme.palette.primary.main,
                 fontWeight: "bold",
                 boxShadow: "0 4px 6px -1px rgba(30, 58, 138, 0.3)",
                 "&:hover": {
-                  backgroundColor: "#2563eb",
+                  backgroundColor: theme.palette.primary.dark,
                 },
               }}
             >
