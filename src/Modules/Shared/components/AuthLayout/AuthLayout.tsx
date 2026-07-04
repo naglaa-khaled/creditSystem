@@ -44,7 +44,7 @@ export default function AuthLayout() {
               color="text.secondary"
               textAlign="center"
             >
-              Faculty of Engineering – Girls Branch
+              Faculty of Engineering 
             </Typography>
           </Stack>
 

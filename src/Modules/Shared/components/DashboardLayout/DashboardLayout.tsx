@@ -53,7 +53,7 @@ const DashboardLayout = ({ sidebar, children }: DashboardLayoutProps) => {
               },
             }}
           >
-            <Box sx={{ width: 250, height: "100%", p: 0 }}>
+            <Box sx={{ width: 250, height: "100%", p: 0,backgroundColor: "primary.light" }}>
               <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
                 <IconButton
                   onClick={() => setOpenSidebar(false)}

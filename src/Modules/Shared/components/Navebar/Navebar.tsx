@@ -174,20 +174,31 @@ const Navebar = ({ toggleSidebar }: NavebarProps) => {
               src={photo}
               alt="Logo"
               sx={{
-                width: { xs: 42, md: 45 },
-                height: { xs: 42, md: 45 },
+                width: { xs: 42, md: 50 },
+                height: { xs: 42, md: 50 },
               }}
             />
-            <Typography
-              fontWeight="bold"
-              sx={{
-                fontSize: { xs: "16px", sm: "25px" },
-                color: theme.palette.text.primary,
-                lineHeight: 2,
-              }}
-            >
-              Al-Azhar University
-            </Typography>
+            <Box sx={{ display: "flex", flexDirection: "column" }}>
+              <Typography
+                fontWeight="bold"
+                sx={{
+                  fontSize: { xs: "14px",md:"20", sm: "24px" }, // قللت الحجم قليلاً ليتسع للسطرين
+                  color: theme.palette.text.primary,
+                  lineHeight: 1.2,
+                }}
+              >
+                Al-Azhar University
+              </Typography>
+              <Typography
+                sx={{
+                  fontSize: { xs: "10px", sm: "12px" },
+                  color: theme.palette.text.secondary,
+                  lineHeight: 1.2,
+                }}
+              >
+                Faculty of Engineering
+              </Typography>
+            </Box>
           </Box>
           <Box
             sx={{

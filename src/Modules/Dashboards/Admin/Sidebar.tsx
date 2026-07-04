@@ -11,30 +11,18 @@ import SettingsIcon from "@mui/icons-material/Settings";
 function Sidebar() {
   return (
     <BasicSidebar
-      items={[
-        { text: "Dashboard", icon: <DashboardIcon />, path: "/admin" },
-        {
-          text: "Users",
-          icon: <PeopleIcon />,
-          path: "/admin/users",
-        },
-
-        { text: "Students", icon: <SchoolIcon />, path: "/admin/students" },
-        { text: "Courses", icon: <MenuBook />, path: "/admin/courses" },
-        {
-          text: "instructors",
-          icon: <PersonOutlineIcon />,
-          path: "/admin/instructors",
-        },
-        { text: "Grades", icon: <GradeIcon />, path: "/admin/grades" },
-        {
-          text: "Schedule",
-          icon: <CalendarMonthIcon />,
-          path: "/admin/schedule",
-        },
-        { text: "System Settings", icon: <SettingsIcon />, path: "/admin/system-settings" },
-      ]}
-    />
+  items={[
+    // ألوان توازن بين الوضوح والأناقة (تليق باللايت والدارك مود)
+    { text: "Dashboard", icon: <DashboardIcon sx={{ color: "#7B61FF" }} />, path: "/admin" },      // بنفسجي ملكي
+    { text: "Users", icon: <PeopleIcon sx={{ color: "#3B82F6" }} />, path: "/admin/users" },          // أزرق حيوي
+    { text: "Students", icon: <SchoolIcon sx={{ color: "#F59E0B" }} />, path: "/admin/students" },    // برتقالي دافئ
+    { text: "Courses", icon: <MenuBook sx={{ color: "#10B981" }} />, path: "/admin/courses" },       // أخضر زمردي
+    { text: "instructors", icon: <PersonOutlineIcon sx={{ color: "#EC4899" }} />, path: "/admin/instructors" }, // وردي ناعم
+    { text: "Grades", icon: <GradeIcon sx={{ color: "#8B5CF6" }} />, path: "/admin/grades" },        // بنفسجي فاتح
+    { text: "Schedule", icon: <CalendarMonthIcon sx={{ color: "#F43F5E" }} />, path: "/admin/schedule" }, // أحمر مرجاني
+    { text: "System Settings", icon: <SettingsIcon sx={{ color: "#6B7280" }} />, path: "/admin/system-settings" }, // رمادي هادئ
+  ]}
+/>
   );
 }
 
