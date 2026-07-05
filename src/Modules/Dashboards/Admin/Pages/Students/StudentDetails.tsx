@@ -15,7 +15,6 @@ import {
   getStudentProfile,
   updateStudentMaxHours,
   changeStudentStatus,
-  updateRegistrationStatus,
 } from "../../../../../API/AdminData/Students";
 
 import { toast } from "react-toastify";
@@ -30,9 +29,7 @@ const StudentDetails = () => {
   const [isMaxHoursModalOpen, setIsMaxHoursModalOpen] = useState(false);
   const [status, setStatus] = useState<string>(student?.status || "");
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
-  const [isCourseStatusModalOpen, setIsCourseStatusModalOpen] = useState(false);
-  const [selectedRegistration, setSelectedRegistration] =
-    useState<ICourse | null>(null);
+
   const editFields = [
     { name: "fullName", label: "Full Name", required: true },
     { name: "email", label: "Email", type: "email", required: true },
@@ -95,7 +92,7 @@ const StudentDetails = () => {
       const apiPayload = {
         name: updatedData.fullName,
         email: updatedData.email,
-        year: updatedData.year?.toString(),
+        level: updatedData.year?.toString(),
         semester: updatedData.semester?.toString(),
       };
 
@@ -142,31 +139,6 @@ const StudentDetails = () => {
       setIsStatusModalOpen(false); // Close the modal even if there's an error
     }
   };
-  const handleUpdateCourseStatus = async (data: FieldValues) => {
-    if (!selectedRegistration) return;
-
-    try {
-      await updateRegistrationStatus(
-        Number(id),
-        selectedRegistration.courseID,
-        data.newStatus,
-      );
-
-      setCourses((prev) =>
-        prev.map((c) =>
-          c.courseID === selectedRegistration.courseID
-            ? { ...c, status: data.newStatus }
-            : c,
-        ),
-      );
-
-      setIsCourseStatusModalOpen(false);
-      toast.success("Course status updated successfully! ✅");
-    } catch {
-      toast.error("Failed to update course status. ❌");
-      setIsCourseStatusModalOpen(false); // Close the modal even if there's an error
-    }
-  };
 
   return (
     <>
@@ -184,39 +156,8 @@ const StudentDetails = () => {
           {
             id: "status",
             label: "Status",
-            render: (row: ICourse) => (
-              <Chip
-                label={row.status}
-                color={
-                  row.status === "Registered"
-                    ? "primary"
-                    : row.status === "Waiting"
-                      ? "warning"
-                      : row.status === "In Progress"
-                        ? "secondary"
-                        : "default"
-                }
-                size="small"
-                sx={{
-                  fontWeight: 700,
-                  borderRadius: "8px",
-                }}
-              />
-            ),
           },
-          {
-            id: "actions",
-            label: "Actions",
-            render: (row: ICourse) => (
-              <EditIcon
-                sx={{ cursor: "pointer", color: "primary.main", fontSize: 18 }}
-                onClick={() => {
-                  setSelectedRegistration(row);
-                  setIsCourseStatusModalOpen(true);
-                }}
-              />
-            ),
-          },
+         
         ]}
         onEdit={() => setEditModalOpen(true)}
       >
@@ -327,26 +268,6 @@ const StudentDetails = () => {
           },
         ]}
         initialData={{ newStatus: status || "Active" }}
-      />
-      <FormModal
-        open={isCourseStatusModalOpen}
-        onClose={() => setIsCourseStatusModalOpen(false)}
-        onSave={handleUpdateCourseStatus}
-        title="Update Course Status"
-        fields={[
-          {
-            name: "newStatus",
-            label: "Status",
-            required: true,
-            select: true,
-            options: [
-              { value: "Registered", label: "Registered" },
-              { value: "In Progress", label: "In Progress" },
-              { value: "Waiting", label: "Waiting" },
-            ],
-          },
-        ]}
-        initialData={{ newStatus: selectedRegistration?.status }}
       />
     </>
   );
