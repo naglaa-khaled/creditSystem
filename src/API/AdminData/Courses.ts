@@ -43,6 +43,7 @@ export const addCourse = async (
         level: courseData.level,
         semester: courseData.semester,
         courseType: courseData.courseType,
+        CourseCategory: courseData.CourseCategory,
       },
     });
     return { success: response.status === 200 || response.status === 201 };

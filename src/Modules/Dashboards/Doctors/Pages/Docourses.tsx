@@ -12,6 +12,10 @@ import ClearIcon from '@mui/icons-material/Clear';
 import CastForEducationIcon from '@mui/icons-material/CastForEducation';
 import LocalLibraryIcon from '@mui/icons-material/LocalLibrary';
 import GroupIcon from '@mui/icons-material/Group';
+import LayersIcon from '@mui/icons-material/Layers';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import SchoolIcon from '@mui/icons-material/School';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
 // --- Interfaces ---
 interface Course {
@@ -21,40 +25,36 @@ interface Course {
   studentCount: number;
   semester: number;
   level: number;
+  academyYear: number;
+  sessionType: string;
+  day: string;
   progress?: number; 
 }
 
+// --- توحيد لوحة الألوان للون وسط مريح للجميع ---
 const getCourseTheme = (courseName: string, mode: 'light' | 'dark') => {
   const name = courseName.toLowerCase();
   const isLight = mode === 'light';
 
+  // تحديد الأيقونة المناسبة للمادة مع تثبيت الألوان
+  let icon = '✨';
   if (name.includes('math') || name.includes('eng')) {
-    return {
-      icon: '📐',
-      cardBg: isLight ? 'linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%)' : 'linear-gradient(135deg, #0f172a 0%, #075985 100%)',
-      borderHover: '#0EA5E9',
-      progressBg: 'linear-gradient(90deg, #0284C7 0%, #38BDF8 100%)',
-      chipBg: isLight ? '#E0F2FE' : '#0369A1',
-      chipColor: isLight ? '#0369A1' : '#E0F2FE'
-    };
+    icon = '📐';
+  } else if (name.includes('code') || name.includes('cs') || name.includes('system')) {
+    icon = '💻';
   }
-  if (name.includes('code') || name.includes('cs') || name.includes('system')) {
-    return {
-      icon: '💻',
-      cardBg: isLight ? 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)' : 'linear-gradient(135deg, #0f172a 0%, #1e40af 100%)',
-      borderHover: '#3B82F6',
-      progressBg: 'linear-gradient(90deg, #1D4ED8 0%, #60A5FA 100%)',
-      chipBg: isLight ? '#DBEAFE' : '#1e3a8a',
-      chipColor: isLight ? '#1E40AF' : '#DBEAFE'
-    };
-  }
+
+  // لون وسط احترافي وموحد (Premium Neutral Slate Theme)
   return {
-    icon: '✨',
-    cardBg: isLight ? 'linear-gradient(135deg, #F8FAFC 0%, #E2E8F0 100%)' : 'linear-gradient(135deg, #0f172a 0%, #334155 100%)',
-    borderHover: '#64748B',
+    icon,
+    cardBg: isLight ? 'linear-gradient(135deg, #F8FAFC 0%, #E2E8F0 100%)' : 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)',
+    borderHover: isLight ? '#64748B' : '#94A3B8',
     progressBg: 'linear-gradient(90deg, #475569 0%, #94A3B8 100%)',
-    chipBg: isLight ? '#E2E8F0' : '#475569',
-    chipColor: isLight ? '#334155' : '#F1F5F9'
+    chipBg: isLight ? '#475569' : '#334155',
+    chipColor: '#FFFFFF',
+    badgeBg: isLight ? 'rgba(71, 85, 105, 0.06)' : 'rgba(255, 255, 255, 0.03)',
+    badgeTextColor: isLight ? '#1E293B' : '#F1F5F9',
+    badgeIconColor: isLight ? '#64748B' : '#94A3B8'
   };
 };
 
@@ -70,6 +70,38 @@ const calculateDynamicProgress = (courseId: string, customProgress?: number): nu
   return Math.abs(hash % (max - min + 1)) + min;
 };
 
+const InfoBadge = ({ icon, label, value, badgeBg, badgeIconColor, badgeTextColor, themeMode, divider, textSecondary }: { icon: React.ReactNode, label: string, value: string | number, badgeBg: string, badgeIconColor: string, badgeTextColor: string, themeMode: 'light' | 'dark', divider: string, textSecondary: string }) => (
+  <Box sx={{
+    display: 'flex',
+    alignItems: 'center',
+    gap: 1.5,
+    bgcolor: badgeBg,
+    px: 1.8,
+    py: 1,
+    borderRadius: '14px',
+    border: themeMode === 'light' ? '1px solid rgba(0,0,0,0.04)' : `1px solid ${divider}`,
+    height: '100%',
+    transition: 'all 0.2s ease-in-out',
+    '&:hover': {
+      transform: 'translateY(-2px)',
+      bgcolor: themeMode === 'light' ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.08)',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.04)'
+    }
+  }}>
+    <Box sx={{ display: 'flex', color: badgeIconColor, fontSize: '1.1rem' }}>
+      {icon}
+    </Box>
+    <Box>
+      <Typography variant="caption" display="block" sx={{ color: textSecondary, fontWeight: 700, fontSize: '0.68rem', letterSpacing: 0.5, mb: 0.2 }}>
+        {label}
+      </Typography>
+      <Typography variant="body2" sx={{ color: badgeTextColor, fontWeight: 800, fontSize: '0.88rem', lineHeight: 1 }}>
+        {value}
+      </Typography>
+    </Box>
+  </Box>
+);
+
 const CourseCard = ({ course }: { course: Course }) => {
   const navigate = useNavigate();
   const theme = useTheme();
@@ -80,25 +112,34 @@ const CourseCard = ({ course }: { course: Course }) => {
     navigate(`/doctors/docourse/${course.courseId}`, { state: { courseData: course } });
   };
 
+  const badgeProps = {
+    badgeBg: courseTheme.badgeBg,
+    badgeIconColor: courseTheme.badgeIconColor,
+    badgeTextColor: courseTheme.badgeTextColor,
+    themeMode: theme.palette.mode,
+    divider: theme.palette.divider,
+    textSecondary: theme.palette.text.secondary
+  };
+
   return (
     <Card sx={{ 
       borderRadius: 6, 
       background: courseTheme.cardBg,
-      border: theme.palette.mode === 'light' ? '1px solid rgba(255, 255, 255, 0.7)' : '1px solid rgba(255, 255, 255, 0.1)',
+      border: theme.palette.mode === 'light' ? '1px solid rgba(0, 0, 0, 0.05)' : '1px solid rgba(255, 255, 255, 0.05)',
       backdropFilter: 'blur(20px)',
       height: '100%',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'space-between',
-      boxShadow: theme.palette.mode === 'light' ? '0 4px 30px rgba(0, 0, 0, 0.03)' : '0 4px 30px rgba(0, 0, 0, 0.2)',
+      boxShadow: theme.palette.mode === 'light' ? '0 8px 32px rgba(0, 0, 0, 0.02)' : '0 8px 32px rgba(0, 0, 0, 0.25)',
       transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)', 
       '&:hover': { 
-        transform: 'translateY(-8px) scale(1.01)', 
-        boxShadow: `0 20px 40px ${theme.palette.mode === 'light' ? 'rgba(57, 65, 136, 0.12)' : 'rgba(0, 0, 0, 0.4)'}`,
+        transform: 'translateY(-8px)', 
+        boxShadow: `0 20px 40px ${theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.06)' : 'rgba(0, 0, 0, 0.45)'}`,
         borderColor: courseTheme.borderHover,
         '& .manage-btn': {
-          transform: 'scale(1.03)',
-          boxShadow: `0 8px 20px ${theme.palette.mode === 'light' ? 'rgba(57, 65, 136, 0.3)' : 'rgba(0, 0, 0, 0.5)'}`,
+          transform: 'scale(1.02)',
+          boxShadow: `0 8px 24px ${theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(0, 0, 0, 0.4)'}`,
         }
       }
     }}>
@@ -111,10 +152,11 @@ const CourseCard = ({ course }: { course: Course }) => {
               bgcolor: courseTheme.chipBg, 
               fontWeight: 800, 
               color: courseTheme.chipColor,
-              px: 1.5,
-              py: 0.5,
+              px: 1.8,
+              py: 0.6,
               borderRadius: 3,
-              fontSize: '0.75rem'
+              fontSize: '0.78rem',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
             }} 
           />
           <Stack 
@@ -122,31 +164,31 @@ const CourseCard = ({ course }: { course: Course }) => {
             alignItems="center" 
             spacing={1} 
             sx={{ 
-              bgcolor: theme.palette.mode === 'light' ? 'rgba(255,255,255,0.6)' : 'rgba(30, 41, 59, 0.6)', 
+              bgcolor: theme.palette.mode === 'light' ? 'rgba(255,255,255,0.7)' : 'rgba(15, 23, 42, 0.6)', 
               px: 2, 
-              py: 0.5, 
+              py: 0.6, 
               borderRadius: 4, 
               border: `1px solid ${theme.palette.divider}` 
             }}
           >
             <GroupIcon sx={{ color: theme.palette.success.main, fontSize: 18 }} />
-            <Typography variant="body2" sx={{ fontWeight: 800, color: theme.palette.text.primary }}>
+            <Typography variant="body2" sx={{ fontWeight: 800, color: theme.palette.text.primary, fontSize: '0.85rem' }}>
               {course.studentCount} Students
             </Typography>
           </Stack>
         </Box>
         
-        <Stack direction="row" spacing={2.5} alignItems="center" sx={{ mb: 4, flexGrow: 1 }}>
+        <Stack direction="row" spacing={2.5} alignItems="center" sx={{ mb: 3.5, flexGrow: 1 }}>
           <Box sx={{ 
-            width: 56, 
-            height: 56, 
+            width: 58, 
+            height: 58, 
             borderRadius: 4, 
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'center', 
             background: theme.palette.background.paper,
-            fontSize: '1.8rem',
-            boxShadow: '0 8px 16px rgba(0,0,0,0.04)',
+            fontSize: '1.9rem',
+            boxShadow: '0 8px 20px rgba(0,0,0,0.05)',
             flexShrink: 0
           }}>
             {courseTheme.icon}
@@ -157,9 +199,46 @@ const CourseCard = ({ course }: { course: Course }) => {
         </Stack>
 
         <Box sx={{ mb: 4 }}>
+          <Grid container spacing={2}>
+            <Grid size={6}>
+              <InfoBadge icon={<LayersIcon fontSize="small" />} label="LEVEL" value={course.level} {...badgeProps} />
+            </Grid>
+            <Grid size={6}>
+              <InfoBadge icon={<SchoolIcon fontSize="small" />} label="SEMESTER" value={course.semester} {...badgeProps} />
+            </Grid>
+            <Grid size={6}>
+              <InfoBadge icon={<AccessTimeIcon fontSize="small" />} label="TYPE" value={course.sessionType} {...badgeProps} />
+            </Grid>
+            <Grid size={6}>
+              <InfoBadge icon={<CalendarMonthIcon fontSize="small" />} label="DAY" value={course.day} {...badgeProps} />
+            </Grid>
+            <Grid size={12}>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                gap: 1.5, 
+                bgcolor: theme.palette.mode === 'light' ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.02)', 
+                px: 2, 
+                py: 1, 
+                borderRadius: '14px',
+                border: `1px dashed ${theme.palette.divider}`
+              }}>
+                <Typography variant="caption" sx={{ color: theme.palette.text.secondary, fontWeight: 800, letterSpacing: 0.8, fontSize: '0.7rem' }}>
+                  ACADEMIC YEAR:
+                </Typography>
+                <Typography variant="body2" sx={{ color: theme.palette.text.primary, fontWeight: 900, fontSize: '0.9rem' }}>
+                  {course.academyYear}
+                </Typography>
+              </Box>
+            </Grid>
+          </Grid>
+        </Box>
+
+        <Box sx={{ mb: 3.5 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
             <Typography sx={{ fontSize: '0.7rem', fontWeight: 800, color: theme.palette.text.secondary, letterSpacing: 0.8 }}>SEMESTER PROGRESS</Typography>
-            <Typography sx={{ fontSize: '0.8rem', fontWeight: 900, color: theme.palette.primary.main }}>{courseProgress}%</Typography>
+            <Typography sx={{ fontSize: '0.85rem', fontWeight: 900, color: courseTheme.chipBg }}>{courseProgress}%</Typography>
           </Box>
           <LinearProgress 
             variant="determinate" 
@@ -167,7 +246,7 @@ const CourseCard = ({ course }: { course: Course }) => {
             sx={{ 
               height: 10, 
               borderRadius: 5,
-              bgcolor: theme.palette.mode === 'light' ? 'rgba(0,0,0,0.04)' : 'rgba(255,255,255,0.08)',
+              bgcolor: theme.palette.mode === 'light' ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.08)',
               '& .MuiLinearProgress-bar': {
                 borderRadius: 5,
                 background: courseTheme.progressBg
@@ -183,15 +262,18 @@ const CourseCard = ({ course }: { course: Course }) => {
             variant="contained" 
             onClick={handleManageGrades} 
             sx={{ 
-              bgcolor: theme.palette.primary.main, 
-              color: theme.palette.primary.contrastText,
+              bgcolor: courseTheme.chipBg, 
+              color: '#FFFFFF',
               borderRadius: 3.5, 
               fontWeight: 800,
               textTransform: 'none',
-              py: 1.2,
+              py: 1.4,
               fontSize: '0.95rem',
               transition: 'all 0.3s ease',
-              '&:hover': { bgcolor: theme.palette.primary.dark }
+              '&:hover': { 
+                bgcolor: courseTheme.chipBg,
+                filter: 'brightness(0.9)'
+              }
             }}
           >
             Course Details
@@ -200,8 +282,8 @@ const CourseCard = ({ course }: { course: Course }) => {
             sx={{ 
               bgcolor: theme.palette.background.paper, 
               borderRadius: 3.5, 
-              width: 48, 
-              height: 48, 
+              width: 50, 
+              height: 50, 
               border: `1px solid ${theme.palette.divider}`, 
               '&:hover': { bgcolor: theme.palette.action.hover } 
             }}
@@ -258,9 +340,8 @@ export default function Docourses() {
   return (
     <Box sx={{ p: { xs: 2.5, sm: 4, md: 6 }, bgcolor: theme.palette.background.default, minHeight: '100vh', position: 'relative', overflowX: 'hidden' }}>
       
-      {/* الدوائر الديكورية الخلفية اتعدلت ألوانها عشان ماتبقاش فاقعة في الـ Dark mode */}
-      <Box sx={{ position: 'absolute', width: { xs: 200, md: 300 }, height: { xs: 200, md: 300 }, borderRadius: '50%', background: theme.palette.mode === 'light' ? 'radial-gradient(circle, #EFF6FF 0%, rgba(255,255,255,0) 70%)' : 'radial-gradient(circle, rgba(57, 65, 136, 0.15) 0%, rgba(0,0,0,0) 70%)', top: -50, left: -50, zIndex: 0 }} />
-      <Box sx={{ position: 'absolute', width: { xs: 250, md: 400 }, height: { xs: 250, md: 400 }, borderRadius: '50%', background: theme.palette.mode === 'light' ? 'radial-gradient(circle, #F0F9FF 0%, rgba(255,255,255,0) 70%)' : 'radial-gradient(circle, rgba(49, 130, 206, 0.15) 0%, rgba(0,0,0,0) 70%)', bottom: -100, right: -100, zIndex: 0 }} />
+      <Box sx={{ position: 'absolute', width: { xs: 200, md: 300 }, height: { xs: 200, md: 300 }, borderRadius: '50%', background: theme.palette.mode === 'light' ? 'radial-gradient(circle, #EFF6FF 0%, rgba(255,255,255,0) 70%)' : 'radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, rgba(0,0,0,0) 70%)', top: -50, left: -50, zIndex: 0 }} />
+      <Box sx={{ position: 'absolute', width: { xs: 250, md: 400 }, height: { xs: 250, md: 400 }, borderRadius: '50%', background: theme.palette.mode === 'light' ? 'radial-gradient(circle, #F0F9FF 0%, rgba(255,255,255,0) 70%)' : 'radial-gradient(circle, rgba(56, 189, 248, 0.1) 0%, rgba(0,0,0,0) 70%)', bottom: -100, right: -100, zIndex: 0 }} />
 
       <Box sx={{ position: 'relative', zIndex: 1 }}>
         <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" alignItems={{ xs: 'stretch', md: 'center' }} spacing={3} sx={{ mb: { xs: 5, md: 7 } }}>
@@ -288,13 +369,13 @@ export default function Docourses() {
             borderColor: isFocused ? theme.palette.primary.main : theme.palette.divider,
             boxShadow: isFocused 
               ? theme.palette.mode === 'light' 
-                ? '0 12px 25px -5px rgba(57, 65, 136, 0.18), 0 4px 12px rgba(57, 65, 136, 0.04)' 
+                ? '0 12px 25px -5px rgba(67, 56, 202, 0.15), 0 4px 12px rgba(67, 56, 202, 0.04)' 
                 : '0 12px 25px -5px rgba(0, 0, 0, 0.5)'
               : '0 4px 18px rgba(0, 0, 0, 0.02)',
             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             '&:hover': {
               borderColor: isFocused ? theme.palette.primary.main : theme.palette.text.disabled,
-              boxShadow: isFocused ? '0 12px 25px -5px rgba(57, 65, 136, 0.18)' : '0 6px 20px rgba(0, 0, 0, 0.04)'
+              boxShadow: isFocused ? '0 12px 25px -5px rgba(67, 56, 202, 0.15)' : '0 6px 20px rgba(0, 0, 0, 0.04)'
             }
           }}>
             <SearchIcon sx={{ 
@@ -345,58 +426,40 @@ export default function Docourses() {
         </Stack>
 
         {error && <Alert severity="error" sx={{ mb: 4, borderRadius: 4, fontWeight: 700 }}>{error}</Alert>}
-          <Grid
-  container
-  spacing={{ xs: 3, md: 4 }}
-  justifyContent="space-between"
->
-  {filteredCourses.length === 0 ? (
-    <Grid size={12}>
-      <Box
-        sx={{
-          textAlign: 'center',
-          py: 10,
-          bgcolor: 'white',
-          borderRadius: 6,
-          border: '2px dashed #E2E8F0',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.01)',
-        }}
-      >
-        <CastForEducationIcon
-          sx={{ fontSize: 64, color: '#94A3B8', mb: 2 }}
-        />
-        <Typography
-          variant="h6"
-          sx={{ fontWeight: 800, color: '#64748B' }}
-        >
-          No active courses found.
-        </Typography>
-        <Typography
-          variant="body2"
-          sx={{ color: '#94A3B8', mt: 0.5 }}
-        >
-          Try adjusting your search criteria.
-        </Typography>
-      </Box>
-    </Grid>
-  ) : (
-    filteredCourses.map((c) => (
-      <Grid
-        key={c.offeringId}
-        sx={{
-          width: {
-            xs: '100%',
-            sm: '48%',
-            md: '45%',
-          },
-        }}
-      >
-        <CourseCard course={c} />
-      </Grid>
-    ))
-  )}
-</Grid>
-
+        
+        <Grid container spacing={{ xs: 3, md: 4 }} justifyContent="space-between">
+          {filteredCourses.length === 0 ? (
+            <Grid size={12}>
+              <Box
+                sx={{
+                  textAlign: 'center',
+                  py: 10,
+                  bgcolor: 'white',
+                  borderRadius: 6,
+                  border: '2px dashed #E2E8F0',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.01)',
+                }}
+              >
+                <CastForEducationIcon sx={{ fontSize: 64, color: '#94A3B8', mb: 2 }} />
+                <Typography variant="h6" sx={{ fontWeight: 800, color: '#64748B' }}>
+                  No active courses found.
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#94A3B8', mt: 0.5 }}>
+                  Try adjusting your search criteria.
+                </Typography>
+              </Box>
+            </Grid>
+          ) : (
+            filteredCourses.map((c) => (
+              <Grid
+                key={c.offeringId}
+                size={{ xs: 12, sm: 6, md: 6 }}
+              >
+                <CourseCard course={c} />
+              </Grid>
+            ))
+          )}
+        </Grid>
       </Box>
     </Box>
   );

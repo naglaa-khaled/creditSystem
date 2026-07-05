@@ -82,6 +82,16 @@ const CoursePage = () => {
         { value: "2", label: "mandatory" },
       ],
     },
+    {
+      name:"CourseCategory",
+      label:"Course Category",
+      required:true,
+      select:true,
+      options:[
+        {value:"Core",label:"Core"},
+        {value:"Elective",label:"Elective"},
+      ]
+    }
   ];
   const [selectedGroup, setSelectedGroup] = useState<{
     level: string;
@@ -146,6 +156,7 @@ const CoursePage = () => {
       level: Number(data.level),
       semester: Number(data.semester),
       courseType: data.courseType,
+      CourseCategory: data.CourseCategory,
     };
 
     try {

@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { FilterBar } from "../../../../Shared/components/FilterBar/FilterBar";
 import FormModal from "../../../../Shared/components/Modals/FormModel";
+import { AxiosError } from "axios";
 import {
   getSchedules,
   addSchedule,
@@ -145,30 +146,28 @@ const SchedaulPage = () => {
     setDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = async () => {
-    if (selectedSchedualeId) {
-      console.log(
-        "Attempting to delete schedule with ID:",
-        selectedSchedualeId,
-      );
-      try {
-        await deleteSchedule(selectedSchedualeId);
-
-        toast.success("Schedule deleted successfully!");
-
-        setAllSchedual((prev) =>
-          prev.filter((item) => item.id !== selectedSchedualeId),
-        );
-
-        setDeleteModalOpen(false);
-        setselectedSchedualeId(null);
-      } catch (error) {
-        console.error("Delete failed", error);
-        toast.error("Failed to delete schedule.");
-        setDeleteModalOpen(false);
+const handleConfirmDelete = async () => {
+  if (selectedSchedualeId) {
+    try {
+      await deleteSchedule(selectedSchedualeId);
+      toast.success("Schedule deleted successfully!");
+      setAllSchedual((prev) => prev.filter((item) => item.id !== selectedSchedualeId));
+    } catch (error) {
+      // نقوم بفحص ما إذا كان الخطأ من نوع AxiosError
+      if (error instanceof AxiosError) {
+        // نستخرج الرسالة من السيرفر، مع افتراض أن الـ response.data هو نص
+        const message = error.response?.data as string || "Failed to delete schedule.";
+        toast.error(message);
+      } else {
+        // في حال كان الخطأ غير متوقع وليس من Axios
+        toast.error("An unexpected error occurred.");
       }
+    } finally {
+      setDeleteModalOpen(false);
+      setselectedSchedualeId(null);
     }
-  };
+  }
+};
   // add Schedual handler
   const handleSaveSchedual = async (data: FieldValues) => {
     try {
